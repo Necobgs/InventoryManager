@@ -1,8 +1,9 @@
+import Status from "./status";
 
 export default interface Task{
-    id:string,
+    id:number,
     title:string,
     description:string,
-    status:string,
-    image:string
+    status:Status,
+    image:any
 }

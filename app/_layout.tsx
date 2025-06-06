@@ -7,6 +7,8 @@ import { useEffect } from 'react';
 import 'react-native-reanimated';
 
 import { useColorScheme } from '@/components/useColorScheme';
+import TaskProvider from './contexts/TaskContext';
+import { TaskStatusProvider } from './contexts/TaskStatusContext';
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -41,8 +43,16 @@ export default function RootLayout() {
   if (!loaded) {
     return null;
   }
-
-  return <RootLayoutNav />;
+        
+  return (
+    <TaskStatusProvider>
+      <TaskProvider>
+        <RootLayoutNav />;
+      </TaskProvider>
+    </TaskStatusProvider>
+  )
+  
+  
 }
 
 function RootLayoutNav() {
