@@ -35,6 +35,27 @@ export default function TaskProvider(
             image:require("../../assets/images/icon.png"),
             title:"Titulo da tarefa 3",
             description:"Descrição meramente longa devido aos testes a serem para a validação dos sucesso da ocultação dos demais caracteres que ultrapassarem o limite pré imposto de 3 linha :3"
+        },
+        {
+            id:4,
+            status: taskStatus.taskStatus[2],
+            image:require("../../assets/images/icon.png"),
+            title:"Titulo da tarefa 3",
+            description:"Descrição meramente longa devido aos testes a serem para a validação dos sucesso da ocultação dos demais caracteres que ultrapassarem o limite pré imposto de 3 linha :3"
+        },
+        {
+            id:5,
+            status: taskStatus.taskStatus[2],
+            image:require("../../assets/images/icon.png"),
+            title:"Titulo da tarefa 3",
+            description:"Descrição meramente longa devido aos testes a serem para a validação dos sucesso da ocultação dos demais caracteres que ultrapassarem o limite pré imposto de 3 linha :3"
+        },
+        {
+            id:6,
+            status: taskStatus.taskStatus[2],
+            image:require("../../assets/images/icon.png"),
+            title:"Titulo da tarefa 3",
+            description:"Descrição meramente longa devido aos testes a serem para a validação dos sucesso da ocultação dos demais caracteres que ultrapassarem o limite pré imposto de 3 linha :3"
         }
 
     ]);
