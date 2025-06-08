@@ -1,8 +1,10 @@
 import { Text } from "@/components/Themed";
-import Status from "../interfaces/status";
 import { StyleSheet } from "react-native";
+import { TaskStatusConst } from "@/constants/Status";
+import TaskStatusInterface from "@/interfaces/TaskStatusInterface";
 
-export default function StatusTag(status:Status){
+
+export default function StatusTag(status:TaskStatusInterface){
     const statusMap: Record<number,any>= {
         1:styles.finished,
         2:styles.in_processing,

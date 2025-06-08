@@ -7,6 +7,7 @@ import {
   FlatList,
   StyleSheet,
 } from "react-native";
+import { FontAwesome } from "@expo/vector-icons";
 
 // Define props type
 interface ModalDropdownProps {
@@ -28,20 +29,23 @@ const ModalDropdown: React.FC<ModalDropdownProps> = ({ data, onSelect, initialVa
   };
 
   return (
-    <View style={styles.container}>
+    <View>
       <TouchableOpacity
         style={styles.button}
         onPress={toggleModal}
         accessibilityLabel="Select task status"
         accessibilityRole="button"
       >
-        <Text style={styles.buttonText}>
-          {selectedValue || "Select an option"}
-        </Text>
+        <View style={styles.contentButton}>
+          <Text style={styles.buttonText}>
+            {selectedValue || "Select an option"}
+          </Text>
+          <FontAwesome name={'angle-down'} size={20}/>
+        </View>
       </TouchableOpacity>
 
-      <Modal visible={isModalVisible} transparent animationType="slide">
-        <View style={styles.modalBackground}>
+      <Modal visible={isModalVisible} transparent animationType="none">
+        <TouchableOpacity style={styles.modalBackground} onPress={toggleModal}>
           <View style={styles.modalContent}>
             <FlatList
               data={data}
@@ -55,32 +59,30 @@ const ModalDropdown: React.FC<ModalDropdownProps> = ({ data, onSelect, initialVa
                 </TouchableOpacity>
               )}
             />
-            <TouchableOpacity
-              style={styles.closeButton}
-              onPress={toggleModal}
-              accessibilityLabel="Close modal"
-              accessibilityRole="button"
-            >
-              <Text style={styles.closeText}>Close</Text>
-            </TouchableOpacity>
           </View>
-        </View>
+        </TouchableOpacity>
       </Modal>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    margin: 20,
+
+  contentButton:{
+    justifyContent:'space-around',
+    flexDirection:'row' ,
+    alignItems:'center'
   },
   button: {
     padding: 15,
-    backgroundColor: "#3498db",
+    backgroundColor: "#f4f4f4",
     borderRadius: 5,
+    borderColor:'#AAAAAA',
+    borderWidth:1,
+    width:150
   },
   buttonText: {
-    color: "white",
+    color: "BLACK",
     textAlign: "center",
   },
   modalBackground: {

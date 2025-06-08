@@ -1,17 +1,16 @@
 import { Text, View } from "@/components/Themed";
-import Task from "@/interfaces/task";
+import Task from "@/interfaces/TaskInterface";
 import { Image, StyleSheet } from "react-native";
 import StatusTag from "./StatusTag";
 import { TouchableOpacity } from "react-native";
 import { useRouter } from "expo-router";
 
 
-
 export default function CardTask(task:Task){
-    const router = useRouter();
-
+    const router = useRouter()
+    
     return (
-    <TouchableOpacity style={styles.container} onPress={()=>{router.navigate(`/tasks/${task.id}`)}}>
+    <TouchableOpacity style={styles.container} onPress={()=>router.navigate(`/tasks/${task.id}`)} activeOpacity={.6}>
         <Image
         source={task.image}
         style={styles.image}
@@ -41,9 +40,10 @@ const styles= StyleSheet.create({
         shadowOpacity:0.5,
         shadowRadius:4,
         marginBottom:25,
+        // height:120,
         padding:15,
         flexDirection:'row',
-        justifyContent:'space-around'
+        gap:15
     },
     image:{
         width:"30%",

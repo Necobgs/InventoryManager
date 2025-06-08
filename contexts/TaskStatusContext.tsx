@@ -1,9 +1,12 @@
 import React, { createContext, useContext, useState } from "react";
-import Status from "@/interfaces/status";
+import TaskStatusInterface from "@/interfaces/TaskStatusInterface";
+import { TaskStatusConst } from "@/constants/Status";
+
 
 interface TaskStatusContextType{
-    taskStatus : Status[],
-    getStatusById: (id:number)=> null | Status
+    taskStatus : TaskStatusInterface[],
+    getStatusById: (id:number)=> null | TaskStatusInterface,
+    getStatusByDescription: (description:string)=> null | TaskStatusInterface,
 }
 
 const TaskStatusContext = createContext<TaskStatusContextType | undefined>(undefined)
@@ -11,18 +14,22 @@ const TaskStatusContext = createContext<TaskStatusContextType | undefined>(undef
 export function TaskStatusProvider(
     {children}:{children:React.ReactNode}){
 
-    const [taskStatus,setTaskStatus] = useState<Status[]>([
-        {id:1,description:"Finalizada"},
-        {id:2,description:"Em andamento"},
-        {id:3,description:"Nova"}
+    const [taskStatus,setTaskStatus] = useState<TaskStatusInterface[]>([
+        {id:1,description:TaskStatusConst.finished},
+        {id:2,description:TaskStatusConst.in_processing},
+        {id:3,description:TaskStatusConst.new_task}
     ])
 
     function getStatusById(id:number){
         return taskStatus.find((status)=>status.id==id) || null;
     }
 
+    function getStatusByDescription(description:string){
+        return taskStatus.find((status)=>status.description==description) || null;
+    }
+
     return (
-    <TaskStatusContext.Provider value={{taskStatus, getStatusById}}>
+    <TaskStatusContext.Provider value={{taskStatus, getStatusById,getStatusByDescription}}>
         {children}
     </TaskStatusContext.Provider>)
 }
