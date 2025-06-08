@@ -10,7 +10,7 @@ export default function CardTask(task:Task){
     const router = useRouter()
     
     return (
-    <TouchableOpacity style={styles.container} onPress={()=>router.navigate(`/tasks/${task.id}`)} activeOpacity={.6}>
+    <TouchableOpacity style={styles.container} onPress={()=>router.navigate(`/tasks/edit/${task.id}`)} activeOpacity={.6}>
         <Image
         source={task.image}
         style={styles.image}
