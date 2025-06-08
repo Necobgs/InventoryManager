@@ -5,10 +5,9 @@ import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
 import 'react-native-reanimated';
-
 import { useColorScheme } from '@/components/useColorScheme';
-import TaskProvider from './contexts/TaskContext';
-import { TaskStatusProvider } from './contexts/TaskStatusContext';
+import TaskProvider from '@/contexts/TaskContext';
+import { TaskStatusProvider } from '@/contexts/TaskStatusContext';
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -55,6 +54,10 @@ export default function RootLayout() {
   
 }
 
+interface title{
+  id:number
+}
+
 function RootLayoutNav() {
   const colorScheme = useColorScheme();
 
@@ -63,6 +66,11 @@ function RootLayoutNav() {
       <Stack>
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
+        <Stack.Screen 
+          name="tasks/[id]"
+          options={{title:'Detalhes da tarefa'}}
+          
+        />
       </Stack>
     </ThemeProvider>
   );

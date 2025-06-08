@@ -18,42 +18,42 @@ export default function TaskProvider(
         {
             id:1,
             status: taskStatus.taskStatus[0],
-            image:require("../../assets/images/icon.png"),
+            image:require("../assets/images/icon.png"),
             title:"Titulo da tarefa 1",
             description:"Descrição meramente longa devido aos testes a serem para a validação dos sucesso da ocultação dos demais caracteres que ultrapassarem o limite pré imposto de 3 linha :3"
         },
         {
             id:2,
             status: taskStatus.taskStatus[1],
-            image:require("../../assets/images/icon.png"),
+            image:require("../assets/images/icon.png"),
             title:"Titulo da tarefa 2",
             description:"Descrição meramente longa devido aos testes a serem para a validação dos sucesso da ocultação dos demais caracteres que ultrapassarem o limite pré imposto de 3 linha :3"
         },
         {
             id:3,
             status: taskStatus.taskStatus[2],
-            image:require("../../assets/images/icon.png"),
+            image:require("../assets/images/icon.png"),
             title:"Titulo da tarefa 3",
             description:"Descrição meramente longa devido aos testes a serem para a validação dos sucesso da ocultação dos demais caracteres que ultrapassarem o limite pré imposto de 3 linha :3"
         },
         {
             id:4,
             status: taskStatus.taskStatus[2],
-            image:require("../../assets/images/icon.png"),
+            image:require("../assets/images/icon.png"),
             title:"Titulo da tarefa 3",
             description:"Descrição meramente longa devido aos testes a serem para a validação dos sucesso da ocultação dos demais caracteres que ultrapassarem o limite pré imposto de 3 linha :3"
         },
         {
             id:5,
             status: taskStatus.taskStatus[2],
-            image:require("../../assets/images/icon.png"),
+            image:require("../assets/images/icon.png"),
             title:"Titulo da tarefa 3",
             description:"Descrição meramente longa devido aos testes a serem para a validação dos sucesso da ocultação dos demais caracteres que ultrapassarem o limite pré imposto de 3 linha :3"
         },
         {
             id:6,
             status: taskStatus.taskStatus[2],
-            image:require("../../assets/images/icon.png"),
+            image:require("../assets/images/icon.png"),
             title:"Titulo da tarefa 3",
             description:"Descrição meramente longa devido aos testes a serem para a validação dos sucesso da ocultação dos demais caracteres que ultrapassarem o limite pré imposto de 3 linha :3"
         }
@@ -68,6 +68,11 @@ export default function TaskProvider(
 
     function getTaskById(id:number){
         return tasks.find((task)=>task.id==id) || null    
+    }
+
+    function updateTaskS(taskUpdated:Task){
+        if(!tasks.filter((task)=>task.id==taskUpdated.id)[0]) return false
+        setTasks((oldValue:Task[])=> [...oldValue,taskUpdated])
     }
 
     return (

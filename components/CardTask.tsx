@@ -1,12 +1,17 @@
 import { Text, View } from "@/components/Themed";
-import Task from "@/app/interfaces/task";
+import Task from "@/interfaces/task";
 import { Image, StyleSheet } from "react-native";
 import StatusTag from "./StatusTag";
+import { TouchableOpacity } from "react-native";
+import { useRouter } from "expo-router";
+
 
 
 export default function CardTask(task:Task){
+    const router = useRouter();
+
     return (
-    <View style={styles.container}>
+    <TouchableOpacity style={styles.container} onPress={()=>{router.navigate(`/tasks/${task.id}`)}}>
         <Image
         source={task.image}
         style={styles.image}
@@ -24,7 +29,7 @@ export default function CardTask(task:Task){
             </Text>
             <StatusTag {...task.status}/>
         </View>
-    </View>   
+    </TouchableOpacity>   
     )
 }
 

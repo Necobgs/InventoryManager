@@ -2,9 +2,7 @@ import { Text, View } from "@/components/Themed";
 import { FlatList, StyleSheet } from "react-native";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import CardTask from "@/components/CardTask";
-import Task from "../interfaces/task";
-import { useContext } from "react";
-import { useTask } from "../contexts/TaskContext";
+import { useTask } from "@/contexts/TaskContext";
 
 
 const Item = ({title}: any) => (

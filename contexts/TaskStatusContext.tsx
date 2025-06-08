@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState } from "react";
-import Status from "../interfaces/status";
+import Status from "@/interfaces/status";
 
 interface TaskStatusContextType{
     taskStatus : Status[],
@@ -12,9 +12,9 @@ export function TaskStatusProvider(
     {children}:{children:React.ReactNode}){
 
     const [taskStatus,setTaskStatus] = useState<Status[]>([
-        {id:1,description:"finished"},
-        {id:2,description:"in process"},
-        {id:3,description:"new task"}
+        {id:1,description:"Finalizada"},
+        {id:2,description:"Em andamento"},
+        {id:3,description:"Nova"}
     ])
 
     function getStatusById(id:number){
