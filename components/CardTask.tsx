@@ -11,9 +11,9 @@ export default function CardTask(task:Task){
     const router = useRouter()
     
     return (
-    <TouchableOpacity style={styles.container} onPress={()=>router.navigate(`/tasks/edit/${task.id}`)} activeOpacity={.6}>
+    <TouchableOpacity style={styles.container} onPress={()=>router.navigate({pathname:"/tasks/edit",params:{id:task.id}})} activeOpacity={.6}>
         <Image
-        source="https://picsum.photos/id/237/200/300"
+        source={task.image}
         style={styles.image}
         />
         <View style={styles.informations}>
@@ -41,10 +41,10 @@ const styles= StyleSheet.create({
         shadowOpacity:0.5,
         shadowRadius:4,
         marginBottom:25,
-        // height:120,
+        height:135,
         padding:15,
         flexDirection:'row',
-        gap:15
+        gap:15,
     },
     image:{
         width:"30%",
@@ -56,7 +56,8 @@ const styles= StyleSheet.create({
     informations:{
         width:'60%',
         backgroundColor:'',
-        gap:5
+        gap:5,
+        justifyContent:'space-between'
     },
     title:{
         fontSize:16,
@@ -65,6 +66,8 @@ const styles= StyleSheet.create({
     },
     description:{
         color:'gray',
-        fontSize:12
+        fontSize:12,
+        alignSelf:'flex-start',
+        flex:1
     }
 })

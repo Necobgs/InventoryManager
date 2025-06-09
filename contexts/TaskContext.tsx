@@ -23,21 +23,21 @@ export default function TaskProvider(
         {
             id:1,
             status: taskStatus.getStatusById(1)!,
-            image:require("@/assets/images/icon.png"),
+            image:"https://picsum.photos/id/237/200/300",
             title:"Titulo da tarefa 1",
             description:"Descrição meramente longa devido aos testes a serem para a validação dos sucesso da ocultação dos demais caracteres que ultrapassarem o limite pré imposto de 3 linha :3"
         },
         {
             id:2,
             status: taskStatus.getStatusById(2)!,
-            image:require("@/assets/images/icon.png"),
+            image:"https://picsum.photos/id/237/200/300",
             title:"Titulo da tarefa 2",
             description:"Descrição meramente longa devido aos testes a serem para a validação dos sucesso da ocultação dos demais caracteres que ultrapassarem o limite pré imposto de 3 linha :3"
         },
         {
             id:3,
             status: taskStatus.getStatusById(3)!,
-            image:require("@/assets/images/icon.png"),
+            image:"https://picsum.photos/id/237/200/300",
             title:"Titulo da tarefa 3",
             description:"Descrição meramente longa devido aos testes a serem para a validação dos sucesso da ocultação dos demais caracteres que ultrapassarem o limite pré imposto de 3 linha :3"
         }

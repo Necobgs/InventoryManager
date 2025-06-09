@@ -4,16 +4,18 @@ import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import CardTask from "@/components/CardTask";
 import { useTask } from "@/contexts/TaskContext";
 import { TouchableOpacity } from "react-native";
+import { useRouter } from "expo-router";
 
 
 
 export default function TabTasks(){
-    const taskContext = useTask()
+    const taskContext = useTask();
+    const router = useRouter();
     return (
         <SafeAreaProvider>
             <SafeAreaView style={{flex:1}}>
                 <View style={styles.div_add_task}>
-                    <TouchableOpacity style={styles.btn_add_task}>
+                    <TouchableOpacity style={styles.btn_add_task} onPress={()=>router.navigate('/tasks/edit')}>
                         <Text style={styles.text_btn_add_task}>Adicionar tarefa</Text>
                     </TouchableOpacity>
                 </View>
