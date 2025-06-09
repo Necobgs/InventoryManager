@@ -107,13 +107,18 @@ export default function PageTarefasId() {
           <Image source={image} style={styles.image} contentFit="contain" />
         </TouchableOpacity>
       ) : (
-        <Button
-          title="Adicionar imagem"
+
+        <TouchableOpacity
+          style={styles.btn_add_image}
           onPress={() => {
             setTempImageUrl("");
             setIsModalVisible(true);
           }}
-        />
+        >
+          <Text style={styles.text_btn_add_image}>
+            Adicionar imagem
+          </Text>
+        </TouchableOpacity>
       )}
 
       <Text style={styles.label}>Descrição</Text>
@@ -145,7 +150,7 @@ export default function PageTarefasId() {
       </View>
 
       {/* Modal para inserir ou editar imagem */}
-      <Modal visible={isModalVisible} transparent={true} animationType="slide">
+      <Modal visible={isModalVisible} transparent={true} animationType="none" >
         <View style={styles.modalBackground}>
           <View style={styles.modalContent}>
             <Text style={{ marginBottom: 10, fontWeight: "bold" }}>Informe a URL da imagem</Text>
@@ -235,4 +240,14 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 5,
   },
+  btn_add_image:{
+    borderRadius:5,
+    backgroundColor:'#588BAE',
+    padding:10,
+    marginVertical:10
+  },
+  text_btn_add_image:{
+    width:'100%',
+    color:'white'
+  }
 });
