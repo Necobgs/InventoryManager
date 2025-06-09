@@ -99,12 +99,12 @@ export default function PageTarefasId() {
 
       {image ? (
         <TouchableOpacity 
-        style={{width:'100%'}}
+        style={{width:'100%',backgroundColor:'#F6F6F6',borderRadius:10}}
         onPress={() => {
           setTempImageUrl(image);
           setIsModalVisible(true);
         }}>
-          <Image source={image} style={styles.image} contentFit="cover" />
+          <Image source={image} style={styles.image} contentFit="contain" />
         </TouchableOpacity>
       ) : (
         <Button
