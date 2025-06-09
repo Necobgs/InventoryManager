@@ -67,7 +67,7 @@ function RootLayoutNav() {
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
         <Stack.Screen 
-          name="tasks/[id]"
+          name="tasks/edit/[id]"
           options={{title:'Detalhes da tarefa'}}
           
         />

@@ -1,6 +1,6 @@
 import { Text, View } from "@/components/Themed";
 import { useTask } from "@/contexts/TaskContext";
-import { useLocalSearchParams } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import { Image, StyleSheet, ImageSourcePropType, Button } from "react-native";
 import ModalDropdown from "@/components/ModalDropdown";
 import { TextInput } from "react-native";
@@ -57,8 +57,19 @@ export default function PageTarefasId() {
   }, [description, taskTitle, taskStatus]); // Trigger effect on any of these fields' change
 
   function saveChanges(){
+    task!.description = description;
+    task!.title = taskTitle; 
+    task!.status = taskStatus;
+    console.log('indo a salvar alterações')
+    console.log(disabledSave)
     if(disabledSave) throw new Error('Nenhuma mudança realizada')
-    // taskContext.
+    const response = taskContext.updateTask(task!)
+    console.log(response)
+  }
+
+  function removeTask(){
+    taskContext.removeTask(task!.id)
+    router.navigate('/tasks')
   }
 
   return (
@@ -90,8 +101,8 @@ export default function PageTarefasId() {
           initialValue={task.status.description}
         />
         <View style={styles.buttons}>
-          <Button title="Salvar" color={'green'} disabled={disabledSave} />
-          <Button title="Excluir" color={'red'} />
+          <Button title="Salvar" color={'green'} disabled={disabledSave} onPress={saveChanges} />
+          <Button title="Excluir" color={'red'} onPress={removeTask} />
         </View>
       </View>
     </View>
@@ -104,7 +115,6 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     width: "100%",
     alignItems: "center",
-    marginBottom: 25,
   },
   container: {
     alignItems: "flex-start",
@@ -123,7 +133,7 @@ const styles = StyleSheet.create({
   },
   textinput: {
     textAlign: "left",
-    marginBottom: 20,
+    marginBottom: 15,
     width: '100%',
     backgroundColor: "#f4f4f4",
     borderRadius: 5,
