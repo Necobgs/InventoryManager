@@ -1,6 +1,7 @@
 import { Text, View } from "@/components/Themed";
 import Task from "@/interfaces/TaskInterface";
-import { Image, StyleSheet } from "react-native";
+import { StyleSheet } from "react-native";
+import { Image } from 'expo-image'
 import StatusTag from "./StatusTag";
 import { TouchableOpacity } from "react-native";
 import { useRouter } from "expo-router";
@@ -12,7 +13,7 @@ export default function CardTask(task:Task){
     return (
     <TouchableOpacity style={styles.container} onPress={()=>router.navigate(`/tasks/edit/${task.id}`)} activeOpacity={.6}>
         <Image
-        source={task.image}
+        source="https://picsum.photos/id/237/200/300"
         style={styles.image}
         />
         <View style={styles.informations}>
