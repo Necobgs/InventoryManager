@@ -48,7 +48,7 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="tasks"
+        name="inventorys"
         options={{
           title: 'Tarefas',
           tabBarIcon: ({ color }) => <TabBarIcon name="th-list" color={color} />,

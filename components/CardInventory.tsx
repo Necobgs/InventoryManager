@@ -1,33 +1,19 @@
 import { Text, View } from "@/components/Themed";
-import Task from "@/interfaces/TaskInterface";
+import Inventory from "@/interfaces/InventoryInterface";
 import { StyleSheet } from "react-native";
-import { Image } from 'expo-image'
-import StatusTag from "./StatusTag";
 import { TouchableOpacity } from "react-native";
 import { useRouter } from "expo-router";
 
 
-export default function CardTask(task:Task){
+export default function CardInventory(inventory:Inventory){
     const router = useRouter()
     
     return (
-    <TouchableOpacity style={styles.container} onPress={()=>router.navigate({pathname:"/tasks/edit",params:{id:task.id}})} activeOpacity={.6}>
-        <Image
-        source={task.image}
-        style={styles.image}
-        />
+    <TouchableOpacity style={styles.container} onPress={()=>router.navigate(`/inventory/edit/${inventory.id}`)} activeOpacity={.6}>
         <View style={styles.informations}>
             <Text style={styles.title}>
-                {task.title}
+                {inventory.title}
             </Text>
-            <Text 
-            style={styles.description}
-            ellipsizeMode="tail"
-            numberOfLines={3}
-            >
-                {task.description}
-            </Text>
-            <StatusTag {...task.status}/>
         </View>
     </TouchableOpacity>   
     )

@@ -1,14 +1,14 @@
 import { Text } from "@/components/Themed";
 import { StyleSheet } from "react-native";
-import { TaskStatusConst } from "@/constants/Status";
-import TaskStatusInterface from "@/interfaces/TaskStatusInterface";
+import { InventoryStatusConst } from "@/constants/Status";
+import InventoryStatusInterface from "@/interfaces/InventoryStatusInterface";
 
 
-export default function StatusTag(status:TaskStatusInterface){
+export default function StatusTag(status:InventoryStatusInterface){
     const statusMap: Record<number,any>= {
         1:styles.finished,
         2:styles.in_processing,
-        3:styles.newTask
+        3:styles.newInventory
     }
     return (
         <Text style={statusMap[status.id]}>
@@ -27,7 +27,7 @@ const styles = StyleSheet.create({
         alignSelf:'flex-end',
         textAlign:'center'
     },
-    newTask:{
+    newInventory:{
         borderRadius:5,
         backgroundColor:"#dbeafe",
         color:"#1e3a8a",

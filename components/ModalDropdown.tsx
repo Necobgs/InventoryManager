@@ -33,7 +33,7 @@ const ModalDropdown: React.FC<ModalDropdownProps> = ({ data, onSelect, initialVa
       <TouchableOpacity
         style={styles.button}
         onPress={toggleModal}
-        accessibilityLabel="Select task status"
+        accessibilityLabel="Select inventory status"
         accessibilityRole="button"
       >
         <View style={styles.contentButton}>

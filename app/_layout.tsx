@@ -6,8 +6,7 @@ import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
 import 'react-native-reanimated';
 import { useColorScheme } from '@/components/useColorScheme';
-import TaskProvider from '@/contexts/TaskContext';
-import { TaskStatusProvider } from '@/contexts/TaskStatusContext';
+import InventoryProvider from '@/contexts/InventoryContext';
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -44,11 +43,9 @@ export default function RootLayout() {
   }
         
   return (
-    <TaskStatusProvider>
-      <TaskProvider>
-        <RootLayoutNav />;
-      </TaskProvider>
-    </TaskStatusProvider>
+    <InventoryProvider>
+      <RootLayoutNav />;
+    </InventoryProvider>
   )
   
   
@@ -67,9 +64,8 @@ function RootLayoutNav() {
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
         <Stack.Screen 
-          name="tasks/edit/index"
+          name="inventorys/edit/index"
           options={{title:'Detalhes da tarefa'}}
-          
         />
       </Stack>
     </ThemeProvider>

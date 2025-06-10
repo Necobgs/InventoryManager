@@ -1,11 +1,11 @@
 {
   "expo": {
-    "name": "TasksManager",
-    "slug": "TasksManager",
+    "name": "InventorysManager",
+    "slug": "InventorysManager",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "tasksmanager",
+    "scheme": "inventorysmanager",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "splash": {
