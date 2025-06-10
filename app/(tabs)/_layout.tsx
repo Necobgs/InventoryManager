@@ -48,9 +48,9 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="inventorys"
+        name="inventory"
         options={{
-          title: 'Tarefas',
+          title: 'Estoque',
           tabBarIcon: ({ color }) => <TabBarIcon name="th-list" color={color} />,
         }}
       />

@@ -7,7 +7,7 @@ import InventoryInterface from "@/interfaces/InventoryInterface";
 interface InventoryContextType{
     inventorys:InventoryInterface[],
     addInventory: (inventory:InventoryInterface)=>ApiResponse,
-    getInventoryById: (id:number)=>InventoryInterface | null,
+    getInventoryBy: <T extends keyof InventoryInterface>(By:T,value:InventoryInterface[T])=>InventoryInterface[],
     updateInventory: (inventory:InventoryInterface)=>ApiResponse,
     removeInventoryById: (id:number)=>InventoryInterface | ApiResponse,
 }
@@ -16,40 +16,16 @@ const InventoryContext = createContext<InventoryContextType | undefined>(undefin
 
 export default function InventoryProvider(
     {children}:{children:React.ReactNode}){
-    const [inventorys,setInventorys] = useState<InventoryInterface[]>([
-        {
-            id:1,
-            title:"Nescau",
-            price_per_unity:5,
-            qty_product:2,
-            stock_value:10,
-            enabled:true
-        },
-        {
-            id:2,
-            title:"Banana",
-            price_per_unity:2,
-            qty_product:4,
-            stock_value:8,
-            enabled:true
-        },
-        {
-            id:3,
-            title:"Monster",
-            price_per_unity:10,
-            qty_product:3,
-            stock_value:30,
-            enabled:false
-        }
-    ]);
-
-    function addInventory(inventory:InventoryInterface): ApiResponse{
-        if(!inventory.title || 
-            !inventory.price_per_unity || 
-            !inventory.qty_product || 
-            !inventory.stock_value)
+     const [inventorys,setInventorys] = useState<InventoryInterface[]>([]);
+    function addInventory(newInventory:InventoryInterface): ApiResponse{
+        if(!newInventory.title ||
+            !newInventory.description ||
+            !newInventory.price_per_unity || 
+            !newInventory.qty_product)
             return { message:"Preencha todos os campos obrigatórios",success:false } 
-        setInventorys((oldInventorys)=>[...oldInventorys,inventory])
+        newInventory.stock_value = newInventory.price_per_unity * newInventory.qty_product
+        newInventory.id = inventorys.length+1
+        setInventorys((oldInventorys)=>[...oldInventorys,newInventory])
         return { message:"Produto Criado!", success:false }
     }
 
@@ -57,7 +33,7 @@ export default function InventoryProvider(
     if (!newInventory.price_per_unity || !newInventory.qty_product) {
         return { message: "Preencha todos os campos obrigatórios", success: false };
     }
-    const oldInventory = getInventoryById(newInventory.id);
+    const oldInventory = getInventoryBy('id',newInventory.id);
     if (!oldInventory) {
         return { message: "Tarefa inexistente", success: false };
     }
@@ -70,12 +46,12 @@ export default function InventoryProvider(
     return { message: "Tarefa Atualizada!", success: true };
     }
 
-    function getInventoryById(id:number){
-        return inventorys.find((inventory)=>inventory.id==id) || null    
+    function getInventoryBy<T extends keyof InventoryInterface>(By:T,value:InventoryInterface[T]){
+        return inventorys.filter((inventory)=>inventory[By]==value)    
     }
 
     function removeInventoryById(id:number){
-        const inventory = getInventoryById(id);
+        const inventory = getInventoryBy('id',id);
         if(!inventory) return {message:"Produto não encontrado",success:false}   
         setInventorys((oldInventorys)=>{
             return oldInventorys.filter((inventoryItem)=>inventoryItem.id!=id)
@@ -84,7 +60,7 @@ export default function InventoryProvider(
     }
 
     return (
-        <InventoryContext.Provider value={{inventorys,addInventory,getInventoryById,updateInventory,removeInventoryById}}>
+        <InventoryContext.Provider value={{inventorys,addInventory,getInventoryBy,updateInventory,removeInventoryById}}>
             {children}
         </InventoryContext.Provider>
     )

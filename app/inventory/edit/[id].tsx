@@ -10,7 +10,7 @@ import compareObjects from "@/common/CompareObjects";
 export default function PageTarefasId() {
   const { id }                                 = useLocalSearchParams<{ id: string }>();
   const inventoryContext                       = useInventory();
-  const oldInventory                           = inventoryContext.getInventoryById(+id)!;
+  const oldInventory                           = inventoryContext.getInventoryBy('id',+id)![0];
   const [updatedInventory,setUpdatedInventory] = useState(oldInventory)
   const [isModalVisible, setIsModalVisible]    = useState(false);
   const [disabledSave, setDisabledSave]        = useState(true);

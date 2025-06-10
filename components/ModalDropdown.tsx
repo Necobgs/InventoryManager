@@ -38,7 +38,7 @@ const ModalDropdown: React.FC<ModalDropdownProps> = ({ data, onSelect, initialVa
       >
         <View style={styles.contentButton}>
           <Text style={styles.buttonText}>
-            {selectedValue || "Select an option"}
+            {selectedValue || "Selecione uma opção"}
           </Text>
           <FontAwesome name={'angle-down'} size={20}/>
         </View>
@@ -47,7 +47,8 @@ const ModalDropdown: React.FC<ModalDropdownProps> = ({ data, onSelect, initialVa
       <Modal visible={isModalVisible} transparent animationType="none">
         <TouchableOpacity style={styles.modalBackground} onPress={toggleModal}>
           <View style={styles.modalContent}>
-            <FlatList
+            {data[0] ?
+              <FlatList
               data={data}
               keyExtractor={(item, index) => index.toString()}
               renderItem={({ item }) => (
@@ -59,6 +60,9 @@ const ModalDropdown: React.FC<ModalDropdownProps> = ({ data, onSelect, initialVa
                 </TouchableOpacity>
               )}
             />
+          :
+          <Text>Nenhum item disponível para selecionar</Text>
+          }
           </View>
         </TouchableOpacity>
       </Modal>
@@ -71,7 +75,8 @@ const styles = StyleSheet.create({
   contentButton:{
     justifyContent:'space-around',
     flexDirection:'row' ,
-    alignItems:'center'
+    alignItems:'center',
+    width:'100%'
   },
   button: {
     padding: 10,
@@ -79,7 +84,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     borderColor:'#AAAAAA',
     borderWidth:1,
-    width:150
+    width:`100%`
   },
   buttonText: {
     color: "BLACK",

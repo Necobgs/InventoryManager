@@ -1,21 +1,17 @@
-import { Text, View } from "@/components/Themed";
 import Inventory from "@/interfaces/InventoryInterface";
 import { StyleSheet } from "react-native";
-import { TouchableOpacity } from "react-native";
 import { useRouter } from "expo-router";
+import { Card } from "react-native-paper";
 
 
 export default function CardInventory(inventory:Inventory){
     const router = useRouter()
     
     return (
-    <TouchableOpacity style={styles.container} onPress={()=>router.navigate(`/inventory/edit/${inventory.id}`)} activeOpacity={.6}>
-        <View style={styles.informations}>
-            <Text style={styles.title}>
-                {inventory.title}
-            </Text>
-        </View>
-    </TouchableOpacity>   
+    <Card style={{marginBottom:15}} mode="elevated" onPress={()=>router.navigate(`/inventory/edit/${inventory.id}`)}>
+    <Card.Title title={inventory.title}/>   
+    <Card.Content>{inventory.description}</Card.Content> 
+    </Card>  
     )
 }
 

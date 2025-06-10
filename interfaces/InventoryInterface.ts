@@ -1,3 +1,4 @@
+import CategoryInterface from "./CategoryInterface";
 
 export default interface InventoryInterface{
     id:number,
@@ -5,5 +6,7 @@ export default interface InventoryInterface{
     stock_value:number,
     price_per_unity:number,
     qty_product:number,
-    enabled:boolean
+    enabled:boolean,
+    description:string;
+    category:CategoryInterface | undefined
 }

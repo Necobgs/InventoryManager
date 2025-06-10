@@ -7,6 +7,8 @@ import { useEffect } from 'react';
 import 'react-native-reanimated';
 import { useColorScheme } from '@/components/useColorScheme';
 import InventoryProvider from '@/contexts/InventoryContext';
+import { CategoryProvider } from '@/contexts/CategoryContext';
+import { PaperProvider } from 'react-native-paper';
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -44,7 +46,13 @@ export default function RootLayout() {
         
   return (
     <InventoryProvider>
-      <RootLayoutNav />;
+      <CategoryProvider>
+        <InventoryProvider>
+          <PaperProvider>
+            <RootLayoutNav />;
+          </PaperProvider>
+        </InventoryProvider>
+      </CategoryProvider>
     </InventoryProvider>
   )
   
@@ -65,7 +73,11 @@ function RootLayoutNav() {
         <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
         <Stack.Screen 
           name="inventorys/edit/index"
-          options={{title:'Detalhes da tarefa'}}
+          options={{title:'Detalhes do produto'}}
+        />
+        <Stack.Screen 
+          name="inventory/create/index"
+          options={{title:'Criar um produto'}}
         />
       </Stack>
     </ThemeProvider>

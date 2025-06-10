@@ -1,10 +1,10 @@
-import { Text, View } from "@/components/Themed";
+import { Text } from "@/components/Themed";
 import { FlatList, StyleSheet } from "react-native";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import CardInventory from "@/components/CardInventory";
 import { useInventory } from "@/contexts/InventoryContext";
-import { TouchableOpacity } from "react-native";
 import { useRouter } from "expo-router";
+import { AnimatedFAB } from "react-native-paper";
 
 
 
@@ -14,11 +14,6 @@ export default function TabInventorys(){
     return (
         <SafeAreaProvider>
             <SafeAreaView style={{flex:1}}>
-                <View style={styles.div_add_inventory}>
-                    <TouchableOpacity style={styles.btn_add_inventory} onPress={()=>router.navigate('/inventory/create')}>
-                        <Text style={styles.text_btn_add_inventory}>Adicionar tarefa</Text>
-                    </TouchableOpacity>
-                </View>
                 {!inventoryContext.inventorys[0] ? 
                 <Text style={styles.no_inventorys}>Nenhuma tarefa disponível</Text> 
                 : 
@@ -29,6 +24,16 @@ export default function TabInventorys(){
                     style={styles.list_inventorys}
                     scrollEnabled={true}
                     />}
+                <AnimatedFAB
+                    icon={'plus'}
+                    label={'Label'}
+                    extended={false}
+                    onPress={() => router.navigate("/inventory/create")}
+                    visible={true}
+                    animateFrom={'right'}
+                    iconMode={'static'}
+                    style={[styles.fabStyle]}
+                />
             </SafeAreaView>
         </SafeAreaProvider>
     )
@@ -63,5 +68,10 @@ const styles = StyleSheet.create({
         textAlign:'center',
         color:'white',
         fontSize:15
-    }
+    },
+    fabStyle: {
+    bottom: 16,
+    right: 16,
+    position: 'absolute',
+  },
 })
