@@ -8,5 +8,5 @@ export default interface InventoryInterface{
     qty_product:number,
     enabled:boolean,
     description:string;
-    category:CategoryInterface | undefined
+    category:CategoryInterface | null;
 }

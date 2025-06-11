@@ -8,7 +8,7 @@ import 'react-native-reanimated';
 import { useColorScheme } from '@/components/useColorScheme';
 import InventoryProvider from '@/contexts/InventoryContext';
 import { CategoryProvider } from '@/contexts/CategoryContext';
-import { PaperProvider } from 'react-native-paper';
+
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -48,9 +48,7 @@ export default function RootLayout() {
     <InventoryProvider>
       <CategoryProvider>
         <InventoryProvider>
-          <PaperProvider>
             <RootLayoutNav />;
-          </PaperProvider>
         </InventoryProvider>
       </CategoryProvider>
     </InventoryProvider>
