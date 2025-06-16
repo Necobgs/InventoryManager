@@ -8,6 +8,7 @@ import 'react-native-reanimated';
 import { useColorScheme } from '@/components/useColorScheme';
 import InventoryProvider from '@/contexts/InventoryContext';
 import { CategoryProvider } from '@/contexts/CategoryContext';
+import UserProvider from '@/contexts/UserContext';
 
 
 export {
@@ -45,13 +46,15 @@ export default function RootLayout() {
   }
         
   return (
-    <InventoryProvider>
-      <CategoryProvider>
-        <InventoryProvider>
-            <RootLayoutNav />;
-        </InventoryProvider>
-      </CategoryProvider>
-    </InventoryProvider>
+    <UserProvider>
+      <InventoryProvider>
+        <CategoryProvider>
+          <InventoryProvider>
+              <RootLayoutNav />;
+          </InventoryProvider>
+        </CategoryProvider>
+      </InventoryProvider>
+    </UserProvider>
   )
   
   
@@ -67,6 +70,7 @@ function RootLayoutNav() {
   return (
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
       <Stack>
+       <Stack.Screen name="login/index" options={{ headerShown: false }} />
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
         <Stack.Screen 
