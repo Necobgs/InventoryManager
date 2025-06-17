@@ -8,6 +8,7 @@ import { Text } from "@/components/Themed";
 import { useUser } from "@/contexts/UserContext";
 import DefaultDialog from "@/components/DefaultDialog";
 import { useState } from "react";
+import { useRouter } from "expo-router";
 
 const schema = yup.object().shape({
   email: yup.string().required('Nome é obrigatório'),
@@ -17,6 +18,7 @@ const schema = yup.object().shape({
 const Login: React.FC = () => {
 
     const usersContext = useUser();
+    const router = useRouter();
 
     const [dialogVisible, setDialogVisible] = useState(false);
     const [dialogTitle, setDialogTitle] = useState('');
@@ -38,8 +40,7 @@ const Login: React.FC = () => {
     const onSubmit = (data: LoginInterface) => {
         const response = usersContext.validationLogin(data);
         if (response) {
-            setDialogTitle('Sucesso');
-            setDialogText('Login feito com sucesso');
+            router.navigate('/');
             reset();
         } else {
             setDialogTitle('Erro');
