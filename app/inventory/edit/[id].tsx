@@ -1,5 +1,4 @@
-// pages/PageTarefasId.tsx
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { Button, TextInput, HelperText, Text } from 'react-native-paper';
 import { useForm, Controller } from 'react-hook-form';
@@ -11,8 +10,17 @@ import DefaultDialog from '@/components/DefaultDialog';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import InventoryInterface from '@/interfaces/InventoryInterface';
 import ModalDropdown from '@/components/ModalDropdownCategory';
+import { formatCurrency } from '@/common/FormatCurrency';
+
+// Função para formatar número como moeda BRL
 
 
+// Função para converter string monetária para número
+const parseCurrency = (value: string): number => {
+  // Remove tudo que não é número ou vírgula
+  const cleaned = value.replace(/[^0-9,]/g, '').replace(',', '.');
+  return parseFloat(cleaned) || 0;
+};
 
 const schema = yup.object().shape({
   title: yup.string().required('Título é obrigatório'),
@@ -27,92 +35,79 @@ const schema = yup.object().shape({
     .typeError('Valor unitário deve ser um número')
     .min(0, 'Não pode ser negativo')
     .required('Valor unitário é obrigatório'),
-    category: yup
+  category: yup
     .object({
-        id:yup.number().required(),
-        description: yup.string().required(),
+      id: yup.number().required(),
+      description: yup.string().required(),
     })
-    .required("selecione uma categoria")
+    .required('Selecione uma categoria')
     .nullable(),
-    id:yup
-    .number()
-    .required(),
-    stock_value:yup
-    .number()
-    .required(),
-    enabled:yup
-    .boolean()
-    .required()
+  id: yup.number().required(),
+  stock_value: yup.number().required(),
+  enabled: yup.boolean().required(),
 });
 
-
-
 export default function PageTarefasId() {
-  const { id }                            = useLocalSearchParams<{ id: string }>();
-  const inventoryContext                  = useInventory();
-  const oldInventory                      = inventoryContext.getInventoryBy('id',+id)![0];
-  const categoryContext                   = useCategory()
-  const [disabledSave, setDisabledSave]   = useState(true);
+  const { id } = useLocalSearchParams<{ id: string }>();
+  const inventoryContext = useInventory();
+  const oldInventory = inventoryContext.getInventoryBy('id', +id)?.[0];
+  const categoryContext = useCategory();
   const [dialogVisible, setDialogVisible] = useState(false);
-  const [dialogTitle, setDialogTitle]     = useState('');
-  const [dialogText, setDialogText]       = useState('');
-  const router = useRouter()
+  const [dialogTitle, setDialogTitle] = useState('');
+  const [dialogText, setDialogText] = useState('');
+  const router = useRouter();
 
-  
-  if(!oldInventory){
+  const {
+    control,
+    handleSubmit,
+    reset,
+    watch,
+    setValue,
+    formState: { errors, isDirty },
+  } = useForm<InventoryInterface>({
+    defaultValues: oldInventory || {},
+    resolver: yupResolver(schema),
+  });
+
+  // Monitora price_per_unity e qty_product para atualizar stock_value
+  const pricePerUnity = watch('price_per_unity');
+  const qtyProduct = watch('qty_product');
+
+  useEffect(() => {
+    setValue('stock_value', pricePerUnity * qtyProduct);
+  }, [pricePerUnity, qtyProduct, setValue]);
+
+  // Sincroniza o formulário com o estado do contexto quando ele muda
+  useEffect(() => {
+    if (oldInventory) {
+      reset(oldInventory); // Atualiza o formulário com os dados mais recentes
+    }
+  }, [inventoryContext.inventorys, reset, oldInventory]);
+
+  if (!oldInventory) {
     return (
-      <View style={{alignContent:'center',alignItems:'center'}}>
-        Produto não encontrado
+      <View style={{ alignContent: 'center', alignItems: 'center' }}>
+        <Text>Produto não encontrado</Text>
       </View>
-    )
-  }
-  
-  function removeInventory() {
-    
-    const response = inventoryContext.removeInventoryById(+id);
-    setDialogTitle(response.success ? 'Sucesso' : 'Erro' );
-    setDialogText(response.message);
-    if (response.success) reset()
-    setDialogVisible(true);
-    router.navigate("/(tabs)/inventory");
+    );
   }
 
-  function saveChanges(data:InventoryInterface) {
-    console.log(data);
+  function removeInventory() {
+    const response = inventoryContext.removeInventoryById(+id);
+    setDialogTitle(response.success ? 'Sucesso' : 'Erro');
+    setDialogText(response.message);
+    setDialogVisible(true);
+    if (response.success) {
+      router.navigate('/(tabs)/inventory');
+    }
+  }
+
+  function saveChanges(data: InventoryInterface) {
     const response = inventoryContext.updateInventory(data);
     setDialogTitle(response.success ? 'Sucesso' : 'Erro');
     setDialogText(response.message);
     setDialogVisible(true);
-      // router.navigate("/inventorys");
   }
-
-  const {
-      control,
-      handleSubmit,
-      reset,
-      formState: { errors },
-    } = useForm<InventoryInterface>({
-      defaultValues: {
-        ...oldInventory
-      },
-      resolver: yupResolver(schema),
-    });
-  
-
-  const onSubmit = (data: InventoryInterface) => {
-      const response = inventoryContext.addInventory(data);
-      if (response.success) {
-        setDialogTitle('Sucesso');
-        setDialogText('Produto criado com sucesso!');
-        reset(); // limpa o formulário
-      } else {
-        setDialogTitle('Erro');
-        setDialogText(response.message);
-      }
-      setDialogVisible(true);
-    };
-  
-  console.log(oldInventory)
 
   return (
     <View style={styles.container}>
@@ -120,7 +115,7 @@ export default function PageTarefasId() {
         control={control}
         name="title"
         render={({ field: { onChange, onBlur, value } }) => (
-            <>
+          <>
             {errors.title && (
               <HelperText type="error">{errors.title.message}</HelperText>
             )}
@@ -142,9 +137,9 @@ export default function PageTarefasId() {
         name="description"
         render={({ field: { onChange, onBlur, value } }) => (
           <>
-              {errors.description && (
-                <HelperText type="error">{errors.description.message}</HelperText>
-              )}
+            {errors.description && (
+              <HelperText type="error">{errors.description.message}</HelperText>
+            )}
             <TextInput
               label="Descrição"
               mode="outlined"
@@ -191,8 +186,8 @@ export default function PageTarefasId() {
               mode="outlined"
               keyboardType="numeric"
               style={styles.fullWidth}
-              value={value.toString()}
-              onChangeText={(text) => onChange(parseFloat(text) || 0)}
+              value={formatCurrency(value)}
+              onChangeText={(text) => onChange(parseCurrency(text))}
               error={!!errors.price_per_unity}
             />
             {errors.price_per_unity && (
@@ -202,30 +197,54 @@ export default function PageTarefasId() {
         )}
       />
 
-        <Controller
+      <Controller
+        control={control}
+        name="stock_value"
+        render={({ field: { value } }) => (
+          <>
+            <TextInput
+              label="Valor de estoque"
+              mode="outlined"
+              keyboardType="numeric"
+              disabled={true}
+              style={styles.fullWidth}
+              value={formatCurrency(value)}
+              editable={false}
+            />
+          </>
+        )}
+      />
+
+      <Controller
         control={control}
         name="category"
         render={({ field: { onChange, value } }) => (
           <>
-            <Text style={{marginLeft:5,marginBottom:5}} >Categoria</Text>
-            <ModalDropdown 
-            data={categoryContext.categories}
-            initialValue={value}
-            onSelect={(categorySelected)=>onChange(categorySelected)}/>
-            {errors.price_per_unity && (
-              <HelperText type="error">{errors.price_per_unity.message}</HelperText>
+            <Text style={{ marginLeft: 5, marginBottom: 5 }}>Categoria</Text>
+            <ModalDropdown
+              data={categoryContext.categories}
+              initialValue={value}
+              onSelect={(categorySelected) => onChange(categorySelected)}
+            />
+            {errors.category && (
+              <HelperText type="error">{errors.category.message}</HelperText>
             )}
           </>
         )}
       />
 
-      <View style={{flexDirection:'row',justifyContent:'space-around',marginTop:15}}>
-      <Button mode="outlined" style={{width:'45%'}} onPress={handleSubmit(removeInventory)}>
-        Excluir produto
-      </Button>
-        <Button mode="contained" style={{width:'45%'}} onPress={handleSubmit(saveChanges)}>
-        Salvar alterações
-      </Button>
+      <View style={{ flexDirection: 'row', justifyContent: 'space-around', marginTop: 15 }}>
+        <Button mode="outlined" style={{ width: '45%' }} onPress={handleSubmit(removeInventory)}>
+          Excluir produto
+        </Button>
+        <Button
+          mode="contained"
+          style={{ width: '45%' }}
+          onPress={handleSubmit(saveChanges)}
+          disabled={!isDirty}
+        >
+          Salvar alterações
+        </Button>
       </View>
 
       <DefaultDialog
@@ -236,7 +255,7 @@ export default function PageTarefasId() {
       />
     </View>
   );
-};
+}
 
 const styles = StyleSheet.create({
   container: {

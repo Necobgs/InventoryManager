@@ -1,9 +1,9 @@
 import { Text, View,  } from "@/components/Themed";
 
-export default function TabTres(){
+export default function TabCategory(){
     return (
         <View>
-            Aba de configurações
+            Aba de categoria
         </View>
     )
 }
