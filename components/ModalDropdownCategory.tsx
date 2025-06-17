@@ -8,21 +8,23 @@ import {
   StyleSheet,
 } from "react-native";
 import { FontAwesome } from "@expo/vector-icons";
+import { Button } from "react-native-paper";
+import CategoryInterface from "@/interfaces/CategoryInterface";
 
 // Define props type
 interface ModalDropdownProps {
-  data: string[];
-  onSelect: (item: string) => void;
-  initialValue?: string | null;
+  data: CategoryInterface[];
+  onSelect: (item: CategoryInterface) => void;
+  initialValue?: CategoryInterface | null;
 }
 
 const ModalDropdown: React.FC<ModalDropdownProps> = ({ data, onSelect, initialValue }) => {
   const [isModalVisible, setModalVisible] = useState<boolean>(false);
-  const [selectedValue, setSelectedValue] = useState<string | null>(initialValue || null);
+  const [selectedValue, setSelectedValue] = useState<CategoryInterface | null>(initialValue || null);
 
   const toggleModal = () => setModalVisible(!isModalVisible);
 
-  const handleSelect = (item: string) => {
+  const handleSelect = (item: CategoryInterface) => {
     setSelectedValue(item);
     onSelect(item);
     toggleModal();
@@ -30,20 +32,18 @@ const ModalDropdown: React.FC<ModalDropdownProps> = ({ data, onSelect, initialVa
 
   return (
     <View>
-      <TouchableOpacity
-        style={styles.button}
-        onPress={toggleModal}
-        accessibilityLabel="Select inventory status"
-        accessibilityRole="button"
+      
+      <Button
+      onPress={toggleModal}
+      style={{borderRadius:5,minWidth:150,}}
+      labelStyle={{textAlign:'left',margin:10}}
+      mode="outlined"
+      accessibilityRole="button"
       >
-        <View style={styles.contentButton}>
-          <Text style={styles.buttonText}>
-            {selectedValue || "Selecione uma opção"}
-          </Text>
-          <FontAwesome name={'angle-down'} size={20}/>
-        </View>
-      </TouchableOpacity>
-
+        {selectedValue?.description || "Categoria"}
+         <FontAwesome style={{marginLeft:10}} name={'angle-down'} size={20}/>
+      </Button>
+      
       <Modal visible={isModalVisible} transparent animationType="none">
         <TouchableOpacity style={styles.modalBackground} onPress={toggleModal}>
           <View style={styles.modalContent}>
@@ -56,7 +56,7 @@ const ModalDropdown: React.FC<ModalDropdownProps> = ({ data, onSelect, initialVa
                   style={styles.option}
                   onPress={() => handleSelect(item)}
                 >
-                  <Text style={styles.optionText}>{item}</Text>
+                  <Text style={styles.optionText}>{item.description}</Text>
                 </TouchableOpacity>
               )}
             />

@@ -1,15 +1,15 @@
 // pages/PageTarefasId.tsx
 import React, { useState } from 'react';
 import { View, StyleSheet } from 'react-native';
-import { Button, TextInput, HelperText } from 'react-native-paper';
+import { Button, TextInput, HelperText, Text } from 'react-native-paper';
 import { useForm, Controller } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import { useInventory } from '@/contexts/InventoryContext';
 import useCategory from '@/contexts/CategoryContext';
 import DefaultDialog from '@/components/DefaultDialog';
-import InventoryInterface from '@/interfaces/InventoryInterface';
 import { InventoryFormType } from '@/types/InventoryFormType';
+import ModalDropdown from '@/components/ModalDropdownCategory';
 
 
 const schema = yup.object().shape({
@@ -160,9 +160,29 @@ const PageTarefasId: React.FC = () => {
         )}
       />
 
+        <Text style={{marginBottom:5,marginLeft:5}}>Categoria</Text>
+      <View style={{flexDirection:'row',width:'100%',justifyContent:'space-between'}}>
+      <Controller
+        control={control}
+        name="category"
+        render={({ field: { onChange, value } }) => (
+          <>
+            <ModalDropdown 
+            data={categoryContext.categories}
+            initialValue={value}
+            onSelect={(categorySelected)=>onChange(categorySelected)}/>
+            {errors.price_per_unity && (
+              <HelperText type="error">{errors.price_per_unity.message}</HelperText>
+            )}
+          </>
+        )}
+      />
+
       <Button mode="contained" onPress={handleSubmit(onSubmit)}>
         Criar produto
       </Button>
+
+      </View>
 
       <DefaultDialog
         visible={dialogVisible}

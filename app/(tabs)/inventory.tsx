@@ -11,14 +11,15 @@ import { AnimatedFAB } from "react-native-paper";
 export default function TabInventorys(){
     const inventoryContext = useInventory();
     const router = useRouter();
+    const inventoryItems =inventoryContext.getInventoryBy('enabled',true);
     return (
         <SafeAreaProvider>
             <SafeAreaView style={{flex:1}}>
-                {!inventoryContext.inventorys[0] ? 
-                <Text style={styles.no_inventorys}>Nenhuma tarefa disponível</Text> 
+                {!inventoryItems[0] ? 
+                <Text style={styles.no_inventorys}>Nenhuma produto cadastrado</Text> 
                 : 
                 <FlatList
-                    data={inventoryContext.inventorys}
+                    data={inventoryItems}
                     renderItem={({item})=><CardInventory {...item}/>}
                     keyExtractor={(item)=>item.id.toString()}
                     style={styles.list_inventorys}

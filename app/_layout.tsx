@@ -77,6 +77,10 @@ function RootLayoutNav() {
           name="inventory/create/index"
           options={{title:'Criar um produto'}}
         />
+        <Stack.Screen 
+          name="inventory/edit/[id]"
+          options={{title:'Atualizar um produto'}}
+        />
       </Stack>
     </ThemeProvider>
   );

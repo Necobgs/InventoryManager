@@ -10,7 +10,7 @@ interface InventoryContextType{
     addInventory: (inventory:InventoryFormType)=>ApiResponse,
     getInventoryBy: <T extends keyof InventoryInterface>(By:T,value:InventoryInterface[T])=>InventoryInterface[],
     updateInventory: (inventory:InventoryInterface)=>ApiResponse,
-    removeInventoryById: (id:number)=>InventoryInterface | ApiResponse,
+    removeInventoryById: (id:number)=> ApiResponse,
 }
 
 const InventoryContext = createContext<InventoryContextType | undefined>(undefined);
@@ -59,7 +59,13 @@ export default function InventoryProvider(
         const inventory = getInventoryBy('id',id);
         if(!inventory) return {message:"Produto não encontrado",success:false}   
         setInventorys((oldInventorys)=>{
-            return oldInventorys.filter((inventoryItem)=>inventoryItem.id!=id)
+            oldInventorys.map((inventoryItem)=>{
+                if (inventoryItem.id==id){
+                    inventoryItem.enabled=false
+                }
+                
+                })
+                return oldInventorys
         }) 
         return {message:"Sucesso ao remover o produto",success:true}
     }
