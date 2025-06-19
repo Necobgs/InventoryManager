@@ -11,16 +11,9 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import InventoryInterface from '@/interfaces/InventoryInterface';
 import ModalDropdown from '@/components/ModalDropdownCategory';
 import { formatCurrency } from '@/common/FormatCurrency';
+import { parseCurrency } from '@/common/PasseCurrency';
+import { FormInput } from '@/components/FormInput';
 
-// Função para formatar número como moeda BRL
-
-
-// Função para converter string monetária para número
-const parseCurrency = (value: string): number => {
-  // Remove tudo que não é número ou vírgula
-  const cleaned = value.replace(/[^0-9,]/g, '').replace(',', '.');
-  return parseFloat(cleaned) || 0;
-};
 
 const schema = yup.object().shape({
   title: yup.string().required('Título é obrigatório'),
@@ -33,7 +26,7 @@ const schema = yup.object().shape({
   price_per_unity: yup
     .number()
     .typeError('Valor unitário deve ser um número')
-    .min(0, 'Não pode ser negativo')
+    .min(1, 'Não pode ser negativo ou zero')
     .required('Valor unitário é obrigatório'),
   category: yup
     .object({
@@ -111,109 +104,42 @@ export default function PageTarefasId() {
 
   return (
     <View style={styles.container}>
-      <Controller
-        control={control}
-        name="title"
-        render={({ field: { onChange, onBlur, value } }) => (
-          <>
-            {errors.title && (
-              <HelperText type="error">{errors.title.message}</HelperText>
-            )}
-            <TextInput
-              label="Título"
-              mode="outlined"
-              style={styles.fullWidth}
-              value={value}
-              onBlur={onBlur}
-              onChangeText={onChange}
-              error={!!errors.title}
-            />
-          </>
-        )}
+      
+      <FormInput
+          control={control}
+          name="title"
+          label="Título do item"
+      />
+      
+      <FormInput
+          control={control}
+          name="description"
+          label="Descrição do item"
+          multiline
       />
 
-      <Controller
-        control={control}
-        name="description"
-        render={({ field: { onChange, onBlur, value } }) => (
-          <>
-            {errors.description && (
-              <HelperText type="error">{errors.description.message}</HelperText>
-            )}
-            <TextInput
-              label="Descrição"
-              mode="outlined"
-              multiline
-              numberOfLines={5}
-              style={styles.fullWidth}
-              value={value}
-              onBlur={onBlur}
-              onChangeText={onChange}
-              error={!!errors.description}
-            />
-          </>
-        )}
+
+      <FormInput
+          control={control}
+          name="qty_product"
+          label="Quantidade em estoque"
       />
 
-      <Controller
-        control={control}
-        name="qty_product"
-        render={({ field: { onChange, value } }) => (
-          <>
-            <TextInput
-              label="Quantidade em estoque"
-              mode="outlined"
-              keyboardType="numeric"
-              style={styles.fullWidth}
-              value={value.toString()}
-              onChangeText={(text) => onChange(parseFloat(text) || 0)}
-              error={!!errors.qty_product}
-            />
-            {errors.qty_product && (
-              <HelperText type="error">{errors.qty_product.message}</HelperText>
-            )}
-          </>
-        )}
+      <FormInput
+          control={control}
+          name="price_per_unity"
+          label="Valor unitário"
+          isCurrency
       />
 
-      <Controller
-        control={control}
-        name="price_per_unity"
-        render={({ field: { onChange, value } }) => (
-          <>
-            <TextInput
-              label="Valor unitário"
-              mode="outlined"
-              keyboardType="numeric"
-              style={styles.fullWidth}
-              value={formatCurrency(value)}
-              onChangeText={(text) => onChange(parseCurrency(text))}
-              error={!!errors.price_per_unity}
-            />
-            {errors.price_per_unity && (
-              <HelperText type="error">{errors.price_per_unity.message}</HelperText>
-            )}
-          </>
-        )}
-      />
 
-      <Controller
-        control={control}
-        name="stock_value"
-        render={({ field: { value } }) => (
-          <>
-            <TextInput
-              label="Valor de estoque"
-              mode="outlined"
-              keyboardType="numeric"
-              disabled={true}
-              style={styles.fullWidth}
-              value={formatCurrency(value)}
-              editable={false}
-            />
-          </>
-        )}
-      />
+        <FormInput
+          control={control}
+          name="stock_value"
+          label="Valor de estoque"
+          isCurrency
+          disabled
+        />
 
       <Controller
         control={control}
@@ -233,7 +159,7 @@ export default function PageTarefasId() {
         )}
       />
 
-      <View style={{ flexDirection: 'row', justifyContent: 'space-around', marginTop: 15 }}>
+      <View style={styles.excludeItemView}>
         <Button mode="outlined" style={{ width: '45%' }} onPress={handleSubmit(removeInventory)}>
           Excluir produto
         </Button>
@@ -264,5 +190,10 @@ const styles = StyleSheet.create({
   fullWidth: {
     width: '100%',
     marginBottom: 10,
+  },
+  excludeItemView:{ 
+    flexDirection: 'row', 
+    justifyContent: 'space-around', 
+    marginTop: 15 
   },
 });

@@ -50,7 +50,7 @@ export default function RootLayout() {
       <InventoryProvider>
         <CategoryProvider>
           <InventoryProvider>
-              <RootLayoutNav />;
+              <RootLayoutNav />
           </InventoryProvider>
         </CategoryProvider>
       </InventoryProvider>

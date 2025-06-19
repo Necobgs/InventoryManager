@@ -10,6 +10,9 @@ import useCategory from '@/contexts/CategoryContext';
 import DefaultDialog from '@/components/DefaultDialog';
 import { InventoryFormType } from '@/types/InventoryFormType';
 import ModalDropdown from '@/components/ModalDropdownCategory';
+import { formatCurrency } from '@/common/FormatCurrency';
+import { parseCurrency } from '@/common/PasseCurrency';
+import { FormInput } from '@/components/FormInput';
 
 
 const schema = yup.object().shape({
@@ -23,7 +26,7 @@ const schema = yup.object().shape({
   price_per_unity: yup
     .number()
     .typeError('Valor unitário deve ser um número')
-    .min(0, 'Não pode ser negativo')
+    .min(1, 'Não pode ser negativo ou zero')
     .required('Valor unitário é obrigatório'),
     category: yup
     .object({
@@ -61,106 +64,43 @@ const PageTarefasId: React.FC = () => {
 
   const onSubmit = (data: InventoryFormType) => {
     const response = inventoryContext.addInventory(data);
-    if (response.success) {
-      setDialogTitle('Sucesso');
-      setDialogText('Produto criado com sucesso!');
-      reset(); // limpa o formulário
-    } else {
-      setDialogTitle('Erro');
+      setDialogTitle(response.success ? 'Sucesso' : 'Erro');
       setDialogText(response.message);
-    }
-    setDialogVisible(true);
+      setDialogVisible(true);
+      if(response.success) reset(); // limpa o formulário
   };
 
   return (
     <View style={styles.container}>
-      <Controller
-        control={control}
-        name="title"
-        render={({ field: { onChange, onBlur, value } }) => (
-            <>
-            {errors.title && (
-              <HelperText type="error">{errors.title.message}</HelperText>
-            )}
-            <TextInput
-              label="Título"
-              mode="outlined"
-              style={styles.fullWidth}
-              value={value}
-              onBlur={onBlur}
-              onChangeText={onChange}
-              error={!!errors.title}
-            />
-          </>
-        )}
+        
+      <FormInput
+          control={control}
+          name="title"
+          label="Título do item"
+      />
+      
+      <FormInput
+          control={control}
+          name="description"
+          label="Descrição do item"
+          multiline
       />
 
-      <Controller
-        control={control}
-        name="description"
-        render={({ field: { onChange, onBlur, value } }) => (
-          <>
-              {errors.description && (
-                <HelperText type="error">{errors.description.message}</HelperText>
-              )}
-            <TextInput
-              label="Descrição"
-              mode="outlined"
-              multiline
-              numberOfLines={5}
-              style={styles.fullWidth}
-              value={value}
-              onBlur={onBlur}
-              onChangeText={onChange}
-              error={!!errors.description}
-            />
-          </>
-        )}
+
+      <FormInput
+          control={control}
+          name="qty_product"
+          label="Quantidade em estoque"
       />
 
-      <Controller
-        control={control}
-        name="qty_product"
-        render={({ field: { onChange, value } }) => (
-          <>
-            <TextInput
-              label="Quantidade em estoque"
-              mode="outlined"
-              keyboardType="numeric"
-              style={styles.fullWidth}
-              value={value.toString()}
-              onChangeText={(text) => onChange(parseFloat(text) || 0)}
-              error={!!errors.qty_product}
-            />
-            {errors.qty_product && (
-              <HelperText type="error">{errors.qty_product.message}</HelperText>
-            )}
-          </>
-        )}
+      <FormInput
+          control={control}
+          name="price_per_unity"
+          label="Valor unitário"
+          isCurrency
       />
 
-      <Controller
-        control={control}
-        name="price_per_unity"
-        render={({ field: { onChange, value } }) => (
-          <>
-            <TextInput
-              label="Valor unitário"
-              mode="outlined"
-              keyboardType="numeric"
-              style={styles.fullWidth}
-              value={value.toString()}
-              onChangeText={(text) => onChange(parseFloat(text) || 0)}
-              error={!!errors.price_per_unity}
-            />
-            {errors.price_per_unity && (
-              <HelperText type="error">{errors.price_per_unity.message}</HelperText>
-            )}
-          </>
-        )}
-      />
-
-        <Text style={{marginBottom:5,marginLeft:5}}>Categoria</Text>
+      <Text style={{marginBottom:5,marginLeft:5}}>Categoria</Text>
       <View style={{flexDirection:'row',width:'100%',justifyContent:'space-between'}}>
       <Controller
         control={control}

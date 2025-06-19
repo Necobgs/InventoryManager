@@ -16,7 +16,7 @@ export default function TabInventorys(){
         <SafeAreaProvider>
             <SafeAreaView style={{flex:1}}>
                 {!inventoryItems[0] ? 
-                <Text style={styles.no_inventorys}>Nenhuma produto cadastrado</Text> 
+                <Text style={styles.no_inventorys}>Nenhuma item cadastrado</Text> 
                 : 
                 <FlatList
                     data={inventoryItems}
@@ -44,7 +44,9 @@ const styles = StyleSheet.create({
     list_inventorys:{
         padding:50,
         borderTopWidth:1,
-        borderTopColor:'#C2C2C2'
+        borderTopColor:'#C2C2C2',
+        // flex:1,
+        // flexDirection:'row'
     },
     no_inventorys:{
         width:'100%',

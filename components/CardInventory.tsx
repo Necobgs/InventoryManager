@@ -22,6 +22,7 @@ export default function CardInventory(inventory:Inventory){
 const styles= StyleSheet.create({
     container:{
         marginBottom:15, 
-        height:125
+        height:125,
+        maxWidth:400
     },
 })

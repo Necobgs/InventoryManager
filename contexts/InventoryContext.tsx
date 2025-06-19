@@ -26,11 +26,12 @@ export default function InventoryProvider({
   const [inventorys, setInventorys] = useState<InventoryInterface[]>([]);
 
   function addInventory(newInventory: InventoryFormType): ApiResponse {
+    console.log(newInventory)
     if (
       !newInventory.title ||
       !newInventory.description ||
       !newInventory.price_per_unity ||
-      !newInventory.qty_product
+      newInventory.price_per_unity <= 0
     ) {
       return { message: "Preencha todos os campos obrigatórios", success: false };
     }
