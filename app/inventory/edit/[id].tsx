@@ -104,81 +104,82 @@ export default function PageTarefasId() {
 
   return (
     <View style={styles.container}>
-      
-      <FormInput
-          control={control}
-          name="title"
-          label="Título do item"
-      />
-      
-      <FormInput
-          control={control}
-          name="description"
-          label="Descrição do item"
-          multiline
-      />
-
-
-      <FormInput
-          control={control}
-          name="qty_product"
-          label="Quantidade em estoque"
-      />
-
-      <FormInput
-          control={control}
-          name="price_per_unity"
-          label="Valor unitário"
-          isCurrency
-      />
+      <View style={styles.formModal}>
+        <FormInput
+            control={control}
+            name="title"
+            label="Título do item"
+        />
+        
+        <FormInput
+            control={control}
+            name="description"
+            label="Descrição do item"
+            multiline
+        />
 
 
         <FormInput
-          control={control}
-          name="stock_value"
-          label="Valor de estoque"
-          isCurrency
-          disabled
+            control={control}
+            name="qty_product"
+            label="Quantidade em estoque"
         />
 
-      <Controller
-        control={control}
-        name="category"
-        render={({ field: { onChange, value } }) => (
-          <>
-            <Text style={{ marginLeft: 5, marginBottom: 5 }}>Categoria</Text>
-            <ModalDropdown
-              data={categoryContext.categories}
-              initialValue={value}
-              onSelect={(categorySelected) => onChange(categorySelected)}
-            />
-            {errors.category && (
-              <HelperText type="error">{errors.category.message}</HelperText>
-            )}
-          </>
-        )}
-      />
+        <FormInput
+            control={control}
+            name="price_per_unity"
+            label="Valor unitário"
+            isCurrency
+        />
 
-      <View style={styles.excludeItemView}>
-        <Button mode="outlined" style={{ width: '45%' }} onPress={handleSubmit(removeInventory)}>
-          Excluir produto
-        </Button>
-        <Button
-          mode="contained"
-          style={{ width: '45%' }}
-          onPress={handleSubmit(saveChanges)}
-          disabled={!isDirty}
-        >
-          Salvar alterações
-        </Button>
+
+          <FormInput
+            control={control}
+            name="stock_value"
+            label="Valor de estoque"
+            isCurrency
+            disabled
+          />
+
+        <Controller
+          control={control}
+          name="category"
+          render={({ field: { onChange, value } }) => (
+            <>
+              <Text style={{ marginLeft: 5, marginBottom: 5 }}>Categoria</Text>
+              <ModalDropdown
+                data={categoryContext.categories}
+                initialValue={value}
+                onSelect={(categorySelected) => onChange(categorySelected)}
+              />
+              {errors.category && (
+                <HelperText type="error">{errors.category.message}</HelperText>
+              )}
+            </>
+          )}
+        />
+
+        <View style={styles.excludeItemView}>
+          <Button mode="outlined" style={{ width: '45%' }} onPress={handleSubmit(removeInventory)}>
+            Excluir produto
+          </Button>
+          <Button
+            mode="contained"
+            style={{ width: '45%' }}
+            onPress={handleSubmit(saveChanges)}
+            disabled={!isDirty}
+          >
+            Salvar alterações
+          </Button>
+        </View>
+
+        <DefaultDialog
+          visible={dialogVisible}
+          onDismiss={() => setDialogVisible(false)}
+          title={dialogTitle}
+          text={dialogText}
+        />
       </View>
-
-      <DefaultDialog
-        visible={dialogVisible}
-        onDismiss={() => setDialogVisible(false)}
-        title={dialogTitle}
-        text={dialogText}
-      />
     </View>
   );
 }
@@ -186,6 +187,9 @@ export default function PageTarefasId() {
 const styles = StyleSheet.create({
   container: {
     padding: 20,
+    minHeight:'100%',
+    alignItems:'center',
+    justifyContent:'center'
   },
   fullWidth: {
     width: '100%',
@@ -196,4 +200,11 @@ const styles = StyleSheet.create({
     justifyContent: 'space-around', 
     marginTop: 15 
   },
+  formModal:{
+    maxWidth:800,
+    width:'98%',
+    backgroundColor:'#ffff',
+    padding:25,
+    borderRadius:10,
+    gap:15}
 });

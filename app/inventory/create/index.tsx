@@ -72,7 +72,7 @@ const PageTarefasId: React.FC = () => {
 
   return (
     <View style={styles.container}>
-        
+      <View style={styles.formModal}>
       <FormInput
           control={control}
           name="title"
@@ -130,6 +130,7 @@ const PageTarefasId: React.FC = () => {
         title={dialogTitle}
         text={dialogText}
       />
+      </View>
     </View>
   );
 };
@@ -137,11 +138,21 @@ const PageTarefasId: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     padding: 20,
+    alignItems:'center',
+    justifyContent:'center',
+    minHeight:'100%'
   },
   fullWidth: {
     width: '100%',
     marginBottom: 10,
   },
+  formModal:{
+    maxWidth:800,
+    width:'98%',
+    backgroundColor:'#ffff',
+    padding:25,
+    borderRadius:10,
+    gap:15}
 });
 
 export default PageTarefasId;
