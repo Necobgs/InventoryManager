@@ -1,14 +1,17 @@
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { useFonts } from 'expo-font';
-import { Stack } from 'expo-router';
+import { Stack, useRouter } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import 'react-native-reanimated';
 import { useColorScheme } from '@/components/useColorScheme';
 import InventoryProvider from '@/contexts/InventoryContext';
 import { CategoryProvider } from '@/contexts/CategoryContext';
-import UserProvider from '@/contexts/UserContext';
+import UserProvider, { useUser } from '@/contexts/UserContext';
+import { StyleSheet } from 'react-native';
+import { Text } from '@/components/Themed';
+import MovementsProvider from '@/contexts/MovementsContext';
 
 
 export {
@@ -50,7 +53,9 @@ export default function RootLayout() {
       <InventoryProvider>
         <CategoryProvider>
           <InventoryProvider>
+            <MovementsProvider>
               <RootLayoutNav />
+            </MovementsProvider>
           </InventoryProvider>
         </CategoryProvider>
       </InventoryProvider>
@@ -67,8 +72,23 @@ interface title{
 function RootLayoutNav() {
   const colorScheme = useColorScheme();
 
+  const router = useRouter();
+  const { userLogged } = useUser();
+  const [load, setLoad] = useState(false);
+  
+  useEffect(() => {
+
+    setTimeout(() => {
+
+      if (!userLogged) router.navigate('/login');
+      setLoad(true);
+    }, 0);
+  }, [])
+
+
   return (
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+      <Text style={load ? styles.hide : styles.msgload}>Carregando...</Text>
       <Stack>
        <Stack.Screen name="login/index" options={{ headerShown: false }} />
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
@@ -85,7 +105,35 @@ function RootLayoutNav() {
           name="inventory/edit/[id]"
           options={{title:'Atualizar um produto'}}
         />
+        <Stack.Screen 
+          name="movements/create/index"
+          options={{title:'Criar uma movimentação'}}
+        />
+        <Stack.Screen 
+          name="movements/edit/[id]"
+          options={{title:'Atualizar movimentação'}}
+        />
       </Stack>
     </ThemeProvider>
   );
 }
+
+const styles = StyleSheet.create({
+  msgload: {
+    position: 'fixed',
+    top: 0,
+    left: 0,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgb(242, 242, 242)',
+    width: '100%',
+    height: '100%',
+    zIndex: 1,
+    fontSize: 40,
+    fontWeight: 'bold'
+  },
+  hide: {
+    display: 'none'
+  }
+});

@@ -1,14 +1,14 @@
 import { StyleSheet } from 'react-native';
-
-import EditScreenInfo from '@/components/EditScreenInfo';
 import { Text, View } from '@/components/Themed';
+import { useUser } from '@/contexts/UserContext';
 
 export default function TabOneScreen() {
+
+  const { userLogged } = useUser();
+
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Tab One do 1</Text>
-      <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
-      <EditScreenInfo path="app/(tabs)/index.tsx" />
+      <Text style={styles.title}>Olá! Seja bem-vindo(a), {userLogged?.name}</Text>
     </View>
   );
 }
@@ -18,14 +18,10 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
+    backgroundColor: 'rgb(242, 242, 242)',
   },
   title: {
     fontSize: 20,
     fontWeight: 'bold',
-  },
-  separator: {
-    marginVertical: 30,
-    height: 1,
-    width: '80%',
   },
 });
