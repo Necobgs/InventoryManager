@@ -7,6 +7,7 @@ interface UserContextType {
     users: UserInterface[],
     userLogged: UserInterface | undefined;
     validationLogin: (inventory:LoginInterface)=>UserInterface | undefined,
+    isLoged: ()=>boolean;
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
@@ -44,8 +45,12 @@ export default function UserProvider({children}:{children:React.ReactNode}) {
         return vobjUser;
     }
 
+    function isLoged(){
+        return !!userLogged;
+    }
+
     return (
-        <UserContext.Provider value={{users,userLogged,validationLogin}}>
+        <UserContext.Provider value={{users,userLogged,validationLogin,isLoged}}>
             {children}
         </UserContext.Provider>
     )
