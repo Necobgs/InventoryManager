@@ -54,9 +54,6 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-<<<<<<< HEAD
-        name="category"
-=======
         name="movements"
         options={{
           title: 'Movimentações',
@@ -65,7 +62,6 @@ export default function TabLayout() {
       />
       <Tabs.Screen
         name="configurations"
->>>>>>> login
         options={{
           title: 'Categoria',
           tabBarIcon: ({ color }) => <TabBarIcon name="tag" color={color} />,
