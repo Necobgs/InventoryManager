@@ -1,8 +1,7 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
-import { Link, Tabs } from 'expo-router';
+import { Link, Tabs, useRouter } from 'expo-router';
 import { Pressable } from 'react-native';
-
 import Colors from '@/constants/Colors';
 import { useColorScheme } from '@/components/useColorScheme';
 import { useClientOnlyValue } from '@/components/useClientOnlyValue';
@@ -18,6 +17,7 @@ export default function TabLayout() {
   const colorScheme = useColorScheme();
 
   return (
+    
     <Tabs
       screenOptions={{
         tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
@@ -54,7 +54,18 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
+<<<<<<< HEAD
         name="category"
+=======
+        name="movements"
+        options={{
+          title: 'Movimentações',
+          tabBarIcon: ({ color }) => <TabBarIcon name="exchange" color={color} />,
+        }}
+      />
+      <Tabs.Screen
+        name="configurations"
+>>>>>>> login
         options={{
           title: 'Categoria',
           tabBarIcon: ({ color }) => <TabBarIcon name="tag" color={color} />,
