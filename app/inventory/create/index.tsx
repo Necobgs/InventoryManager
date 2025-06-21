@@ -11,6 +11,7 @@ import DefaultDialog from '@/components/DefaultDialog';
 import { InventoryFormType } from '@/types/InventoryFormType';
 import ModalDropdown from '@/components/ModalDropdownCategory';
 import { FormInput } from '@/components/FormInput';
+import ComboBoxForm from '@/components/ComboBoxForm';
 
 
 const schema = yup.object().shape({
@@ -39,7 +40,7 @@ const schema = yup.object().shape({
 const PageTarefasId: React.FC = () => {
   const inventoryContext = useInventory();
   const categoryContext = useCategory();
-
+  const categories = categoryContext.findCategoryBy('enabled',true);
   const [dialogVisible, setDialogVisible] = useState(false);
   const [dialogTitle, setDialogTitle] = useState('');
   const [dialogText, setDialogText] = useState('');
@@ -91,32 +92,24 @@ const PageTarefasId: React.FC = () => {
           label="Quantidade em estoque"
       />
 
-      <FormInput
+      <FormInput 
           control={control}
           name="price_per_unity"
           label="Valor unitário"
           isCurrency
       />
 
-      <Text style={{marginBottom:5,marginLeft:5}}>Categoria</Text>
-      <View style={{flexDirection:'row',width:'100%',justifyContent:'space-between'}}>
-      <Controller
-        control={control}
-        name="category"
-        render={({ field: { onChange, value } }) => (
-          <>
-            <ModalDropdown 
-            data={categoryContext.findCategoryBy('enabled',true)}
-            initialValue={value}
-            onSelect={(categorySelected)=>onChange(categorySelected)}/>
-            {errors.price_per_unity && (
-              <HelperText type="error">{errors.price_per_unity.message}</HelperText>
-            )}
-          </>
-        )}
-      />
-
-      <Button mode="contained" onPress={handleSubmit(onSubmit)}>
+      <View style={{flexDirection:'row',width:'100%',justifyContent:'space-between',alignItems:'flex-end'}}>
+        <ComboBoxForm
+          data={categories}
+          control={control}
+          name="category"
+          label="Categoria"
+          errors={errors}
+          displayKey={'description'}
+        />
+      
+      <Button mode="contained" onPress={handleSubmit(onSubmit)} style={{height:40}}>
         Criar produto
       </Button>
 

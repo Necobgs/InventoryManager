@@ -13,6 +13,7 @@ import ModalDropdown from '@/components/ModalDropdownCategory';
 import { formatCurrency } from '@/common/FormatCurrency';
 import { parseCurrency } from '@/common/PasseCurrency';
 import { FormInput } from '@/components/FormInput';
+import ComboBoxForm from '@/components/ComboBoxForm';
 
 
 const schema = yup.object().shape({
@@ -50,6 +51,7 @@ export default function PageTarefasId() {
   const [dialogTitle, setDialogTitle] = useState('');
   const [dialogText, setDialogText] = useState('');
   const router = useRouter();
+  const categories = categoryContext.findCategoryBy('enabled',true);
 
   const {
     control,
@@ -142,22 +144,13 @@ export default function PageTarefasId() {
             disabled
           />
 
-        <Controller
+        <ComboBoxForm
+          data={categories}
           control={control}
           name="category"
-          render={({ field: { onChange, value } }) => (
-            <>
-              <Text style={{ marginLeft: 5, marginBottom: 5 }}>Categoria</Text>
-              <ModalDropdown
-                data={categoryContext.findCategoryBy('enabled',true)}
-                initialValue={value}
-                onSelect={(categorySelected) => onChange(categorySelected)}
-              />
-              {errors.category && (
-                <HelperText type="error">{errors.category.message}</HelperText>
-              )}
-            </>
-          )}
+          label="Categoria"
+          displayKey={'description'}
+          errors={errors}
         />
 
         <View style={styles.excludeItemView}>
