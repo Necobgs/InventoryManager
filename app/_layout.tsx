@@ -1,15 +1,21 @@
-import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
-import { useFonts } from 'expo-font';
-import { Stack, useRouter } from 'expo-router';
-import * as SplashScreen from 'expo-splash-screen';
-import { useEffect } from 'react';
+import { Stack } from 'expo-router';
+import { useState } from 'react';
 import 'react-native-reanimated';
 import { useColorScheme } from '@/components/useColorScheme';
 import InventoryProvider from '@/contexts/InventoryContext';
 import { CategoryProvider } from '@/contexts/CategoryContext';
-import UserProvider, { useUser } from '@/contexts/UserContext';
-import { StyleSheet, View, Text } from 'react-native';
+import UserProvider from '@/contexts/UserContext';
+import { StyleSheet } from 'react-native';
+import { Text } from '@/components/Themed';
+import MovementsProvider from '@/contexts/MovementsContext';
+import { useUser } from '@/contexts/UserContext'; 
+
+
+export {
+  // Catch any errors thrown by the Layout component.
+  ErrorBoundary,
+} from 'expo-router';
 
 // Configurações do Expo Router
 export const unstable_settings = {
@@ -23,7 +29,9 @@ export default function RootLayout() {
       <InventoryProvider>
         <CategoryProvider>
           <InventoryProvider>
+            <MovementsProvider>
               <RootLayoutNav />
+            </MovementsProvider>
           </InventoryProvider>
         </CategoryProvider>
       </InventoryProvider>
@@ -34,6 +42,7 @@ export default function RootLayout() {
 function RootLayoutNav() {
   const colorScheme = useColorScheme();
   const { isLoged } = useUser();
+  const [load, setLoad] = useState(false);
 
 
   return (
@@ -41,33 +50,51 @@ function RootLayoutNav() {
       <Stack>
           <Stack.Screen name="login/index" options={{ headerShown: false }} />
           <Stack.Protected guard={isLoged()} >
-              <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-              <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
-              <Stack.Screen
-                name="inventorys/edit/index"
-                options={{ title: 'Detalhes do produto' }}
-              />
-              <Stack.Screen
-                name="inventory/create/index"
-                options={{ title: 'Criar um produto' }}
-              />
+            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+            <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
+            <Stack.Screen 
+              name="inventory/edit/index"
+              options={{title:'Detalhes do produto'}}
+            />
+            <Stack.Screen 
+              name="inventory/create/index"
+              options={{title:'Criar um produto'}}
+            />
+            <Stack.Screen 
+              name="inventory/edit/[id]"
+              options={{title:'Atualizar um produto'}}
+            />
+            <Stack.Screen 
+              name="movements/create/index"
+              options={{title:'Criar uma movimentação'}}
+            />
+            <Stack.Screen 
+              name="movements/edit/[id]"
+              options={{title:'Atualizar movimentação'}}
+            />
           </Stack.Protected>
               
         </Stack>
-
     </ThemeProvider>
   );
 }
 
 const styles = StyleSheet.create({
-  loadingContainer: {
-    flex: 1,
-    justifyContent: 'center',
+  msgload: {
+    position: 'fixed',
+    top: 0,
+    left: 0,
+    display: 'flex',
     alignItems: 'center',
-    backgroundColor: '#F2F2F2',
+    justifyContent: 'center',
+    backgroundColor: 'rgb(242, 242, 242)',
+    width: '100%',
+    height: '100%',
+    zIndex: 1,
+    fontSize: 40,
+    fontWeight: 'bold'
   },
-  loadingText: {
-    fontSize: 24,
-    fontWeight: 'bold',
-  },
+  hide: {
+    display: 'none'
+  }
 });

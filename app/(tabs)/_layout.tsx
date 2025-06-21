@@ -54,10 +54,10 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="movements"
+        name="category"
         options={{
-          title: 'Movimentações',
-          tabBarIcon: ({ color }) => <TabBarIcon name="exchange" color={color} />,
+          title: 'Categorias',
+          tabBarIcon: ({ color }) => <TabBarIcon name="tag" color={color} />,
         }}
       />
       <Tabs.Screen
@@ -65,6 +65,13 @@ export default function TabLayout() {
         options={{
           title: 'Categoria',
           tabBarIcon: ({ color }) => <TabBarIcon name="tag" color={color} />,
+        }}
+      />
+      <Tabs.Screen
+        name="movements"
+        options={{
+          title: 'Movimentações',
+          tabBarIcon: ({ color }) => <TabBarIcon name="exchange" color={color} />,
         }}
       />
       <Tabs.Screen

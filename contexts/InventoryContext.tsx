@@ -49,7 +49,7 @@ export default function InventoryProvider({
   }
 
   function updateInventory(newInventory: InventoryInterface): ApiResponse {
-    if (!newInventory.price_per_unity || !newInventory.qty_product) {
+    if (!newInventory.price_per_unity) {
       return { message: "Preencha todos os campos obrigatórios", success: false };
     }
 

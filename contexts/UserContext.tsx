@@ -7,6 +7,10 @@ interface UserContextType {
     users: UserInterface[],
     userLogged: UserInterface | undefined;
     validationLogin: (inventory:LoginInterface)=>UserInterface | undefined,
+    getUsersBy<T extends keyof UserInterface>(
+        By: T,
+        value: UserInterface[T]
+    ): UserInterface[],
     isLoged: ()=>boolean;
 }
 
@@ -45,12 +49,19 @@ export default function UserProvider({children}:{children:React.ReactNode}) {
         return vobjUser;
     }
 
+    function getUsersBy<T extends keyof UserInterface>(
+        By: T,
+        value: UserInterface[T]
+        ): UserInterface[] {
+        return users.filter((user) => user[By] === value);
+    }
+
     function isLoged(){
         return !!userLogged;
     }
 
     return (
-        <UserContext.Provider value={{users,userLogged,validationLogin,isLoged}}>
+        <UserContext.Provider value={{users,userLogged,validationLogin,getUsersBy, isLoged}}>
             {children}
         </UserContext.Provider>
     )
