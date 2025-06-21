@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Controller, Control, FieldValues, Path } from 'react-hook-form';
 import { HelperText, TextInput } from 'react-native-paper';
 import { StyleSheet, View, StyleProp, TextStyle, ViewStyle } from 'react-native';
@@ -13,6 +13,7 @@ interface FormInputProps<T extends FieldValues> {
   multiline?: boolean;
   disabled?: boolean;
   isCurrency?: boolean;
+  isPassword?: boolean;
   styles?: {
     container?: StyleProp<ViewStyle>;
     input?: StyleProp<TextStyle>;
@@ -27,8 +28,19 @@ export const FormInput = <T extends FieldValues>({
   multiline = false,
   disabled = false,
   isCurrency = false,
+  isPassword = false,
   styles = {},
-}: FormInputProps<T>) => (
+}: FormInputProps<T>) => {
+
+  const [showPassword,setShowPassword] = useState(false);
+  
+  function handlerPassword(){
+
+    setShowPassword((oldValue)=>!oldValue)
+  }
+
+
+  return (
   <View style={styles.container ?? defaultStyles.container}>
     <Controller
       control={control}
@@ -43,6 +55,8 @@ export const FormInput = <T extends FieldValues>({
             multiline={multiline}
             numberOfLines={multiline ? 5 : 1}
             style={styles.input ?? defaultStyles.input}
+            secureTextEntry={isPassword && !showPassword}
+            right={isPassword && <TextInput.Icon icon={!showPassword ? "eye" : "eye-off"} onPress={handlerPassword}/>}
             value={
               isCurrency && typeof value === 'number'
                 ? formatCurrency(value)
@@ -73,7 +87,7 @@ export const FormInput = <T extends FieldValues>({
       )}
     />
   </View>
-);
+)};
 
 const defaultStyles = StyleSheet.create({
   container: {

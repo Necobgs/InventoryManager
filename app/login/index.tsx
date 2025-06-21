@@ -64,6 +64,7 @@ const Login: React.FC = () => {
                 control={control}
                 name="password"
                 label="Senha"
+                isPassword={true}
             />
 
             <Button style={styles.button} mode="contained" onPress={handleSubmit(onSubmit)}>
