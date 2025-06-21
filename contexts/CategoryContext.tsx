@@ -4,9 +4,10 @@ import React, { createContext, useContext, useState } from "react";
 
 interface CategoryContextType{
     categories:CategoryInterface[],
-    findCategoryBy:<T extends keyof CategoryInterface>(by:T,value:CategoryInterface[T]) => CategoryInterface[] | ApiResponse,
+    findCategoryBy:<T extends keyof CategoryInterface>(by:T,value:CategoryInterface[T]) => CategoryInterface[],
     addCategory: (category:CategoryInterface) => ApiResponse,
-    removeCategory: (id:number) => ApiResponse
+    removeCategory: (id:number) => ApiResponse,
+    updateCategory: (data:CategoryInterface) => ApiResponse
 }
 
 const CategoryContext = createContext<CategoryContextType | undefined>(undefined);
@@ -40,8 +41,12 @@ export function CategoryProvider(
 
     function addCategory(newCategory:CategoryInterface): ApiResponse{
         if(!isValidCategory(newCategory)) return { message:"Preencha todos os campos", success:false }
-        setCategories((oldCategories)=>[...oldCategories,newCategory])
-        return {message:"Sucesso ao cadastrar categoria",success:true}
+        setCategories((oldCategories)=>[...oldCategories,{
+            ...newCategory,
+            id:categories.length+1
+        }]);
+
+        return {message:"Sucesso ao cadastrar categoria",success:true};
     }
 
     function removeCategory(id:number): ApiResponse{
@@ -53,8 +58,17 @@ export function CategoryProvider(
         return { message:"Categoria excluida com sucesso",success:true }
     }
 
+    function updateCategory(data:CategoryInterface){
+        const category = findCategoryBy('id',data.id)[0]
+        if(!category) return {message:"Não foi possível encontrar a categoria",success:false}
+        setCategories((oldCategories)=>
+            oldCategories.map((category)=>category.id == data.id ? data : category)
+        )
+        return {message:"Sucesso ao atualizar a categoria!",success:true}
+    }
+
     return (
-    <CategoryContext.Provider value={{addCategory,removeCategory,findCategoryBy,categories}}>
+    <CategoryContext.Provider value={{addCategory,removeCategory,findCategoryBy,categories,updateCategory}}>
         {children}
     </CategoryContext.Provider>
     )

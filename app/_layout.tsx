@@ -42,7 +42,6 @@ export default function RootLayout() {
 function RootLayoutNav() {
   const colorScheme = useColorScheme();
   const { isLoged } = useUser();
-  const [load, setLoad] = useState(false);
 
 
   return (
@@ -52,14 +51,6 @@ function RootLayoutNav() {
           <Stack.Protected guard={isLoged()} >
             <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
             <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
-            <Stack.Screen 
-              name="inventory/edit/index"
-              options={{title:'Detalhes do produto'}}
-            />
-            <Stack.Screen 
-              name="inventory/create/index"
-              options={{title:'Criar um produto'}}
-            />
             <Stack.Screen 
               name="inventory/edit/[id]"
               options={{title:'Atualizar um produto'}}
@@ -71,6 +62,14 @@ function RootLayoutNav() {
             <Stack.Screen 
               name="movements/edit/[id]"
               options={{title:'Atualizar movimentação'}}
+            />
+            <Stack.Screen 
+              name="category/create/index"
+              options={{title:'Criar uma categoria'}}
+            />
+            <Stack.Screen 
+              name="category/edit/[id]"
+              options={{title:'Atualizar categoria'}}
             />
           </Stack.Protected>
               

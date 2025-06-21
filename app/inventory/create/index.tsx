@@ -1,7 +1,7 @@
 // pages/PageTarefasId.tsx
 import React, { useState } from 'react';
 import { View, StyleSheet } from 'react-native';
-import { Button, TextInput, HelperText, Text } from 'react-native-paper';
+import { Button, HelperText, Text } from 'react-native-paper';
 import { useForm, Controller } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
@@ -10,8 +10,6 @@ import useCategory from '@/contexts/CategoryContext';
 import DefaultDialog from '@/components/DefaultDialog';
 import { InventoryFormType } from '@/types/InventoryFormType';
 import ModalDropdown from '@/components/ModalDropdownCategory';
-import { formatCurrency } from '@/common/FormatCurrency';
-import { parseCurrency } from '@/common/PasseCurrency';
 import { FormInput } from '@/components/FormInput';
 
 
