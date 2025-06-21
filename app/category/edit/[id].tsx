@@ -6,18 +6,21 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import useCategory from '@/contexts/CategoryContext';
 import DefaultDialog from '@/components/DefaultDialog';
-import { useLocalSearchParams } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import { FormInput } from '@/components/FormInput';
 import CategoryInterface from '@/interfaces/CategoryInterface';
 
 
 const schema = yup.object().shape({
     id: yup
-    .number()
-    .required(),
-  description: yup
-    .string()
-    .required('A descrição da categoria é obrigatória'),
+        .number()
+        .required(),
+    description: yup
+        .string()
+        .required('A descrição da categoria é obrigatória'),
+    enabled: yup
+        .boolean()
+        .required()
 });
 
 export default function PageCategoryEdit() {
@@ -27,6 +30,7 @@ export default function PageCategoryEdit() {
   const [dialogVisible, setDialogVisible] = useState(false);
   const [dialogTitle, setDialogTitle] = useState('');
   const [dialogText, setDialogText] = useState('');
+  const router = useRouter()
 
   const {
     control,
@@ -53,15 +57,15 @@ export default function PageCategoryEdit() {
     );
   }
 
-//   function removeInventory() {
-//     const response = categoryContext.removeInventoryById(+id);
-//     setDialogTitle(response.success ? 'Sucesso' : 'Erro');
-//     setDialogText(response.message);
-//     setDialogVisible(true);
-//     if (response.success) {
-//       router.navigate('/(tabs)/inventory');
-//     }
-//   }
+  function removeCategory() {
+    const response = categoryContext.removeCategory(+id);
+    setDialogTitle(response.success ? 'Sucesso' : 'Erro');
+    setDialogText(response.message);
+    setDialogVisible(true);
+    if (response.success) {
+      router.navigate('/(tabs)/category');
+    }
+  }
 
   function saveChanges(data: CategoryInterface) {
     const response = categoryContext.updateCategory(data);
@@ -81,9 +85,9 @@ export default function PageCategoryEdit() {
           />
 
         <View style={styles.excludeItemView}>
-          {/* <Button mode="outlined" style={{ width: '45%' }} onPress={handleSubmit(removeInventory)}>
+          <Button mode="outlined" style={{ width: '45%' }} onPress={handleSubmit(removeCategory)}>
             Excluir produto
-          </Button> */}
+          </Button>
           <Button
             mode="contained"
             style={{ width: '45%' }}

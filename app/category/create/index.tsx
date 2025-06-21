@@ -17,6 +17,9 @@ const schema = yup.object().shape({
   description: yup
     .string()
     .required('A descrição da categoria é obrigatória'),
+  enabled: yup
+    .boolean()
+    .required()
 });
 
 export default function PageCategoryCreate() {

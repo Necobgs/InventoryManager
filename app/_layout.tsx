@@ -1,13 +1,10 @@
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { Stack } from 'expo-router';
-import { useState } from 'react';
 import 'react-native-reanimated';
 import { useColorScheme } from '@/components/useColorScheme';
 import InventoryProvider from '@/contexts/InventoryContext';
 import { CategoryProvider } from '@/contexts/CategoryContext';
 import UserProvider from '@/contexts/UserContext';
-import { StyleSheet } from 'react-native';
-import { Text } from '@/components/Themed';
 import MovementsProvider from '@/contexts/MovementsContext';
 import { useUser } from '@/contexts/UserContext'; 
 
@@ -77,23 +74,3 @@ function RootLayoutNav() {
     </ThemeProvider>
   );
 }
-
-const styles = StyleSheet.create({
-  msgload: {
-    position: 'fixed',
-    top: 0,
-    left: 0,
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: 'rgb(242, 242, 242)',
-    width: '100%',
-    height: '100%',
-    zIndex: 1,
-    fontSize: 40,
-    fontWeight: 'bold'
-  },
-  hide: {
-    display: 'none'
-  }
-});

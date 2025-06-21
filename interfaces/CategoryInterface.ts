@@ -1,4 +1,5 @@
 export default interface CategoryInterface{
     id:number,
-    description:string
+    description:string,
+    enabled:boolean
 }

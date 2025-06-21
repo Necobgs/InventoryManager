@@ -19,16 +19,19 @@ export function CategoryProvider(
     const [categories,setCategories] = useState<CategoryInterface[]>([
         {
             id:1,
-            description:"Fruta"
+            description:"Fruta",
+            enabled:true
         },
         {
             id:2,
-            description:"Bebida"
+            description:"Bebida",
+            enabled:true
         },
         {
             id:3,
-            description:"Energético"
-        }
+            description:"Energético",
+            enabled:true
+        },
     ])
 
     function isValidCategory(category:CategoryInterface){
@@ -53,7 +56,7 @@ export function CategoryProvider(
         const categoryFounded = findCategoryBy('id',id);
         if(!categoryFounded) return { message:"Categoria não encontrada",success:false }
         setCategories((oldCategories)=>
-            oldCategories.filter((category)=>category.id != id)
+            oldCategories.map((category)=>category.id != id ? category : {...category,enabled:false})
         )
         return { message:"Categoria excluida com sucesso",success:true }
     }

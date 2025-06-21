@@ -32,6 +32,7 @@ const schema = yup.object().shape({
     .object({
       id: yup.number().required(),
       description: yup.string().required(),
+      enabled:yup.boolean().required()
     })
     .required('Selecione uma categoria')
     .nullable(),
@@ -148,7 +149,7 @@ export default function PageTarefasId() {
             <>
               <Text style={{ marginLeft: 5, marginBottom: 5 }}>Categoria</Text>
               <ModalDropdown
-                data={categoryContext.categories}
+                data={categoryContext.findCategoryBy('enabled',true)}
                 initialValue={value}
                 onSelect={(categorySelected) => onChange(categorySelected)}
               />

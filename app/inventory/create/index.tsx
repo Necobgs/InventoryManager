@@ -30,10 +30,10 @@ const schema = yup.object().shape({
     .object({
         id:yup.number().required(),
         description: yup.string().required(),
+        enabled:yup.boolean().required()
     })
     .required("selecione uma categoria")
-    .nullable()
-    // .typeError("Selecione uma categoria para o produto")
+    .nullable(),    
 });
 
 const PageTarefasId: React.FC = () => {
@@ -51,11 +51,11 @@ const PageTarefasId: React.FC = () => {
     formState: { errors },
   } = useForm<InventoryFormType>({
     defaultValues: {
-      category: null,
-      description: '',
-      price_per_unity: 0,
-      qty_product: 0,
       title: '',
+      description: '',
+      qty_product: 0,
+      price_per_unity: 0,
+      category: null,
     },
     resolver: yupResolver(schema),
   });
@@ -106,7 +106,7 @@ const PageTarefasId: React.FC = () => {
         render={({ field: { onChange, value } }) => (
           <>
             <ModalDropdown 
-            data={categoryContext.categories}
+            data={categoryContext.findCategoryBy('enabled',true)}
             initialValue={value}
             onSelect={(categorySelected)=>onChange(categorySelected)}/>
             {errors.price_per_unity && (

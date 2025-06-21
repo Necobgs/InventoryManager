@@ -1,9 +1,8 @@
 import { Text } from "@/components/Themed";
 import { FlatList, StyleSheet } from "react-native";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
-import CardInventory from "@/components/CardInventory";
 import useCategory from "@/contexts/CategoryContext";
-import { RelativePathString, useRouter } from "expo-router";
+import { useRouter } from "expo-router";
 import { AnimatedFAB } from "react-native-paper";
 import GenericCard from "@/components/GenericCard";
 
@@ -12,7 +11,7 @@ import GenericCard from "@/components/GenericCard";
 export default function TabCategory(){
     const useCategoryContext = useCategory();
     const router = useRouter();
-    const categories =useCategoryContext.categories;
+    const categories =useCategoryContext.findCategoryBy('enabled',true);
     return (
         <SafeAreaProvider>
             <SafeAreaView style={{flex:1}}>
