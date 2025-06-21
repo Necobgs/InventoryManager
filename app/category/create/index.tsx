@@ -65,8 +65,8 @@ export default function PageCategoryCreate() {
           />
 
         <View style={styles.excludeItemView}>
-          {/* <Button mode="outlined" style={{ width: '45%' }} onPress={handleSubmit(removeInventory)}>
-            Excluir produto
+          {/* <Button mode="outlined" style={{ width: '45%' }} onPress={handleSubmit(disableInventory)}>
+            Desabilitar produto
           </Button> */}
           <Button
             mode="contained"

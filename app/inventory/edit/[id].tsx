@@ -86,8 +86,8 @@ export default function PageTarefasId() {
     );
   }
 
-  function removeInventory() {
-    const response = inventoryContext.removeInventoryById(+id);
+  function disableInventory() {
+    const response = inventoryContext.disableInventoryById(+id);
     setDialogTitle(response.success ? 'Sucesso' : 'Erro');
     setDialogText(response.message);
     setDialogVisible(true);
@@ -161,8 +161,8 @@ export default function PageTarefasId() {
         />
 
         <View style={styles.excludeItemView}>
-          <Button mode="outlined" style={{ width: '45%' }} onPress={handleSubmit(removeInventory)}>
-            Excluir produto
+          <Button mode="outlined" style={{ width: '45%' }} onPress={handleSubmit(disableInventory)}>
+            Desabilitar produto
           </Button>
           <Button
             mode="contained"

@@ -6,7 +6,7 @@ interface CategoryContextType{
     categories:CategoryInterface[],
     findCategoryBy:<T extends keyof CategoryInterface>(by:T,value:CategoryInterface[T]) => CategoryInterface[],
     addCategory: (category:CategoryInterface) => ApiResponse,
-    removeCategory: (id:number) => ApiResponse,
+    disableCategory: (id:number) => ApiResponse,
     updateCategory: (data:CategoryInterface) => ApiResponse
 }
 
@@ -52,7 +52,7 @@ export function CategoryProvider(
         return {message:"Sucesso ao cadastrar categoria",success:true};
     }
 
-    function removeCategory(id:number): ApiResponse{
+    function disableCategory(id:number): ApiResponse{
         const categoryFounded = findCategoryBy('id',id);
         if(!categoryFounded) return { message:"Categoria não encontrada",success:false }
         setCategories((oldCategories)=>
@@ -71,7 +71,7 @@ export function CategoryProvider(
     }
 
     return (
-    <CategoryContext.Provider value={{addCategory,removeCategory,findCategoryBy,categories,updateCategory}}>
+    <CategoryContext.Provider value={{addCategory,disableCategory,findCategoryBy,categories,updateCategory}}>
         {children}
     </CategoryContext.Provider>
     )

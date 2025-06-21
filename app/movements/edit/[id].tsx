@@ -76,8 +76,8 @@ const EditMovements: React.FC = () => {
         setDialogVisible(true);
     };
 
-    const removeMovement = () => {
-        const response = MovementsContext.removeMovementById(+id);
+    const disableMovement = () => {
+        const response = MovementsContext.disableMovementById(+id);
         setDialogTitle(response.success ? 'Sucesso' : 'Erro');
         setDialogText(response.message);
         setDialogVisible(true);
@@ -115,8 +115,8 @@ const EditMovements: React.FC = () => {
 
             <View style={styles.areaButtons}>
 
-                <Button mode="outlined" style={{ width: '45%' }} onPress={handleSubmit(removeMovement)}>
-                    Excluir produto
+                <Button mode="outlined" style={{ width: '45%' }} onPress={handleSubmit(disableMovement)}>
+                    Desabilitar produto
                 </Button>
                 <Button
                     mode="contained"

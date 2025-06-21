@@ -57,8 +57,8 @@ export default function PageCategoryEdit() {
     );
   }
 
-  function removeCategory() {
-    const response = categoryContext.removeCategory(+id);
+  function disableCategory() {
+    const response = categoryContext.disableCategory(+id);
     setDialogTitle(response.success ? 'Sucesso' : 'Erro');
     setDialogText(response.message);
     setDialogVisible(true);
@@ -85,8 +85,8 @@ export default function PageCategoryEdit() {
           />
 
         <View style={styles.excludeItemView}>
-          <Button mode="outlined" style={{ width: '45%' }} onPress={handleSubmit(removeCategory)}>
-            Excluir produto
+          <Button mode="outlined" style={{ width: '45%' }} onPress={handleSubmit(disableCategory)}>
+            Desabilitar categoria
           </Button>
           <Button
             mode="contained"

@@ -14,7 +14,7 @@ export default function Root({ children }: { children: React.ReactNode }) {
 
         {/* 
           Disable body scrolling on web. This makes ScrollView components work closer to how they do on native. 
-          However, body scrolling is often nice to have for mobile web. If you want to enable it, remove this line.
+          However, body scrolling is often nice to have for mobile web. If you want to enable it, disable this line.
         */}
         <ScrollViewStyleReset />
 
