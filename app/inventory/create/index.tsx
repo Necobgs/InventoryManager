@@ -129,9 +129,10 @@ const PageTarefasId: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     padding: 20,
+    flex: 1,
     alignItems:'center',
     justifyContent:'center',
-    minHeight:'100%'
+    minHeight:'100%',
   },
   fullWidth: {
     width: '100%',
@@ -140,10 +141,13 @@ const styles = StyleSheet.create({
   formModal:{
     maxWidth:800,
     width:'98%',
+    maxHeight:'100%',
     backgroundColor:'#ffff',
     padding:25,
     borderRadius:10,
-    gap:15}
+    gap:15,
+    overflowY: 'auto',
+  }
 });
 
 export default PageTarefasId;

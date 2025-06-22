@@ -38,15 +38,14 @@ export default function PageCategoryCreate() {
   } = useForm<CategoryInterface>({
     defaultValues: {
       id:0,
-      description:""
+      description:"",
+      enabled: true,
     },
     resolver: yupResolver(schema),
   });
 
   function saveChanges(data: CategoryInterface) {
-    console.log('enviado:')
-    console.log(data)
-    console.log(data.description)
+    console.log("teste 2")
     const response = categoryContext.addCategory(data);
     setDialogTitle(response.success ? 'Sucesso' : 'Erro');
     setDialogText(response.message);
@@ -65,16 +64,12 @@ export default function PageCategoryCreate() {
           />
 
         <View style={styles.excludeItemView}>
-          {/* <Button mode="outlined" style={{ width: '45%' }} onPress={handleSubmit(disableInventory)}>
-            Desabilitar produto
-          </Button> */}
           <Button
             mode="contained"
             style={{ width: '45%' }}
             onPress={handleSubmit(saveChanges)}
-            disabled={!isDirty}
           >
-            Salvar alterações
+            Salvar
           </Button>
         </View>
 
@@ -92,9 +87,10 @@ export default function PageCategoryCreate() {
 const styles = StyleSheet.create({
   container: {
     padding: 20,
+    flex: 1,
     minHeight:'100%',
     alignItems:'center',
-    justifyContent:'center'
+    justifyContent:'center',
   },
   fullWidth: {
     width: '100%',
@@ -108,8 +104,11 @@ const styles = StyleSheet.create({
   formModal:{
     maxWidth:800,
     width:'98%',
+    maxHeight:'100%',
     backgroundColor:'#ffff',
     padding:25,
     borderRadius:10,
-    gap:15}
+    gap:15,
+    overflowY: 'auto',
+  }
 });

@@ -7,10 +7,9 @@ import { useUser } from "@/contexts/UserContext";
 import { MovementsInterface } from "@/interfaces/MovementsInterface";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useEffect, useState } from "react";
-import { Controller, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { StyleSheet } from "react-native";
 import { Button } from "react-native-paper";
-import ModalDropdownInventory from '@/components/ModalDropdownInventory';
 import * as yup from 'yup';
 import MovementsFormType from "@/types/MovementsFormType";
 import ComboBoxForm from "@/components/ComboBoxForm";
@@ -167,10 +166,13 @@ const styles = StyleSheet.create({
   formModal:{
     maxWidth:800,
     width:'98%',
+    maxHeight:'100%',
     backgroundColor:'#ffff',
     padding:25,
     borderRadius:10,
-    gap:15}
+    gap:15,
+    overflowY: 'auto',
+  }
 });
 
 

@@ -112,9 +112,10 @@ export default function PageCategoryEdit() {
 const styles = StyleSheet.create({
   container: {
     padding: 20,
+    flex: 1,
     minHeight:'100%',
     alignItems:'center',
-    justifyContent:'center'
+    justifyContent:'center',
   },
   fullWidth: {
     width: '100%',
@@ -128,8 +129,11 @@ const styles = StyleSheet.create({
   formModal:{
     maxWidth:800,
     width:'98%',
+    maxHeight:'100%',
     backgroundColor:'#ffff',
     padding:25,
     borderRadius:10,
-    gap:15}
+    gap:15,
+    overflowY: 'auto',
+  }
 });

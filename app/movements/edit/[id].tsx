@@ -191,7 +191,6 @@ const styles = StyleSheet.create({
     justifyContent:'center',
     minHeight:'100%',
     backgroundColor:'rgb(242 242 242)',
-
   },
   fullWidth: {
     width: '100%',
@@ -205,10 +204,14 @@ const styles = StyleSheet.create({
   formModal:{
     maxWidth:800,
     width:'98%',
+    maxHeight:'100%',
+    minHeight: 'auto',
     backgroundColor:'#ffff',
     padding:25,
     borderRadius:10,
-    gap:15}
+    gap:15,
+    overflowY: 'auto',
+  }
 });
 
 

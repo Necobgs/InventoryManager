@@ -1,5 +1,6 @@
 // components/DefaultDialog.tsx
 import React from 'react';
+import { StyleSheet } from 'react-native';
 import { Dialog, Portal, Button, Text } from 'react-native-paper';
 import { PaperProvider } from 'react-native-paper';
 
@@ -14,7 +15,7 @@ interface DefaultDialogProps {
 const DefaultDialog: React.FC<DefaultDialogProps> = ({ visible, onDismiss, title, text }) => (
   <PaperProvider>
   <Portal>
-    <Dialog visible={visible} onDismiss={onDismiss}>
+    <Dialog visible={visible} onDismiss={onDismiss} style={styles.dialog}>
       <Dialog.Title>{title}</Dialog.Title>
       <Dialog.Content>
         <Text>{text}</Text>
@@ -26,5 +27,16 @@ const DefaultDialog: React.FC<DefaultDialogProps> = ({ visible, onDismiss, title
   </Portal>
   </PaperProvider>
 );
+
+const styles = StyleSheet.create({
+  dialog: {
+    position: 'fixed',
+    top: 80,
+    marginLeft: 0,
+    marginRight: 0,
+    left: 20,
+    right: 20,
+  }
+});
 
 export default DefaultDialog;

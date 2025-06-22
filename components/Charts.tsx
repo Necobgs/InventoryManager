@@ -115,7 +115,7 @@ export default function Charts() {
             <Text style={styles.title}>Quantidade de produtos no estoque</Text>
             <PieChart
             data={dataIventorys}
-            width={320}
+            width={315}
             height={220}
             chartConfig={{
                 color: () => `black`
@@ -132,7 +132,7 @@ export default function Charts() {
             <Text style={styles.title}>Retiradas de estoque por produto</Text>
             <PieChart
             data={dataMovements}
-            width={320}
+            width={315}
             height={220}
             chartConfig={{
                 color: () => `black`
@@ -149,7 +149,7 @@ export default function Charts() {
             <Text style={styles.title}>Quantidade de produtos por categoria</Text>
             <PieChart
             data={dataCategories}
-            width={320}
+            width={315}
             height={220}
             chartConfig={{
                 color: () => `black`
@@ -183,7 +183,7 @@ const styles = StyleSheet.create({
         backgroundColor: 'rgb(242 242 242)',
     },
     title: {
-        fontSize: 18,
+        fontSize: 16,
         fontWeight: 'bold',
     }
 })
