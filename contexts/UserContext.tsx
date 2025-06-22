@@ -28,7 +28,7 @@ export default function UserProvider({children}:{children:React.ReactNode}) {
             id: 2,
             name: "Lucas Rosa",
             email: "lucas@gmail.com",
-            password: "1234"
+            password: "1234@teste"
         }
     ])
 

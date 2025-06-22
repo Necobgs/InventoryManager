@@ -6,13 +6,14 @@ import { useMovements } from "@/contexts/MovementsContext";
 import { useUser } from "@/contexts/UserContext";
 import { MovementsInterface } from "@/interfaces/MovementsInterface";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { StyleSheet } from "react-native";
 import { Button } from "react-native-paper";
 import ModalDropdownInventory from '@/components/ModalDropdownInventory';
 import * as yup from 'yup';
 import MovementsFormType from "@/types/MovementsFormType";
+import ComboBoxForm from "@/components/ComboBoxForm";
 
 const schema = yup.object().shape({
     quantity: yup
@@ -26,13 +27,17 @@ const schema = yup.object().shape({
         title: yup.string().required(),
     })
     .required("selecione uma categoria")
-    .nullable()
+    .nullable(),
+    qty_product:yup.number().required(),
+    price_per_unity:yup.number().required(),
+    value:yup.number().required(),
 });
 
 const CreateMovements: React.FC = () => {
-    const MovementsContext = useMovements();
+    const movementsContext = useMovements();
     const inventoryContext = useInventory();
     const { userLogged } = useUser();
+    const inventorys = inventoryContext.getInventoryBy("enabled", true);
 
     const [dialogVisible, setDialogVisible] = useState(false);
     const [dialogTitle, setDialogTitle] = useState('');
@@ -42,14 +47,32 @@ const CreateMovements: React.FC = () => {
         control,
         handleSubmit,
         reset,
+        watch,
+        setValue,
         formState: { errors },
     } = useForm<MovementsFormType>({
         defaultValues: {
         inventory: null,
         quantity: 0,
+        qty_product: 0,
+        price_per_unity: 0,
+        value: 0,
         },
         resolver: yupResolver(schema),
     });
+
+    const quantity = watch('quantity');
+    const inventorySel = watch('inventory');
+
+    useEffect(() => {
+        const inventory = inventoryContext.getInventoryBy("id", !inventorySel?.id ? 0 : inventorySel.id)?.[0];
+
+        if (inventory){
+            setValue('qty_product', inventory.qty_product);
+            setValue('price_per_unity', inventory.price_per_unity);
+            setValue('value', inventory.price_per_unity * quantity);
+        }
+    }, [quantity, inventorySel, setValue]);
 
     const onSubmit = (data: MovementsFormType) => {
 
@@ -62,7 +85,7 @@ const CreateMovements: React.FC = () => {
             price_at_time: 0,
             date: new Date(),
         }
-        const response = MovementsContext.addMovement(newData);
+        const response = movementsContext.addMovement(newData);
         setDialogTitle(response.success ? 'Sucesso' : 'Erro');
         setDialogText(response.message);
         setDialogVisible(true);
@@ -73,32 +96,48 @@ const CreateMovements: React.FC = () => {
         <View style={styles.container}>
             <View style={styles.formModal}>
 
+            <ComboBoxForm
+                data={inventorys}
+                control={control}
+                name="inventory"
+                label="Produto"
+                displayKey={'title'}
+                errors={errors}
+            />
+
             <FormInput
                 control={control}
                 name="quantity"
-                label="Quantidade em estoque"
+                label="Quantidade Movimentação"
             />
 
-            <Text style={{marginBottom:5,marginLeft:5}}>Produto</Text>
-            <View style={{flexDirection:'row',width:'100%',justifyContent:'space-between'}}>
-            <Controller
+            <FormInput
                 control={control}
-                name="inventory"
-                render={({ field: { onChange, value } }) => (
-                <>
-                    <ModalDropdownInventory 
-                    data={inventoryContext.inventorys}
-                    initialValue={value}
-                    onSelect={(inventorySelected)=>onChange(inventorySelected)}/>
-                </>
-                )}
+                name="qty_product"
+                label="Quantidade em Estoque"
+                disabled
+            />
+
+            <FormInput
+                control={control}
+                name="price_per_unity"
+                label="Preço Unidade"
+                isCurrency
+                disabled
+            />
+
+            <FormInput
+                control={control}
+                name="value"
+                label="Valor Total"
+                isCurrency
+                disabled
             />
 
             <Button mode="contained" onPress={handleSubmit(onSubmit)}>
                 Cadastar movimentação
             </Button>
 
-            </View>
 
             <DefaultDialog
                 visible={dialogVisible}

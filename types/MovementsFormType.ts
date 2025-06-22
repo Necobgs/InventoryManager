@@ -4,4 +4,7 @@ export default interface MovementsFormType {
         title: string;
     } | null,
     quantity: number,
+    qty_product: number,
+    price_per_unity: number,
+    value: number,
 }

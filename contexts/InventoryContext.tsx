@@ -26,7 +26,6 @@ export default function InventoryProvider({
   const [inventorys, setInventorys] = useState<InventoryInterface[]>([]);
 
   function addInventory(newInventory: InventoryFormType): ApiResponse {
-    console.log(newInventory)
     if (
       !newInventory.title ||
       !newInventory.description ||

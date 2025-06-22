@@ -7,7 +7,7 @@ interface MovementsContextType {
     movements: MovementsInterface[],
     addMovement: (data:MovementsInterface)=> ApiResponse,
     updateMovement: (data:MovementsInterface)=> ApiResponse,
-    disableMovementById: (id:number)=> ApiResponse,
+    removeMovementById: (id:number)=> ApiResponse,
     getMovementsBy<T extends keyof MovementsInterface>(
         By: T,
         value: MovementsInterface[T]
@@ -143,7 +143,7 @@ export default function MovementsProvider({children}:{children:React.ReactNode})
     }
 
 
-    function disableMovementById(id: number): ApiResponse {
+    function removeMovementById(id: number): ApiResponse {
         const moviment = getMovementsBy("id", id)?.[0];
 
         if (!moviment) {
@@ -182,7 +182,7 @@ export default function MovementsProvider({children}:{children:React.ReactNode})
     }
 
     return (
-        <MovementsContext.Provider value={{movements, addMovement, updateMovement, disableMovementById, getMovementsBy}}>
+        <MovementsContext.Provider value={{movements, addMovement, updateMovement, removeMovementById, getMovementsBy}}>
             {children}
         </MovementsContext.Provider>
     )

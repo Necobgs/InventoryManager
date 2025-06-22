@@ -6,14 +6,15 @@ import { useMovements } from "@/contexts/MovementsContext";
 import { useUser } from "@/contexts/UserContext";
 import { MovementsInterface } from "@/interfaces/MovementsInterface";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { useState } from "react";
-import { Controller, useForm } from "react-hook-form";
+import { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
 import { StyleSheet } from "react-native";
 import { Button } from "react-native-paper";
 import ModalDropdownInventory from '@/components/ModalDropdownInventory';
 import * as yup from 'yup';
 import MovementsFormType from "@/types/MovementsFormType";
 import { useLocalSearchParams, useRouter } from "expo-router";
+import ComboBoxForm from "@/components/ComboBoxForm";
 
 const schema = yup.object().shape({
     quantity: yup
@@ -27,17 +28,22 @@ const schema = yup.object().shape({
         title: yup.string().required(),
     })
     .required("selecione uma categoria")
-    .nullable()
+    .nullable(),
+    qty_product:yup.number().required(),
+    price_per_unity:yup.number().required(),
+    value:yup.number().required(),
 });
 
 const EditMovements: React.FC = () => {
     const { id } = useLocalSearchParams<{ id: string }>();
-    const MovementsContext = useMovements();
+    const movementsContext = useMovements();
     const inventoryContext = useInventory();
     const router = useRouter();
     const { userLogged } = useUser();
-    const moviment = MovementsContext.getMovementsBy("id", +id)?.[0];
-    const inventory = inventoryContext.getInventoryBy("id", !moviment?.id_inventory ? 0 : moviment.id_inventory)?.[0];
+    const movement = movementsContext.getMovementsBy("id", +id)?.[0];
+    const inventory = inventoryContext.getInventoryBy("id", !movement?.id_inventory ? 0 : movement.id_inventory)?.[0];
+    const inventorys = inventoryContext.getInventoryBy("enabled", true);
+
 
     const [dialogVisible, setDialogVisible] = useState(false);
     const [dialogTitle, setDialogTitle] = useState('');
@@ -47,6 +53,8 @@ const EditMovements: React.FC = () => {
         control,
         handleSubmit,
         reset,
+        watch,
+        setValue,
         formState: { errors },
     } = useForm<MovementsFormType>({
         defaultValues: {
@@ -54,10 +62,33 @@ const EditMovements: React.FC = () => {
             id: inventory?.id,
             title: inventory?.title,
         },
-        quantity: moviment?.quantity,
+        quantity: movement?.quantity,
+        qty_product: !inventory?.qty_product || !movement?.quantity ? 0 : inventory.qty_product + movement.quantity,
+        price_per_unity: inventory?.price_per_unity,
+        value: !inventory?.price_per_unity || !movement?.quantity ? 0 : inventory.price_per_unity * movement.quantity,
         },
         resolver: yupResolver(schema),
     });
+
+    const quantity = watch('quantity');
+    const inventorySel = watch('inventory');
+    
+    useEffect(() => {
+        const inventory_obj_sel = inventoryContext.getInventoryBy("id", !inventorySel?.id ? 0 : inventorySel.id)?.[0];
+
+        if (inventory_obj_sel){
+
+            if (inventory_obj_sel.id === inventory.id) {
+                setValue('qty_product', inventory_obj_sel.qty_product + movement.quantity);
+            }
+            else {
+                setValue('qty_product', inventory_obj_sel.qty_product);
+            }
+
+            setValue('price_per_unity', inventory_obj_sel.price_per_unity);
+            setValue('value', inventory_obj_sel.price_per_unity * quantity);
+        }
+    }, [quantity, inventorySel, setValue]);
 
     const updateMovement = (data: MovementsFormType) => {
 
@@ -70,14 +101,14 @@ const EditMovements: React.FC = () => {
             price_at_time: 0,
             date: new Date(),
         }
-        const response = MovementsContext.updateMovement(newData);
+        const response = movementsContext.updateMovement(newData);
         setDialogTitle(response.success ? 'Sucesso' : 'Erro');
         setDialogText(response.message);
         setDialogVisible(true);
     };
 
-    const disableMovement = () => {
-        const response = MovementsContext.disableMovementById(+id);
+    const removeMovement = () => {
+        const response = movementsContext.removeMovementById(+id);
         setDialogTitle(response.success ? 'Sucesso' : 'Erro');
         setDialogText(response.message);
         setDialogVisible(true);
@@ -88,35 +119,49 @@ const EditMovements: React.FC = () => {
 
     return (
         <View style={styles.container}>
-            {!moviment ? 
-            <Text>Movimentação não encontrada</Text>:
             <View style={styles.formModal}>
+
+            <ComboBoxForm
+                data={inventorys}
+                control={control}
+                name="inventory"
+                label="Produto"
+                displayKey={'title'}
+                errors={errors}
+            />
 
             <FormInput
                 control={control}
                 name="quantity"
-                label="Quantidade em estoque"
+                label="Quantidade Movementação"
             />
 
-            <Text style={{marginBottom:5,marginLeft:5}}>Produto</Text>
-            <View style={{flexDirection:'row',width:'100%',justifyContent:'space-between'}}>
-            <Controller
+            <FormInput
                 control={control}
-                name="inventory"
-                render={({ field: { onChange, value } }) => (
-                <>
-                    <ModalDropdownInventory 
-                    data={inventoryContext.inventorys}
-                    initialValue={value}
-                    onSelect={(inventorySelected)=>onChange(inventorySelected)}/>
-                </>
-                )}
+                name="qty_product"
+                label="Quantidade em Estoque"
+                disabled
+            />
+
+            <FormInput
+                control={control}
+                name="price_per_unity"
+                label="Preço por unidade"
+                isCurrency
+                disabled
+            />
+
+            <FormInput
+                control={control}
+                name="value"
+                label="Novo Valor Total"
+                isCurrency
+                disabled
             />
 
             <View style={styles.areaButtons}>
-
-                <Button mode="outlined" style={{ width: '45%' }} onPress={handleSubmit(disableMovement)}>
-                    Desabilitar produto
+                <Button mode="outlined" style={{ width: '45%' }} onPress={handleSubmit(removeMovement)}>
+                    Excluir movementação
                 </Button>
                 <Button
                     mode="contained"
@@ -127,15 +172,13 @@ const EditMovements: React.FC = () => {
                 </Button>
             </View>
 
-            </View>
-
             <DefaultDialog
                 visible={dialogVisible}
                 onDismiss={() => setDialogVisible(false)}
                 title={dialogTitle}
                 text={dialogText}
             />
-            </View>}
+            </View>
         </View>
     );
 }
