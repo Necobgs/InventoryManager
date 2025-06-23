@@ -88,14 +88,15 @@ export default function PageTarefasId() {
     );
   }
 
-  function disableInventory() {
-    const response = inventoryContext.disableInventoryById(+id);
+  function disableOrEnable() {
+    const response = inventoryContext.disableOrEnable(+id);
+    if (response.success) {
+      router.navigate('/(tabs)/inventory');
+      return
+    }
     setDialogTitle(response.success ? 'Sucesso' : 'Erro');
     setDialogText(response.message);
     setDialogVisible(true);
-    if (response.success) {
-      router.navigate('/(tabs)/inventory');
-    }
   }
 
   function saveChanges(data: InventoryInterface) {
@@ -154,8 +155,8 @@ export default function PageTarefasId() {
         />
 
         <View style={styles.excludeItemView}>
-          <Button mode="outlined" style={{ width: '45%' }} onPress={handleSubmit(disableInventory)}>
-            Desabilitar produto
+          <Button mode="outlined" style={{ width: '45%' }} onPress={handleSubmit(disableOrEnable)}>
+            {oldInventory.enabled ? 'Desabilitar' : 'Habilitar'}
           </Button>
           <Button
             mode="contained"

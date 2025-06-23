@@ -1,4 +1,3 @@
-import Inventory from "@/interfaces/InventoryInterface";
 import { StyleSheet,Text } from "react-native";
 import { RelativePathString, useRouter } from "expo-router";
 import { Card } from "react-native-paper";
@@ -23,8 +22,7 @@ export default function GenericCard(props:GenericCardProps){
 
 const styles= StyleSheet.create({
     container:{
-        marginBottom:15, 
         height:125,
-        maxWidth:400
+        width:'100%'
     },
 })

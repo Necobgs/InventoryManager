@@ -23,6 +23,7 @@ export default function tabMovements() {
                     keyExtractor={(item)=>item.id.toString()}
                     style={styles.list_movements}
                     scrollEnabled={true}
+                    contentContainerStyle={{gap:25}}
                 />}
                 <AnimatedFAB
                     icon={'plus'}

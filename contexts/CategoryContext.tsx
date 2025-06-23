@@ -6,7 +6,7 @@ interface CategoryContextType{
     categories:CategoryInterface[],
     findCategoryBy:<T extends keyof CategoryInterface>(by:T,value:CategoryInterface[T]) => CategoryInterface[],
     addCategory: (category:CategoryInterface) => ApiResponse,
-    disableCategory: (id:number) => ApiResponse,
+    disableOrEnable: (id:number) => ApiResponse,
     updateCategory: (data:CategoryInterface) => ApiResponse
 }
 
@@ -52,13 +52,13 @@ export function CategoryProvider(
         return {message:"Sucesso ao cadastrar categoria",success:true};
     }
 
-    function disableCategory(id:number): ApiResponse{
+    function disableOrEnable(id:number): ApiResponse{
         const categoryFounded = findCategoryBy('id',id);
         if(!categoryFounded) return { message:"Categoria não encontrada",success:false }
         setCategories((oldCategories)=>
-            oldCategories.map((category)=>category.id != id ? category : {...category,enabled:false})
+            oldCategories.map((category)=>category.id != id ? category : {...category,enabled:!category.enabled})
         )
-        return { message:"Categoria excluida com sucesso",success:true }
+        return { message:"Sucesso",success:true }
     }
 
     function updateCategory(data:CategoryInterface){
@@ -71,7 +71,7 @@ export function CategoryProvider(
     }
 
     return (
-    <CategoryContext.Provider value={{addCategory,disableCategory,findCategoryBy,categories,updateCategory}}>
+    <CategoryContext.Provider value={{addCategory,disableOrEnable,findCategoryBy,categories,updateCategory}}>
         {children}
     </CategoryContext.Provider>
     )

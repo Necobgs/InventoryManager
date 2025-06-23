@@ -56,7 +56,6 @@ export const FormInput = <T extends FieldValues>({
             numberOfLines={multiline ? 5 : 1}
             style={styles.input ?? defaultStyles.input}
             secureTextEntry={isPassword && !showPassword}
-            right={isPassword && <TextInput.Icon icon={!showPassword ? "eye" : "eye-off"} onPress={handlerPassword}/>}
             value={
               isCurrency && typeof value === 'number'
                 ? formatCurrency(value)

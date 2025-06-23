@@ -57,14 +57,15 @@ export default function PageCategoryEdit() {
     );
   }
 
-  function disableCategory() {
-    const response = categoryContext.disableCategory(+id);
+  function disableOrEnable() {
+    const response = categoryContext.disableOrEnable(+id);
+    if (response.success) {
+      router.navigate('/(tabs)/category');
+      return
+    }
     setDialogTitle(response.success ? 'Sucesso' : 'Erro');
     setDialogText(response.message);
     setDialogVisible(true);
-    if (response.success) {
-      router.navigate('/(tabs)/category');
-    }
   }
 
   function saveChanges(data: CategoryInterface) {
@@ -85,8 +86,8 @@ export default function PageCategoryEdit() {
           />
 
         <View style={styles.excludeItemView}>
-          <Button mode="outlined" style={{ width: '45%' }} onPress={handleSubmit(disableCategory)}>
-            Desabilitar categoria
+          <Button mode="outlined" style={{ width: '45%' }} onPress={handleSubmit(disableOrEnable)}>
+            { oldCategory.enabled? 'Desabilitar' : 'Habilitar'}
           </Button>
           <Button
             mode="contained"

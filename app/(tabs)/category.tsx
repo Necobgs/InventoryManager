@@ -32,6 +32,7 @@ export default function TabCategory(){
                     keyExtractor={(item)=>item.id.toString()}
                     style={styles.list_inventorys}
                     scrollEnabled={true}
+                    contentContainerStyle={{gap:25}}
                     />}
                 <AnimatedFAB
                     icon={'plus'}
@@ -51,8 +52,6 @@ export default function TabCategory(){
 const styles = StyleSheet.create({
     list_inventorys:{
         padding:50,
-        // flex:1,
-        // flexDirection:'row'
     },
     no_inventorys:{
         width:'100%',

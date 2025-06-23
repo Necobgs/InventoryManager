@@ -22,7 +22,7 @@ export default function CardInventory(movement:MovementsInterface){
     }).format(movement.value);
     
     return (
-    <Card style={styles.card} mode="elevated" onPress={()=>router.navigate(`/movements/edit/${(movement.id)}`)}>
+    <Card mode="elevated" onPress={()=>router.navigate(`/movements/edit/${(movement.id)}`)}>
     <Card.Content>
         <Text numberOfLines={2}>
             <Text style={styles.bold}>Produto: </Text>
@@ -50,9 +50,6 @@ export default function CardInventory(movement:MovementsInterface){
 }
 
 const styles= StyleSheet.create({
-    card:{
-        marginBottom:15, 
-    },
     bold: {
         fontWeight: 'bold',
     }

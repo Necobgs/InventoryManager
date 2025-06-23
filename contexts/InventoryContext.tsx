@@ -11,7 +11,7 @@ interface InventoryContextType {
     value: InventoryInterface[T]
   ) => InventoryInterface[];
   updateInventory: (inventory: InventoryInterface) => ApiResponse;
-  disableInventoryById: (id: number) => ApiResponse;
+  disableOrEnable: (id: number) => ApiResponse;
 }
 
 const InventoryContext = createContext<InventoryContextType | undefined>(
@@ -78,7 +78,7 @@ export default function InventoryProvider({
     return inventorys.filter((inventory) => inventory[By] === value);
   }
 
-  function disableInventoryById(id: number): ApiResponse {
+  function disableOrEnable(id: number): ApiResponse {
     const inventory = getInventoryBy("id", id);
     if (inventory.length === 0) {
       return { message: "Produto não encontrado", success: false };
@@ -87,11 +87,11 @@ export default function InventoryProvider({
     setInventorys((oldInventorys) =>
       oldInventorys.map((inventoryItem) =>
         inventoryItem.id === id
-          ? { ...inventoryItem, enabled: false }
+          ? { ...inventoryItem, enabled: !inventoryItem.enabled }
           : inventoryItem
       )
     );
-    return { message: "Sucesso ao Desabilitar o produto", success: true };
+    return { message: "Sucesso", success: true };
   }
 
   return (
@@ -101,7 +101,7 @@ export default function InventoryProvider({
         addInventory,
         getInventoryBy,
         updateInventory,
-        disableInventoryById,
+        disableOrEnable,
       }}
     >
       {children}

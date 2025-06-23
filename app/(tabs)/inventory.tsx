@@ -1,11 +1,11 @@
 import { Text, View } from "@/components/Themed";
 import { FlatList, StyleSheet } from "react-native";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
-import CardInventory from "@/components/CardInventory";
 import { useInventory } from "@/contexts/InventoryContext";
 import { useRouter } from "expo-router";
 import { AnimatedFAB, Button} from "react-native-paper";
 import { useState } from "react";
+import GenericCard from "@/components/GenericCard";
 
 
 
@@ -28,10 +28,11 @@ export default function TabInventorys(){
                 : 
                 <FlatList
                     data={inventoryItems}
-                    renderItem={({item})=><CardInventory {...item}/>}
+                    renderItem={({item})=><GenericCard key={item.id} title={`Id: ${item.id.toString()}`} description={item.description} navigateURL={`/inventory/edit/${item.id}`}/>}
                     keyExtractor={(item)=>item.id.toString()}
                     style={styles.list_inventorys}
                     scrollEnabled={true}
+                    contentContainerStyle={{gap:25}}
                     />}
                 <AnimatedFAB
                     icon={'plus'}
@@ -51,8 +52,6 @@ export default function TabInventorys(){
 const styles = StyleSheet.create({
     list_inventorys:{
         padding:50,
-        // flex:1,
-        // flexDirection:'row'
     },
     no_inventorys:{
         width:'100%',
