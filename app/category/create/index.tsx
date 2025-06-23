@@ -45,7 +45,6 @@ export default function PageCategoryCreate() {
   });
 
   function saveChanges(data: CategoryInterface) {
-    console.log("teste 2")
     const response = categoryContext.addCategory(data);
     setDialogTitle(response.success ? 'Sucesso' : 'Erro');
     setDialogText(response.message);
