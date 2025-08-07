@@ -1,7 +1,6 @@
-import { ApiResponse } from "@/interfaces/ApiResponse";
 import { LoginInterface } from "@/interfaces/LoginInterface";
 import { UserInterface } from "@/interfaces/UserInterface";
-import { Children, createContext, useContext, useState } from "react";
+import { createContext, useContext, useState } from "react";
 
 interface UserContextType {
     users: UserInterface[],
