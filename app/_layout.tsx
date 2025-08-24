@@ -7,6 +7,7 @@ import { CategoryProvider } from '@/contexts/CategoryContext';
 import UserProvider from '@/contexts/UserContext';
 import MovementsProvider from '@/contexts/MovementsContext';
 import { useUser } from '@/contexts/UserContext'; 
+import SupplierProvider from '@/contexts/SupplierContext';
 
 
 export {
@@ -25,11 +26,13 @@ export default function RootLayout() {
     <UserProvider>
       <InventoryProvider>
         <CategoryProvider>
-          <InventoryProvider>
-            <MovementsProvider>
-              <RootLayoutNav />
-            </MovementsProvider>
-          </InventoryProvider>
+          <SupplierProvider>
+            <InventoryProvider>
+              <MovementsProvider>
+                <RootLayoutNav />
+              </MovementsProvider>
+            </InventoryProvider>
+          </SupplierProvider>
         </CategoryProvider>
       </InventoryProvider>
     </UserProvider>
@@ -65,12 +68,28 @@ function RootLayoutNav() {
               options={{title:'Atualizar movimentação'}}
             />
             <Stack.Screen 
+              name="supplier/create/index"
+              options={{title:'Criar um fornecedor'}}
+            />
+            <Stack.Screen 
+              name="supplier/edit/[id]"
+              options={{title:'Atualizar fornecedor'}}
+            />
+            <Stack.Screen 
               name="category/create/index"
               options={{title:'Criar uma categoria'}}
             />
             <Stack.Screen 
               name="category/edit/[id]"
               options={{title:'Atualizar categoria'}}
+            />
+            <Stack.Screen 
+              name="user/create/index"
+              options={{title:'Criar uma usuário'}}
+            />
+            <Stack.Screen 
+              name="user/edit/[id]"
+              options={{title:'Atualizar usuário'}}
             />
           </Stack.Protected>
               

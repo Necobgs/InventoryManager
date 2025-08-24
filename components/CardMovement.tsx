@@ -25,6 +25,10 @@ export default function CardInventory(movement:MovementsInterface){
     <Card mode="elevated" onPress={()=>router.navigate(`/movements/edit/${(movement.id)}`)}>
     <Card.Content>
         <Text numberOfLines={2}>
+            <Text style={styles.bold}>Operação: </Text>
+            {movement.quantity > 0 ? "Entrada" : "Saída"}
+        </Text> 
+        <Text numberOfLines={2}>
             <Text style={styles.bold}>Produto: </Text>
             {iventory?.title}
         </Text>  
@@ -34,7 +38,7 @@ export default function CardInventory(movement:MovementsInterface){
         </Text> 
         <Text numberOfLines={2}>
             <Text style={styles.bold}>Quantidade: </Text>
-            {movement.quantity}
+            {Math.abs(movement.quantity)}
         </Text> 
             <Text numberOfLines={2}>
             <Text style={styles.bold}>Valor Total: </Text>

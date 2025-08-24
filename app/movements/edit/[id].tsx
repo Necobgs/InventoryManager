@@ -10,7 +10,6 @@ import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { StyleSheet } from "react-native";
 import { Button } from "react-native-paper";
-import ModalDropdownInventory from '@/components/ModalDropdownInventory';
 import * as yup from 'yup';
 import MovementsFormType from "@/types/MovementsFormType";
 import { useLocalSearchParams, useRouter } from "expo-router";
@@ -22,6 +21,13 @@ const schema = yup.object().shape({
     .typeError('Quantidade deve ser um número')
     .min(1, 'Não pode ser negativo ou zero')
     .required('Quantidade é obrigatória'),
+    operation: yup
+    .object({
+        id:yup.number().required(),
+        title: yup.string().required(),
+    })
+    .required("selecione uma operação")
+    .nullable(),
     inventory: yup
     .object({
         id:yup.number().required(),
@@ -44,7 +50,6 @@ const EditMovements: React.FC = () => {
     const inventory = inventoryContext.getInventoryBy("id", !movement?.id_inventory ? 0 : movement.id_inventory)?.[0];
     const inventorys = inventoryContext.getInventoryBy("enabled", true);
 
-
     const [dialogVisible, setDialogVisible] = useState(false);
     const [dialogTitle, setDialogTitle] = useState('');
     const [dialogText, setDialogText] = useState('');
@@ -62,33 +67,29 @@ const EditMovements: React.FC = () => {
             id: inventory?.id,
             title: inventory?.title,
         },
-        quantity: movement?.quantity,
-        qty_product: !inventory?.qty_product || !movement?.quantity ? 0 : inventory.qty_product + movement.quantity,
+        operation: movement?.quantity > 0 ? {id: 1, title: "Entrada"} : {id: 2, title: "Saída"},
+        quantity: Math.abs(movement?.quantity),
+        qty_product: !inventory?.qty_product ? 0 : inventory.qty_product,
         price_per_unity: inventory?.price_per_unity,
-        value: !inventory?.price_per_unity || !movement?.quantity ? 0 : inventory.price_per_unity * movement.quantity,
+        value: !inventory?.price_per_unity || !movement?.quantity ? 0 : inventory.price_per_unity * Math.abs(movement.quantity),
         },
         resolver: yupResolver(schema),
     });
 
     const quantity = watch('quantity');
     const inventorySel = watch('inventory');
+    const operationSel = watch("operation");
     
     useEffect(() => {
         const inventory_obj_sel = inventoryContext.getInventoryBy("id", !inventorySel?.id ? 0 : inventorySel.id)?.[0];
 
         if (inventory_obj_sel){
 
-            if (inventory_obj_sel.id === inventory.id) {
-                setValue('qty_product', inventory_obj_sel.qty_product + movement.quantity);
-            }
-            else {
-                setValue('qty_product', inventory_obj_sel.qty_product);
-            }
-
+            setValue('qty_product', inventory_obj_sel.qty_product);
             setValue('price_per_unity', inventory_obj_sel.price_per_unity);
             setValue('value', inventory_obj_sel.price_per_unity * quantity);
         }
-    }, [quantity, inventorySel, setValue]);
+    }, [quantity, inventorySel, operationSel, setValue]);
 
     const updateMovement = (data: MovementsFormType) => {
 
@@ -96,7 +97,7 @@ const EditMovements: React.FC = () => {
             id: +id,
             id_inventory: !data?.inventory?.id ? 0 : data.inventory.id,
             id_user: !userLogged?.id ? 0 : userLogged.id,
-            quantity: data.quantity,
+            quantity: data.operation?.id === 2 ? data.quantity * -1 : data.quantity,
             value: 0,
             price_at_time: 0,
             date: new Date(),
@@ -112,14 +113,25 @@ const EditMovements: React.FC = () => {
         setDialogTitle(response.success ? 'Sucesso' : 'Erro');
         setDialogText(response.message);
         setDialogVisible(true);
+
         if(response.success) {
-            router.navigate("/movements");
+            router.navigate("/(tabs)/movements");
+            return;
         }
     }
 
     return (
         <View style={styles.container}>
             <View style={styles.formModal}>
+
+            <ComboBoxForm
+                data={[{id: 1, title: "Entrada"},{id: 2, title: "Saída"}]}
+                control={control}
+                name="operation"
+                label="Operação"
+                displayKey={'title'}
+                errors={errors}
+            />
 
             <ComboBoxForm
                 data={inventorys}
@@ -133,13 +145,13 @@ const EditMovements: React.FC = () => {
             <FormInput
                 control={control}
                 name="quantity"
-                label="Quantidade Movementação"
+                label="Quantidade Movimentação"
             />
 
             <FormInput
                 control={control}
                 name="qty_product"
-                label="Quantidade em Estoque"
+                label="Quantidade em estoque atual"
                 disabled
             />
 
@@ -161,7 +173,7 @@ const EditMovements: React.FC = () => {
 
             <View style={styles.areaButtons}>
                 <Button mode="outlined" style={{ width: '45%' }} onPress={handleSubmit(removeMovement)}>
-                    Excluir movementação
+                    Excluir movimentação
                 </Button>
                 <Button
                     mode="contained"

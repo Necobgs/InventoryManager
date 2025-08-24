@@ -20,8 +20,7 @@ export default function MovementsProvider({children}:{children:React.ReactNode})
 
     const inventoryContext = useInventory();
 
-    const [movements, setMovements] = useState<MovementsInterface[]>([
-]);
+    const [movements, setMovements] = useState<MovementsInterface[]>([]);
 
     function addMovement(data: MovementsInterface): ApiResponse {
         if (!data.quantity) {
@@ -34,11 +33,11 @@ export default function MovementsProvider({children}:{children:React.ReactNode})
             return { message: "Produto inexistente", success: false };
         }
 
-        if (iventory.qty_product < data.quantity) {
-             return { message: "Não há estoque suficiente para movimentar este produto", success: false };
+        if ((data.quantity < 0) && (iventory.qty_product < Math.abs(data.quantity))) {
+            return { message: "Não há estoque suficiente para efetuar a saída deste produto", success: false };
         }
 
-        iventory.qty_product -= data.quantity;
+        iventory.qty_product += data.quantity;
         iventory.stock_value = iventory.qty_product * iventory.price_per_unity;
 
         const response = inventoryContext.updateInventory(iventory);
@@ -48,7 +47,7 @@ export default function MovementsProvider({children}:{children:React.ReactNode})
         }
 
         const newId = !movements[0] ? 1 : movements.reduce((max, current) => current.id > max.id ? current : max).id + 1;
-        const newValue = iventory.price_per_unity * data.quantity;
+        const newValue = iventory.price_per_unity * Math.abs(data.quantity);
 
         setMovements((oldMovements) => {
             return [
@@ -84,13 +83,15 @@ export default function MovementsProvider({children}:{children:React.ReactNode})
 
         if (moviment.id_inventory === data.id_inventory) {
             if (moviment.quantity !== data.quantity) {
-                let vqty_product = iventory.qty_product + moviment.quantity;
 
-                if (vqty_product < data.quantity) {
+                let vqty_product = iventory.qty_product - moviment.quantity;
+                vqty_product += data.quantity;
+
+                if (vqty_product < 0) {
                     return { message: "Não há estoque suficiente para movimentar este produto", success: false };
                 }
 
-                iventory.qty_product = vqty_product - data.quantity;
+                iventory.qty_product = vqty_product;
                 iventory.stock_value = iventory.qty_product * iventory.price_per_unity;
 
                 const response = inventoryContext.updateInventory(iventory);
@@ -100,8 +101,8 @@ export default function MovementsProvider({children}:{children:React.ReactNode})
                 }
             }
         } else {
-            if (iventory.qty_product < data.quantity) {
-                return { message: "Não há estoque suficiente para movimentar este produto", success: false };
+            if ((data.quantity < 0) && (iventory.qty_product < Math.abs(data.quantity))) {
+                return { message: "Não há estoque suficiente para efetuar a saída deste produto", success: false };
             }
 
             const oldIventory = inventoryContext.getInventoryBy('id', moviment.id_inventory)?.[0];
@@ -110,7 +111,11 @@ export default function MovementsProvider({children}:{children:React.ReactNode})
                 return { message: "O produto anteriormente relacionado à movimentação não existe mais", success: false };
             }
 
-            let vqty_product = oldIventory.qty_product + moviment.quantity;
+            let vqty_product = oldIventory.qty_product - moviment.quantity;
+
+            if (vqty_product < 0) {
+                return { message: "Não é possível realizar essa movimentação, pois a quantidade do produto antigo ficará negativa", success: false };
+            }
 
             oldIventory.qty_product = vqty_product;
             oldIventory.stock_value = oldIventory.qty_product * oldIventory.price_per_unity;
@@ -121,7 +126,7 @@ export default function MovementsProvider({children}:{children:React.ReactNode})
                 return oldResponse;
             }
 
-            iventory.qty_product -= data.quantity;
+            iventory.qty_product += data.quantity;
             iventory.stock_value = iventory.qty_product * iventory.price_per_unity;
 
             const response = inventoryContext.updateInventory(iventory);
@@ -131,7 +136,7 @@ export default function MovementsProvider({children}:{children:React.ReactNode})
             }
         }
 
-        const newValue = iventory.price_per_unity * data.quantity;
+        const newValue = iventory.price_per_unity * Math.abs(data.quantity);
 
         const newMovements: MovementsInterface[] = movements.map((vobj) => {
             return vobj.id === data.id ? {...vobj, ...data, value: newValue, price_at_time: iventory.price_per_unity} : vobj;
@@ -156,7 +161,11 @@ export default function MovementsProvider({children}:{children:React.ReactNode})
             return { message: "O produto relacionado à movimentação não existe mais", success: false };
         }
 
-        let vqty_product = iventory.qty_product + moviment.quantity;
+        let vqty_product = iventory.qty_product - moviment.quantity;
+
+        if (vqty_product < 0) {
+            return { message: "Não há estoque suficiente para excluir essa movimentação", success: false};
+        }
 
         iventory.qty_product = vqty_product;
         iventory.stock_value = iventory.qty_product * iventory.price_per_unity;

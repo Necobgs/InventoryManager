@@ -1,6 +1,6 @@
 import DefaultDialog from "@/components/DefaultDialog";
 import { FormInput } from "@/components/FormInput";
-import { Text, View } from "@/components/Themed";
+import { View } from "@/components/Themed";
 import { useInventory } from "@/contexts/InventoryContext";
 import { useMovements } from "@/contexts/MovementsContext";
 import { useUser } from "@/contexts/UserContext";
@@ -15,18 +15,25 @@ import MovementsFormType from "@/types/MovementsFormType";
 import ComboBoxForm from "@/components/ComboBoxForm";
 
 const schema = yup.object().shape({
-    quantity: yup
-    .number()
-    .typeError('Quantidade deve ser um número')
-    .min(1, 'Não pode ser negativo ou zero')
-    .required('Quantidade é obrigatória'),
     inventory: yup
     .object({
         id:yup.number().required(),
         title: yup.string().required(),
     })
-    .required("selecione uma categoria")
+    .required("selecione um produto")
     .nullable(),
+    operation: yup
+    .object({
+        id:yup.number().required(),
+        title: yup.string().required(),
+    })
+    .required("selecione uma operação")
+    .nullable(),
+    quantity: yup
+    .number()
+    .typeError('Quantidade deve ser um número')
+    .min(1, 'Não pode ser negativo ou zero')
+    .required('Quantidade é obrigatória'),
     qty_product:yup.number().required(),
     price_per_unity:yup.number().required(),
     value:yup.number().required(),
@@ -52,6 +59,7 @@ const CreateMovements: React.FC = () => {
     } = useForm<MovementsFormType>({
         defaultValues: {
         inventory: null,
+        operation: {id: 1, title: "Entrada"},
         quantity: 0,
         qty_product: 0,
         price_per_unity: 0,
@@ -62,6 +70,7 @@ const CreateMovements: React.FC = () => {
 
     const quantity = watch('quantity');
     const inventorySel = watch('inventory');
+    const operationSel = watch("operation");
 
     useEffect(() => {
         const inventory = inventoryContext.getInventoryBy("id", !inventorySel?.id ? 0 : inventorySel.id)?.[0];
@@ -71,7 +80,7 @@ const CreateMovements: React.FC = () => {
             setValue('price_per_unity', inventory.price_per_unity);
             setValue('value', inventory.price_per_unity * quantity);
         }
-    }, [quantity, inventorySel, setValue]);
+    }, [quantity, inventorySel, operationSel, setValue]);
 
     const onSubmit = (data: MovementsFormType) => {
 
@@ -79,7 +88,7 @@ const CreateMovements: React.FC = () => {
             id: 0,
             id_inventory: !data.inventory?.id ? 0 : data.inventory.id,
             id_user: !userLogged?.id ? 0 : userLogged.id,
-            quantity: data.quantity,
+            quantity: data.operation?.id === 2 ? data.quantity * -1 : data.quantity,
             value: 0,
             price_at_time: 0,
             date: new Date(),
@@ -94,6 +103,15 @@ const CreateMovements: React.FC = () => {
     return (
         <View style={styles.container}>
             <View style={styles.formModal}>
+
+            <ComboBoxForm
+                data={[{id: 1, title: "Entrada"},{id: 2, title: "Saída"}]}
+                control={control}
+                name="operation"
+                label="Operação"
+                displayKey={'title'}
+                errors={errors}
+            />
 
             <ComboBoxForm
                 data={inventorys}
@@ -136,7 +154,6 @@ const CreateMovements: React.FC = () => {
             <Button mode="contained" onPress={handleSubmit(onSubmit)}>
                 Cadastar movimentação
             </Button>
-
 
             <DefaultDialog
                 visible={dialogVisible}
