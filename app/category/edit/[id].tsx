@@ -32,6 +32,15 @@ export default function PageCategoryEdit() {
   const [dialogText, setDialogText] = useState('');
   const router = useRouter()
 
+  const showDialog = () => {
+    
+    setDialogVisible(true);
+
+    setTimeout(() => {
+      setDialogVisible(false);
+    }, 4000);
+  };
+
   const {
     control,
     handleSubmit,
@@ -65,14 +74,14 @@ export default function PageCategoryEdit() {
     }
     setDialogTitle(response.success ? 'Sucesso' : 'Erro');
     setDialogText(response.message);
-    setDialogVisible(true);
+    showDialog();
   }
 
   function saveChanges(data: CategoryInterface) {
     const response = categoryContext.updateCategory(data);
     setDialogTitle(response.success ? 'Sucesso' : 'Erro');
     setDialogText(response.message);
-    setDialogVisible(true);
+    showDialog();
   }
 
   return (

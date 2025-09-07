@@ -1,23 +1,33 @@
 import GenericCard from "@/components/GenericCard";
-import { Text } from "@/components/Themed";
+import { Text, View } from "@/components/Themed";
 import { useUser } from "@/contexts/UserContext";
 import { useRouter } from "expo-router";
+import { useState } from "react";
 import { FlatList, StyleSheet } from "react-native";
-import { AnimatedFAB } from "react-native-paper";
+import { AnimatedFAB, Button } from "react-native-paper";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 
 export default function tabUser() {
-    const { users } = useUser();
+    const userContext = useUser();
     const router = useRouter();
+    const [enabled, setEnabled] = useState(true);
+    const userItems = userContext.getUsersBy("enabled", enabled);
 
     return (
         <SafeAreaProvider>
+
+
+            <View style={styles.areaButtons}>
+                <Button mode={enabled ? 'contained' : 'outlined'} style={styles.button} onPress={() => {setEnabled(true)}}>Ativos</Button>
+                <Button mode={enabled ? 'outlined' : 'contained'} style={styles.button} onPress={() => {setEnabled(false)}}>Inativos</Button>
+            </View>
+
             <SafeAreaView style={{flex:1}}>
-                {!users[0] ? 
-                <Text style={styles.no_user}>Nenhum usuário cadastrado</Text> 
+                {!userItems[0] ? 
+                <Text style={styles.no_user}>Nenhum usuário {enabled ? "Ativo" : "Inativo"}</Text> 
                 : 
                 <FlatList
-                    data={users}
+                    data={userItems}
                     renderItem={({item})=><GenericCard key={item.id} title={`Id: ${item.id.toString()}`} description={item.name} navigateURL={`/user/edit/${item.id}`}/>}
                     keyExtractor={(item)=>item.id.toString()}
                     style={styles.list_user}
@@ -73,6 +83,23 @@ const styles = StyleSheet.create({
         bottom: 16,
         right: 16,
         position: 'absolute',
-  },
+    },
+    areaButtons: {
+        display: 'flex',
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: 10,
+        backgroundColor: "rgb(242, 242, 242)",
+        padding: 15,
+        boxSizing: 'border-box',
+        borderBottomWidth: 1,
+        borderStyle: 'solid',
+        borderColor: 'rgba(103, 80, 164, 0.3)',
+    },
+    button: {
+        borderRadius: 10,
+        width: '50%'
+    }
 })
 

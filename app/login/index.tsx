@@ -3,11 +3,11 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from 'yup';
 import { useForm } from "react-hook-form";
 import { StyleSheet, View } from "react-native";
-import { Button, HelperText, TextInput } from "react-native-paper";
+import { Button } from "react-native-paper";
 import { Text } from "@/components/Themed";
 import { useUser } from "@/contexts/UserContext";
 import DefaultDialog from "@/components/DefaultDialog";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FormInput } from "@/components/FormInput";
 import { useRouter } from "expo-router";
 
@@ -24,7 +24,27 @@ const Login: React.FC = () => {
     const [dialogVisible, setDialogVisible] = useState(false);
     const [dialogTitle, setDialogTitle] = useState('');
     const [dialogText, setDialogText] = useState('');
-    
+
+    useEffect(() => {
+      const checkSection = async () => {
+        if(!usersContext.usersLoaded) return;
+
+        const userLogged = await usersContext.getUserLoggedStorage();
+
+        if (userLogged) {
+
+          const data = {email: userLogged.email, password: userLogged.password};
+          const response = usersContext.validationLogin(data, userLogged.expire);
+
+          if (response) {
+              router.navigate('/');
+              reset();
+          } 
+        }
+      }
+      checkSection();
+    }, [usersContext.usersLoaded]);
+
     const {
         control,
         handleSubmit,
@@ -39,7 +59,7 @@ const Login: React.FC = () => {
         });
 
     const onSubmit = (data: LoginInterface) => {
-        const response = usersContext.validationLogin(data);
+        const response = usersContext.validationLogin(data, 0);
         if (response) {
             router.navigate('/');
             reset();

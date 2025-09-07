@@ -1,12 +1,13 @@
 import { ApiResponse } from "@/interfaces/ApiResponse";
 import { SupplierInterface } from "@/interfaces/SupplierInterface";
-import { createContext, useContext, useState } from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { createContext, useContext, useEffect, useState } from "react";
 
 interface SupplierContextType {
     suppliers: SupplierInterface[],
     addSupplier: (data:SupplierInterface)=> ApiResponse,
     updateSupplier: (data:SupplierInterface)=> ApiResponse,
-    removeSupplierById: (id:number)=> ApiResponse,
+    disableOrEnable: (id:number)=> ApiResponse,
     getSuppliersBy<T extends keyof SupplierInterface>(
         By: T,
         value: SupplierInterface[T]
@@ -19,42 +20,66 @@ export default function SupplierProvider({children}:{children:React.ReactNode}) 
 
     const [suppliers, setSuppliers] = useState<SupplierInterface[]>([]);
 
+    useEffect(() => {
+        async function loadData() {
+            const newSuppliers = await getSuppliersStorage();
+            setSuppliers(newSuppliers);
+        }
+        loadData();
+    },[]);
+
     function addSupplier(data: SupplierInterface): ApiResponse {
 
-        const newId = !suppliers[0] ? 1 : suppliers.reduce((max, current) => current.id > max.id ? current : max).id + 1;
-        
         setSuppliers((oldSuppliers) => {
-            return [
+            const newId = !oldSuppliers[0] ? 1 : oldSuppliers.reduce((max, current) => current.id > max.id ? current : max).id + 1;
+
+            const newSuppliers = [
                 ...oldSuppliers,
                 {
                     ...data,
                     id: newId,
                 }
             ];
-        })
 
+            setSuppliersStorage(newSuppliers);
+            return newSuppliers;
+        })
 
         return { message: "Fornecedor cadastrado com sucesso!", success: true };
     }
 
     function updateSupplier(data: SupplierInterface): ApiResponse {
 
-        const newSuppliers: SupplierInterface[] = suppliers.map((vobj) => {
-            return vobj.id === data.id ? {...vobj, ...data} : vobj;
-        })
+        setSuppliers((oldSuppliers) => {
+            const newSuppliers = oldSuppliers.map((vobj) => {
+                return vobj.id === data.id ? {...vobj, ...data} : vobj;
+            });
 
-        setSuppliers(newSuppliers);
+            setSuppliersStorage(newSuppliers);
+            return newSuppliers;
+        });
 
         return { message: "Fornecedor alterado com sucesso!", success: true };
     }
 
-    function removeSupplierById(id: number): ApiResponse {
+    function disableOrEnable(id: number): ApiResponse {
 
-        const newSuppliers: SupplierInterface[] = suppliers.filter(vobj => vobj.id !== id);
-        
-        setSuppliers(newSuppliers);
+        const supplier = getSuppliersBy("id", id);
 
-        return { message: "Forncedor removido com sucesso!", success: true };
+        if (supplier.length === 0) {
+         return { message: "Fornecedor não encontrado", success: false };
+        }
+
+        setSuppliers((oldSuppliers) => {
+            const newSuppliers= oldSuppliers.map((vobj) => {
+                return vobj.id === id ? {...vobj, enabled: !vobj.enabled } : vobj;
+            });
+
+            setSuppliersStorage(newSuppliers);
+            return newSuppliers;
+        });
+
+        return { message: "Sucesso", success: true };
     }
 
     function getSuppliersBy<T extends keyof SupplierInterface>(
@@ -64,8 +89,18 @@ export default function SupplierProvider({children}:{children:React.ReactNode}) 
         return suppliers.filter((supplier) => supplier[By] === value);
     }
 
+    async function setSuppliersStorage(newSuppliers: SupplierInterface[]) {
+        await AsyncStorage.setItem("suppliers", JSON.stringify(newSuppliers));
+    }
+
+    async function getSuppliersStorage(): Promise<SupplierInterface[]> {
+        const data_json = await AsyncStorage.getItem("suppliers");
+        const data: SupplierInterface[] = data_json ? JSON.parse(data_json) : [];
+        return data;
+    }
+
     return (
-        <SupplierContext.Provider value={{suppliers, addSupplier, updateSupplier, removeSupplierById, getSuppliersBy}}>
+        <SupplierContext.Provider value={{suppliers, addSupplier, updateSupplier, disableOrEnable, getSuppliersBy}}>
             {children}
         </SupplierContext.Provider>
     )

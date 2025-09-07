@@ -3,4 +3,5 @@ export interface SupplierInterface {
     name: string,
     cnpj: string,
     phone: string,
+    enabled:boolean,
 }

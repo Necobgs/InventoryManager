@@ -7,13 +7,11 @@ import { AnimatedFAB, Button} from "react-native-paper";
 import { useState } from "react";
 import GenericCard from "@/components/GenericCard";
 
-
-
 export default function TabInventorys(){
     const [enabled, setEnabled] = useState(true);
     const inventoryContext = useInventory();
     const router = useRouter();
-    const inventoryItems =inventoryContext.getInventoryBy('enabled',enabled);
+    const inventoryItems = inventoryContext.getInventoryBy('enabled',enabled);
     return (
         <SafeAreaProvider>
 

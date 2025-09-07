@@ -1,4 +1,5 @@
 import CategoryInterface from "./CategoryInterface";
+import { SupplierInterface } from "./SupplierInterface";
 
 export default interface InventoryInterface{
     id:number,
@@ -9,4 +10,5 @@ export default interface InventoryInterface{
     enabled:boolean,
     description:string;
     category:CategoryInterface | null;
+    supplier:SupplierInterface | null;
 }

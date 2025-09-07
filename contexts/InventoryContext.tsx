@@ -1,7 +1,8 @@
-import React, { createContext, useContext, useState } from "react";
+import React, { createContext, useContext, useEffect, useState } from "react";
 import { ApiResponse } from "@/interfaces/ApiResponse";
 import InventoryInterface from "@/interfaces/InventoryInterface";
 import { InventoryFormType } from "@/types/InventoryFormType";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 interface InventoryContextType {
   inventorys: InventoryInterface[];
@@ -25,6 +26,14 @@ export default function InventoryProvider({
 }) {
   const [inventorys, setInventorys] = useState<InventoryInterface[]>([]);
 
+  useEffect(() => {
+    async function loadData() {
+      const newInventorys = await getInventorysStorage();
+      setInventorys(newInventorys);
+    }
+    loadData();
+  },[]);
+
   function addInventory(newInventory: InventoryFormType): ApiResponse {
     if (
       !newInventory.title ||
@@ -35,15 +44,23 @@ export default function InventoryProvider({
       return { message: "Preencha todos os campos obrigatórios", success: false };
     }
 
-    setInventorys((oldInventorys) => [
-      ...oldInventorys,
-      {
-        ...newInventory,
-        id: oldInventorys.length + 1,
-        stock_value: newInventory.price_per_unity * newInventory.qty_product,
-        enabled: true,
-      } as InventoryInterface,
-    ]);
+    setInventorys((oldInventorys) => {
+
+      const newId = !oldInventorys[0] ? 1 : oldInventorys.reduce((max, current) => current.id > max.id ? current : max).id + 1;
+
+      const newInventorys = [
+        ...oldInventorys,
+        {
+          ...newInventory,
+          id: newId,
+          stock_value: newInventory.price_per_unity * newInventory.qty_product,
+          enabled: true,
+        } as InventoryInterface,
+      ]
+      setInventorysStorage(newInventorys);
+      return newInventorys;
+    });
+
     return { message: "Produto criado!", success: true };
   }
 
@@ -62,11 +79,14 @@ export default function InventoryProvider({
       stock_value: newInventory.price_per_unity * newInventory.qty_product,
     };
 
-    setInventorys((oldInventorys) =>
-      oldInventorys.map((inventory) =>
+    setInventorys((oldInventorys) => {
+      const newInventorys = oldInventorys.map((inventory) =>
         inventory.id === newInventory.id ? updatedInventory : inventory
-      )
-    );
+      );
+
+      setInventorysStorage(newInventorys);
+      return newInventorys;
+    });
 
     return { message: "Produto atualizado!", success: true };
   }
@@ -84,14 +104,28 @@ export default function InventoryProvider({
       return { message: "Produto não encontrado", success: false };
     }
 
-    setInventorys((oldInventorys) =>
-      oldInventorys.map((inventoryItem) =>
+    setInventorys((oldInventorys) => {
+      const newInventorys = oldInventorys.map((inventoryItem) =>
         inventoryItem.id === id
           ? { ...inventoryItem, enabled: !inventoryItem.enabled }
           : inventoryItem
-      )
-    );
+      );
+
+      setInventorysStorage(newInventorys);
+      return newInventorys;
+    });
+
     return { message: "Sucesso", success: true };
+  }
+
+  async function setInventorysStorage(newInventorys: InventoryInterface[]) {
+    await AsyncStorage.setItem("inventorys", JSON.stringify(newInventorys));
+  }
+
+  async function getInventorysStorage(): Promise<InventoryInterface[]> {
+    const data_json = await AsyncStorage.getItem("inventorys");
+    const data: InventoryInterface[] = data_json ? JSON.parse(data_json) : [];
+    return data;
   }
 
   return (

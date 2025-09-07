@@ -14,7 +14,8 @@ const schema = yup.object().shape({
     id: yup.number().required(),
     name: yup.string().required('Nome é obrigatório'),
     email: yup.string().required('Email é obrigatório'),
-    password: yup.string().required('Senha é obrigatória')
+    password: yup.string().required('Senha é obrigatória'),
+    enabled: yup.boolean().required()
 });
 
 const CreateUser: React.FC = () => {
@@ -23,6 +24,15 @@ const CreateUser: React.FC = () => {
     const [dialogVisible, setDialogVisible] = useState(false);
     const [dialogTitle, setDialogTitle] = useState('');
     const [dialogText, setDialogText] = useState('');
+
+    const showDialog = () => {
+    
+      setDialogVisible(true);
+
+      setTimeout(() => {
+      setDialogVisible(false);
+      }, 4000);
+    };
 
     const {
         control,
@@ -35,6 +45,7 @@ const CreateUser: React.FC = () => {
           name: '',
           email: '',
           password: '',
+          enabled: true,
         },
         resolver: yupResolver(schema),
       });
@@ -44,7 +55,7 @@ const CreateUser: React.FC = () => {
         const response = userContext.addUser(data);
         setDialogTitle(response.success ? 'Sucesso' : 'Erro');
         setDialogText(response.message);
-        setDialogVisible(true);
+        showDialog();
         if(response.success) reset(); // limpa o formulário
     };
 

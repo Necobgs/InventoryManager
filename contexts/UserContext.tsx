@@ -1,54 +1,79 @@
 import { ApiResponse } from "@/interfaces/ApiResponse";
 import { LoginInterface } from "@/interfaces/LoginInterface";
 import { UserInterface } from "@/interfaces/UserInterface";
-import { createContext, useContext, useState } from "react";
+import { UserLoggedInterface } from "@/interfaces/UserLoggedInterface";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { createContext, useContext, useEffect, useState } from "react";
 
 interface UserContextType {
     users: UserInterface[],
     userLogged: UserInterface | undefined;
+    usersLoaded: boolean,
     addUser: (data:UserInterface)=> ApiResponse,
     updateUser: (data:UserInterface)=> ApiResponse,
-    removeUserById: (id:number)=> ApiResponse,
-    validationLogin: (inventory:LoginInterface)=>UserInterface | undefined,
+    disableOrEnable: (id:number)=> ApiResponse,
+    validationLogin: (inventory:LoginInterface,expire:number)=>UserInterface | undefined,
     getUsersBy<T extends keyof UserInterface>(
         By: T,
         value: UserInterface[T]
     ): UserInterface[],
+    getUserLoggedStorage(): Promise<UserLoggedInterface | undefined>,
     isLoged: ()=>boolean;
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
 
 export default function UserProvider({children}:{children:React.ReactNode}) {
-    const [users, setUsers] = useState<UserInterface[]>([
+    const [users, setUsers] = useState<UserInterface[]>([]);
+    const [userLogged, setUserLogged] = useState<UserLoggedInterface | undefined>(undefined);
+    const [usersLoaded, setUsersLoaded] = useState<boolean>(false);
+
+    const defaultUsers = [
         {
             id: 1,
             name: "Emanuel Borges",
             email: "emanuel@gmail.com",
-            password: "123"
+            password: "123",
+            enabled: true,
         },
         {
             id: 2,
             name: "Lucas Rosa",
             email: "lucas@gmail.com",
-            password: "1234@teste"
+            password: "1234@teste",
+            enabled: true,
         }
-    ])
+    ];
 
-    const [userLogged, setUserLogged] = useState<UserInterface | undefined>(undefined);
+    useEffect(() => {
+        async function loadData() {
+            const newSuppliers = await getUsersStorage();
+            if (newSuppliers[0]) {
+                setUsers(newSuppliers);
+            }
+            else {
+                setUsers(defaultUsers);
+            }
+            setUsersLoaded(true);
+        }
+        loadData();
+    },[]);
     
-     function addUser(data: UserInterface): ApiResponse {
-    
-        const newId = !users[0] ? 1 : users.reduce((max, current) => current.id > max.id ? current : max).id + 1;
+    function addUser(data: UserInterface): ApiResponse {
         
         setUsers((oldUsers) => {
-            return [
+            const newId = !oldUsers[0] ? 1 : oldUsers.reduce((max, current) => current.id > max.id ? current : max).id + 1;
+
+            const newUsers = [
                 ...oldUsers,
                 {
                     ...data,
                     id: newId,
                 }
             ];
+
+            setUsersStorage(newUsers);
+            return newUsers;
         })
 
         return { message: "Usuário cadastrado com sucesso!", success: true };
@@ -56,37 +81,59 @@ export default function UserProvider({children}:{children:React.ReactNode}) {
     
     function updateUser(data: UserInterface): ApiResponse {
 
-        const newUsers: UserInterface[] = users.map((vobj) => {
-            return vobj.id === data.id ? {...vobj, ...data} : vobj;
-        })
+        setUsers((oldUsers) => {
+            const newUsers = oldUsers.map((vobj) => {
+                return vobj.id === data.id ? {...vobj, ...data} : vobj;
+            });
 
-        setUsers(newUsers);
+            setUsersStorage(newUsers);
+            return newUsers;
+        });
 
         return { message: "Usuário alterado com sucesso!", success: true };
     }
 
-    function removeUserById(id: number): ApiResponse {
 
-        const newUsers: UserInterface[] = users.filter(vobj => vobj.id !== id);
-        
-        setUsers(newUsers);
+    function disableOrEnable(id: number): ApiResponse {
 
-        return { message: "Usuário removido com sucesso!", success: true };
+        const user = getUsersBy("id", id);
+
+        if (user.length === 0) {
+         return { message: "Usuário não encontrado", success: false };
+        }
+
+        setUsers((oldUsers) => {
+            const newUsers = oldUsers.map((vobj) => {
+                return vobj.id === id ? {...vobj, enabled: !vobj.enabled } : vobj;
+            });
+
+            setUsersStorage(newUsers);
+            return newUsers;
+        });
+
+        return { message: "Sucesso", success: true };
     }
 
-    function validationLogin(data: LoginInterface) {
+    function validationLogin(data: LoginInterface, expire: number) {
         
-        let vobjUser = undefined;
+        if (expire && expire < Date.now()) return;
 
+        let vobjUserLogged: UserLoggedInterface | undefined = undefined;
+
+        if (!expire) {
+            expire = Date.now() + 86400000;
+        }
+        
         users.map((user) => {
-            if (user.email === data.email && user.password === data.password) {
-                vobjUser = user; 
+            if (user.email === data.email && user.password === data.password && user.enabled) {
+                vobjUserLogged = {...user, expire: expire};
             }
         });
 
-        setUserLogged(vobjUser);
+        setUserLogged(vobjUserLogged);
+        setUserLoggedStorage(vobjUserLogged);
 
-        return vobjUser;
+        return vobjUserLogged;
     }
 
     function getUsersBy<T extends keyof UserInterface>(
@@ -100,8 +147,28 @@ export default function UserProvider({children}:{children:React.ReactNode}) {
         return !!userLogged;
     }
 
+    async function setUsersStorage(newUsers: UserInterface[]) {
+        await AsyncStorage.setItem("users", JSON.stringify(newUsers));
+    }
+
+    async function getUsersStorage(): Promise<UserInterface[]> {
+        const data_json = await AsyncStorage.getItem("users");
+        const data: UserInterface[] = data_json ? JSON.parse(data_json) : [];
+        return data;
+    }
+
+    async function setUserLoggedStorage(user: UserLoggedInterface | undefined) {
+        await AsyncStorage.setItem("userlogged", user ? JSON.stringify(user) : "");
+    }
+
+    async function getUserLoggedStorage(): Promise<UserLoggedInterface | undefined> {
+        const data_json = await AsyncStorage.getItem("userlogged");
+        const data: UserLoggedInterface | undefined = data_json ? JSON.parse(data_json) : undefined;
+        return data;
+    }
+
     return (
-        <UserContext.Provider value={{users, userLogged, addUser, updateUser, removeUserById, validationLogin, getUsersBy, isLoged}}>
+        <UserContext.Provider value={{users, userLogged, usersLoaded, addUser, updateUser, disableOrEnable, validationLogin, getUsersBy, getUserLoggedStorage, isLoged}}>
             {children}
         </UserContext.Provider>
     )

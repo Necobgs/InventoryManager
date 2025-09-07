@@ -4,7 +4,6 @@ import { useInventory } from '@/contexts/InventoryContext';
 import { useUser } from '@/contexts/UserContext';
 import { StyleSheet } from 'react-native';
 
-
 export default function TabOneScreen() {
 
   const { userLogged } = useUser();

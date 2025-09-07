@@ -15,7 +15,8 @@ const schema = yup.object().shape({
     id: yup.number().required(),
     name: yup.string().required('Nome é obrigatório'),
     email: yup.string().required('Email é obrigatório'),
-    password: yup.string().required('Senha é obrigatória')
+    password: yup.string().required('Senha é obrigatória'),
+    enabled: yup.boolean().required(),
 });
 
 const EditUser: React.FC = () => {
@@ -28,6 +29,15 @@ const EditUser: React.FC = () => {
     const [dialogTitle, setDialogTitle] = useState('');
     const [dialogText, setDialogText] = useState('');
 
+    const showDialog = () => {
+    
+      setDialogVisible(true);
+
+      setTimeout(() => {
+      setDialogVisible(false);
+      }, 4000);
+    };
+
     const {
         control,
         handleSubmit,
@@ -38,6 +48,7 @@ const EditUser: React.FC = () => {
           name: user?.name,
           email: user?.email,
           password: user?.password,
+          enabled: user?.enabled,
         },
         resolver: yupResolver(schema),
       });
@@ -47,15 +58,15 @@ const EditUser: React.FC = () => {
         const response = userContext.updateUser(data);
         setDialogTitle(response.success ? 'Sucesso' : 'Erro');
         setDialogText(response.message);
-        setDialogVisible(true);
+        showDialog();
     };
 
-const removeUser = () => {
+const disableOrEnable = () => {
         
-        const response = userContext.removeUserById(+id);
+        const response = userContext.disableOrEnable(+id);
         setDialogTitle(response.success ? 'Sucesso' : 'Erro');
         setDialogText(response.message);
-        setDialogVisible(true);
+        showDialog();
 
         if(response.success) {
             router.navigate("/(tabs)/user");
@@ -86,8 +97,8 @@ const removeUser = () => {
             />
 
             <View style={styles.areaButtons}>
-                <Button mode="outlined" style={{ width: '45%' }} onPress={handleSubmit(removeUser)}>
-                    Excluir usuário
+                <Button mode="outlined" style={{ width: '45%' }} onPress={handleSubmit(disableOrEnable)}>
+                    {user?.enabled ? "Desabilitar" : "Habilitar"}
                 </Button>
                 <Button
                     mode="contained"

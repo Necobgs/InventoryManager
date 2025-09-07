@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, StyleSheet } from 'react-native';
-import { Button, TextInput, HelperText, Text } from 'react-native-paper';
-import { useForm, Controller } from 'react-hook-form';
+import { Button, Text } from 'react-native-paper';
+import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import { useInventory } from '@/contexts/InventoryContext';
@@ -9,12 +9,9 @@ import useCategory from '@/contexts/CategoryContext';
 import DefaultDialog from '@/components/DefaultDialog';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import InventoryInterface from '@/interfaces/InventoryInterface';
-import ModalDropdown from '@/components/ModalDropdownCategory';
-import { formatCurrency } from '@/common/FormatCurrency';
-import { parseCurrency } from '@/common/PasseCurrency';
 import { FormInput } from '@/components/FormInput';
 import ComboBoxForm from '@/components/ComboBoxForm';
-
+import { useSupplier } from '@/contexts/SupplierContext';
 
 const schema = yup.object().shape({
   title: yup.string().required('Título é obrigatório'),
@@ -37,6 +34,16 @@ const schema = yup.object().shape({
     })
     .required('Selecione uma categoria')
     .nullable(),
+  supplier: yup
+      .object({
+          id:yup.number().required(),
+          name:yup.string().required(),
+          cnpj:yup.string().required(),
+          phone:yup.string().required(),
+          enabled:yup.boolean().required()
+      })
+      .required("selecione um fonecedor")
+      .nullable(),
   id: yup.number().required(),
   stock_value: yup.number().required(),
   enabled: yup.boolean().required(),
@@ -47,11 +54,22 @@ export default function PageTarefasId() {
   const inventoryContext = useInventory();
   const oldInventory = inventoryContext.getInventoryBy('id', +id)?.[0];
   const categoryContext = useCategory();
+  const supplierContext = useSupplier();
   const [dialogVisible, setDialogVisible] = useState(false);
   const [dialogTitle, setDialogTitle] = useState('');
   const [dialogText, setDialogText] = useState('');
   const router = useRouter();
   const categories = categoryContext.findCategoryBy('enabled',true);
+  const suppliers = supplierContext.getSuppliersBy('enabled',true);
+
+  const showDialog = () => {
+    
+    setDialogVisible(true);
+
+    setTimeout(() => {
+      setDialogVisible(false);
+    }, 4000);
+  };
 
   const {
     control,
@@ -96,14 +114,14 @@ export default function PageTarefasId() {
     }
     setDialogTitle(response.success ? 'Sucesso' : 'Erro');
     setDialogText(response.message);
-    setDialogVisible(true);
+    showDialog();
   }
 
   function saveChanges(data: InventoryInterface) {
     const response = inventoryContext.updateInventory(data);
     setDialogTitle(response.success ? 'Sucesso' : 'Erro');
     setDialogText(response.message);
-    setDialogVisible(true);
+    showDialog();
   }
 
   return (
@@ -137,13 +155,13 @@ export default function PageTarefasId() {
         />
 
 
-          <FormInput
-            control={control}
-            name="stock_value"
-            label="Valor de estoque"
-            isCurrency
-            disabled
-          />
+        <FormInput
+          control={control}
+          name="stock_value"
+          label="Valor de estoque"
+          isCurrency
+          disabled
+        />
 
         <ComboBoxForm
           data={categories}
@@ -152,6 +170,15 @@ export default function PageTarefasId() {
           label="Categoria"
           displayKey={'description'}
           errors={errors}
+        />
+
+        <ComboBoxForm
+          data={suppliers}
+          control={control}
+          name="supplier"
+          label="Fornecedor"
+          errors={errors}
+          displayKey={'name'}
         />
 
         <View style={styles.excludeItemView}>

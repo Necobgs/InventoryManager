@@ -1,6 +1,6 @@
 import DefaultDialog from "@/components/DefaultDialog";
 import { FormInput } from "@/components/FormInput";
-import { Text, View } from "@/components/Themed";
+import { View } from "@/components/Themed";
 import { useInventory } from "@/contexts/InventoryContext";
 import { useMovements } from "@/contexts/MovementsContext";
 import { useUser } from "@/contexts/UserContext";
@@ -53,6 +53,18 @@ const EditMovements: React.FC = () => {
     const [dialogVisible, setDialogVisible] = useState(false);
     const [dialogTitle, setDialogTitle] = useState('');
     const [dialogText, setDialogText] = useState('');
+    const [alterInventory, setAlterInventory] = useState(false);
+    const [alterPrice, setAlterPrice] = useState(false);
+    const [disablePrice, setDisablePrice] = useState(false);
+
+    const showDialog = () => {
+    
+        setDialogVisible(true);
+
+        setTimeout(() => {
+        setDialogVisible(false);
+        }, 4000);
+    };
 
     const {
         control,
@@ -70,26 +82,45 @@ const EditMovements: React.FC = () => {
         operation: movement?.quantity > 0 ? {id: 1, title: "Entrada"} : {id: 2, title: "Saída"},
         quantity: Math.abs(movement?.quantity),
         qty_product: !inventory?.qty_product ? 0 : inventory.qty_product,
-        price_per_unity: inventory?.price_per_unity,
+        price_per_unity: movement?.quantity > 0 ? movement?.price_at_time : inventory?.price_per_unity,
         value: !inventory?.price_per_unity || !movement?.quantity ? 0 : inventory.price_per_unity * Math.abs(movement.quantity),
         },
         resolver: yupResolver(schema),
     });
 
+    const price_per_unity = watch('price_per_unity');
     const quantity = watch('quantity');
     const inventorySel = watch('inventory');
     const operationSel = watch("operation");
+
+    useEffect(() => {
+        setAlterPrice(true);
+    }, [price_per_unity]);
     
+    useEffect(() => {
+        setAlterInventory(true);
+    }, [inventorySel]);
+
     useEffect(() => {
         const inventory_obj_sel = inventoryContext.getInventoryBy("id", !inventorySel?.id ? 0 : inventorySel.id)?.[0];
 
         if (inventory_obj_sel){
 
-            setValue('qty_product', inventory_obj_sel.qty_product);
-            setValue('price_per_unity', inventory_obj_sel.price_per_unity);
-            setValue('value', inventory_obj_sel.price_per_unity * quantity);
+            if (operationSel?.id === 2 || (quantity === 0 && !alterPrice) || alterInventory) {
+                setValue('price_per_unity', inventory.price_per_unity);
+                setValue('value', inventory.price_per_unity * quantity);
+                setDisablePrice(true);
+            }
+            else {
+                setValue('price_per_unity', price_per_unity);
+                setValue('value', price_per_unity * quantity);
+                setDisablePrice(false);
+            }
         }
-    }, [quantity, inventorySel, operationSel, setValue]);
+
+        setAlterPrice(false);
+        setAlterInventory(false);
+    }, [quantity, inventorySel, operationSel, price_per_unity, setValue]);
 
     const updateMovement = (data: MovementsFormType) => {
 
@@ -105,14 +136,14 @@ const EditMovements: React.FC = () => {
         const response = movementsContext.updateMovement(newData);
         setDialogTitle(response.success ? 'Sucesso' : 'Erro');
         setDialogText(response.message);
-        setDialogVisible(true);
+        showDialog();
     };
 
     const removeMovement = () => {
         const response = movementsContext.removeMovementById(+id);
         setDialogTitle(response.success ? 'Sucesso' : 'Erro');
         setDialogText(response.message);
-        setDialogVisible(true);
+        showDialog();
 
         if(response.success) {
             router.navigate("/(tabs)/movements");
@@ -160,7 +191,7 @@ const EditMovements: React.FC = () => {
                 name="price_per_unity"
                 label="Preço por unidade"
                 isCurrency
-                disabled
+                disabled={disablePrice}
             />
 
             <FormInput

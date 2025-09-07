@@ -1,17 +1,17 @@
 // pages/PageTarefasId.tsx
 import React, { useState } from 'react';
 import { View, StyleSheet } from 'react-native';
-import { Button, HelperText, Text } from 'react-native-paper';
-import { useForm, Controller } from 'react-hook-form';
+import { Button } from 'react-native-paper';
+import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import { useInventory } from '@/contexts/InventoryContext';
 import useCategory from '@/contexts/CategoryContext';
 import DefaultDialog from '@/components/DefaultDialog';
 import { InventoryFormType } from '@/types/InventoryFormType';
-import ModalDropdown from '@/components/ModalDropdownCategory';
 import { FormInput } from '@/components/FormInput';
 import ComboBoxForm from '@/components/ComboBoxForm';
+import { useSupplier } from '@/contexts/SupplierContext';
 
 
 const schema = yup.object().shape({
@@ -27,23 +27,44 @@ const schema = yup.object().shape({
     .typeError('Valor unitário deve ser um número')
     .min(1, 'Não pode ser negativo ou zero')
     .required('Valor unitário é obrigatório'),
-    category: yup
+  category: yup
     .object({
         id:yup.number().required(),
         description: yup.string().required(),
         enabled:yup.boolean().required()
     })
     .required("selecione uma categoria")
-    .nullable(),    
+    .nullable(),   
+  supplier: yup
+    .object({
+        id:yup.number().required(),
+        name:yup.string().required(),
+        cnpj:yup.string().required(),
+        phone:yup.string().required(),
+        enabled:yup.boolean().required()
+    })
+    .required("selecione um fonecedor")
+    .nullable(),   
 });
 
 const PageTarefasId: React.FC = () => {
   const inventoryContext = useInventory();
   const categoryContext = useCategory();
+  const supplierContext = useSupplier();
   const categories = categoryContext.findCategoryBy('enabled',true);
+  const suppliers = supplierContext.getSuppliersBy('enabled',true);
   const [dialogVisible, setDialogVisible] = useState(false);
   const [dialogTitle, setDialogTitle] = useState('');
   const [dialogText, setDialogText] = useState('');
+
+  const showDialog = () => {
+    
+    setDialogVisible(true);
+
+    setTimeout(() => {
+      setDialogVisible(false);
+    }, 4000);
+  };
 
   const {
     control,
@@ -57,6 +78,7 @@ const PageTarefasId: React.FC = () => {
       qty_product: 0,
       price_per_unity: 0,
       category: null,
+      supplier: null,
     },
     resolver: yupResolver(schema),
   });
@@ -65,7 +87,7 @@ const PageTarefasId: React.FC = () => {
     const response = inventoryContext.addInventory(data);
       setDialogTitle(response.success ? 'Sucesso' : 'Erro');
       setDialogText(response.message);
-      setDialogVisible(true);
+      showDialog();
       if(response.success) reset(); // limpa o formulário
   };
 
@@ -99,21 +121,27 @@ const PageTarefasId: React.FC = () => {
           isCurrency
       />
 
-      <View style={{flexDirection:'row',width:'100%',justifyContent:'space-between',alignItems:'flex-end'}}>
-        <ComboBoxForm
-          data={categories}
-          control={control}
-          name="category"
-          label="Categoria"
-          errors={errors}
-          displayKey={'description'}
-        />
+      <ComboBoxForm
+        data={categories}
+        control={control}
+        name="category"
+        label="Categoria"
+        errors={errors}
+        displayKey={'description'}
+      />
+
+      <ComboBoxForm
+        data={suppliers}
+        control={control}
+        name="supplier"
+        label="Fornecedor"
+        errors={errors}
+        displayKey={'name'}
+      />
       
       <Button mode="contained" onPress={handleSubmit(onSubmit)} style={{height:40}}>
         Criar produto
       </Button>
-
-      </View>
 
       <DefaultDialog
         visible={dialogVisible}

@@ -48,6 +48,18 @@ const CreateMovements: React.FC = () => {
     const [dialogVisible, setDialogVisible] = useState(false);
     const [dialogTitle, setDialogTitle] = useState('');
     const [dialogText, setDialogText] = useState('');
+    const [alterInventory, setAlterInventory] = useState(false);
+    const [alterPrice, setAlterPrice] = useState(false);
+    const [disablePrice, setDisablePrice] = useState(false);
+
+    const showDialog = () => {
+    
+        setDialogVisible(true);
+
+        setTimeout(() => {
+        setDialogVisible(false);
+        }, 4000);
+    };
 
     const {
         control,
@@ -68,19 +80,45 @@ const CreateMovements: React.FC = () => {
         resolver: yupResolver(schema),
     });
 
+    const price_per_unity = watch('price_per_unity');
     const quantity = watch('quantity');
     const inventorySel = watch('inventory');
     const operationSel = watch("operation");
+
+    useEffect(() => {
+        setAlterPrice(true);
+    }, [price_per_unity]);
+    
+    useEffect(() => {
+        setAlterInventory(true);
+    }, [inventorySel]);
 
     useEffect(() => {
         const inventory = inventoryContext.getInventoryBy("id", !inventorySel?.id ? 0 : inventorySel.id)?.[0];
 
         if (inventory){
             setValue('qty_product', inventory.qty_product);
-            setValue('price_per_unity', inventory.price_per_unity);
-            setValue('value', inventory.price_per_unity * quantity);
+
+            if (operationSel?.id === 2 || quantity === 0 || alterInventory) {
+                setValue('price_per_unity', inventory.price_per_unity);
+                setValue('value', inventory.price_per_unity * quantity);
+            }
+            else {
+                setValue('price_per_unity', price_per_unity);
+                setValue('value', price_per_unity * quantity);
+            }
+
+            if (operationSel?.id === 1) {
+                setDisablePrice(false);
+            }
+            else {
+                setDisablePrice(true);
+            }
         }
-    }, [quantity, inventorySel, operationSel, setValue]);
+
+        setAlterPrice(false);
+        setAlterInventory(false);
+    }, [quantity, inventorySel, operationSel, price_per_unity, setValue]);
 
     const onSubmit = (data: MovementsFormType) => {
 
@@ -90,13 +128,13 @@ const CreateMovements: React.FC = () => {
             id_user: !userLogged?.id ? 0 : userLogged.id,
             quantity: data.operation?.id === 2 ? data.quantity * -1 : data.quantity,
             value: 0,
-            price_at_time: 0,
+            price_at_time: data.price_per_unity,
             date: new Date(),
         }
         const response = movementsContext.addMovement(newData);
         setDialogTitle(response.success ? 'Sucesso' : 'Erro');
         setDialogText(response.message);
-        setDialogVisible(true);
+        showDialog();
         if(response.success) reset(); // limpa o formulário
     };
 
@@ -140,7 +178,7 @@ const CreateMovements: React.FC = () => {
                 name="price_per_unity"
                 label="Preço Unidade"
                 isCurrency
-                disabled
+                disabled={disablePrice}
             />
 
             <FormInput

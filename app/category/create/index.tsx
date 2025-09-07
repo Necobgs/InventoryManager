@@ -30,6 +30,15 @@ export default function PageCategoryCreate() {
   const [dialogTitle, setDialogTitle] = useState('');
   const [dialogText, setDialogText] = useState('');
 
+  const showDialog = () => {
+    
+    setDialogVisible(true);
+
+    setTimeout(() => {
+      setDialogVisible(false);
+    }, 4000);
+  };
+
   const {
     control,
     handleSubmit,
@@ -48,7 +57,7 @@ export default function PageCategoryCreate() {
     const response = categoryContext.addCategory(data);
     setDialogTitle(response.success ? 'Sucesso' : 'Erro');
     setDialogText(response.message);
-    setDialogVisible(true);
+    showDialog();
     if(response.success) reset();
   }
 

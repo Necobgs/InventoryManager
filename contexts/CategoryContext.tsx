@@ -1,6 +1,7 @@
 import { ApiResponse } from "@/interfaces/ApiResponse";
 import CategoryInterface from "@/interfaces/CategoryInterface";
-import React, { createContext, useContext, useState } from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import React, { createContext, useContext, useEffect, useState } from "react";
 
 interface CategoryContextType{
     categories:CategoryInterface[],
@@ -12,27 +13,18 @@ interface CategoryContextType{
 
 const CategoryContext = createContext<CategoryContextType | undefined>(undefined);
 
-
 export function CategoryProvider(
     {children}: {children:React.ReactNode}
 ){
-    const [categories,setCategories] = useState<CategoryInterface[]>([
-        {
-            id:1,
-            description:"Fruta",
-            enabled:true
-        },
-        {
-            id:2,
-            description:"Bebida",
-            enabled:true
-        },
-        {
-            id:3,
-            description:"Energético",
-            enabled:true
-        },
-    ])
+    const [categories,setCategories] = useState<CategoryInterface[]>([]);
+
+    useEffect(() => {
+        async function loadData() {
+          const newCategory = await getCategoriesStorage();
+          setCategories(newCategory);
+        }
+        loadData();
+    },[]);
 
     function isValidCategory(category:CategoryInterface){
         return category.description
@@ -44,10 +36,20 @@ export function CategoryProvider(
 
     function addCategory(newCategory:CategoryInterface): ApiResponse{
         if(!isValidCategory(newCategory)) return { message:"Preencha todos os campos", success:false }
-        setCategories((oldCategories)=>[...oldCategories,{
-            ...newCategory,
-            id:categories.length+1
-        }]);
+        
+        setCategories((oldCategories)=>{
+
+            const newId = !oldCategories[0] ? 1 : oldCategories.reduce((max, current) => current.id > max.id ? current : max).id + 1;
+
+            const newCategories = [   
+                ...oldCategories,{
+                ...newCategory,
+                id:newId}
+            ]
+
+            setCategoriesStorage(newCategories);
+            return newCategories;
+        });
 
         return {message:"Sucesso ao cadastrar categoria",success:true};
     }
@@ -55,19 +57,33 @@ export function CategoryProvider(
     function disableOrEnable(id:number): ApiResponse{
         const categoryFounded = findCategoryBy('id',id);
         if(!categoryFounded) return { message:"Categoria não encontrada",success:false }
-        setCategories((oldCategories)=>
-            oldCategories.map((category)=>category.id != id ? category : {...category,enabled:!category.enabled})
-        )
+        setCategories((oldCategories) => {
+            const newCategories = oldCategories.map((category)=>category.id != id ? category : {...category,enabled:!category.enabled});
+            setCategoriesStorage(newCategories);
+            return newCategories;
+        })
         return { message:"Sucesso",success:true }
     }
 
     function updateCategory(data:CategoryInterface){
         const category = findCategoryBy('id',data.id)[0]
         if(!category) return {message:"Não foi possível encontrar a categoria",success:false}
-        setCategories((oldCategories)=>
-            oldCategories.map((category)=>category.id == data.id ? data : category)
-        )
+        setCategories((oldCategories) => {
+            const newCategories = oldCategories.map((category)=>category.id == data.id ? data : category);
+            setCategoriesStorage(newCategories);
+            return newCategories;
+        })
         return {message:"Sucesso ao atualizar a categoria!",success:true}
+    }
+
+    async function setCategoriesStorage(newCategories: CategoryInterface[]) {
+        await AsyncStorage.setItem("categories", JSON.stringify(newCategories));
+    }
+
+    async function getCategoriesStorage(): Promise<CategoryInterface[]> {
+        const data_json = await AsyncStorage.getItem("categories");
+        const data: CategoryInterface[] = data_json ? JSON.parse(data_json) : [];
+        return data;
     }
 
     return (

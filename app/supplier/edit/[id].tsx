@@ -15,7 +15,8 @@ const schema = yup.object().shape({
     id: yup.number().required(),
     name: yup.string().required('Nome é obrigatório'),
     cnpj: yup.string().required('CNPJ é obrigatório'),
-    phone: yup.string().required('Telefone é obrigatório')
+    phone: yup.string().required('Telefone é obrigatório'),
+    enabled: yup.boolean().required()
 });
 
 const EditSupplier: React.FC = () => {
@@ -28,6 +29,15 @@ const EditSupplier: React.FC = () => {
     const [dialogTitle, setDialogTitle] = useState('');
     const [dialogText, setDialogText] = useState('');
 
+    const showDialog = () => {
+    
+      setDialogVisible(true);
+
+      setTimeout(() => {
+      setDialogVisible(false);
+      }, 4000);
+    };
+
     const {
         control,
         handleSubmit,
@@ -38,6 +48,7 @@ const EditSupplier: React.FC = () => {
           name: supplier?.name,
           cnpj: supplier?.cnpj,
           phone: supplier?.phone,
+          enabled: supplier?.enabled
         },
         resolver: yupResolver(schema),
       });
@@ -47,15 +58,15 @@ const EditSupplier: React.FC = () => {
         const response = supplierContext.updateSupplier(data);
         setDialogTitle(response.success ? 'Sucesso' : 'Erro');
         setDialogText(response.message);
-        setDialogVisible(true);
+        showDialog();
     };
 
-    const removeSupplier = () => {
+    const disableOrEnable = () => {
         
-        const response = supplierContext.removeSupplierById(+id);
+        const response = supplierContext.disableOrEnable(+id);
         setDialogTitle(response.success ? 'Sucesso' : 'Erro');
         setDialogText(response.message);
-        setDialogVisible(true);
+        showDialog();
 
         if(response.success) {
             router.navigate("/(tabs)/supplier");
@@ -86,8 +97,8 @@ const EditSupplier: React.FC = () => {
             />
 
             <View style={styles.areaButtons}>
-                <Button mode="outlined" style={{ width: '45%' }} onPress={handleSubmit(removeSupplier)}>
-                    Excluir forncedor
+                <Button mode="outlined" style={{ width: '45%' }} onPress={handleSubmit(disableOrEnable)}>
+                    {supplier?.enabled ? "Desabilitar" : "Habilitar"}
                 </Button>
                 <Button
                     mode="contained"

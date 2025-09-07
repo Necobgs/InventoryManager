@@ -7,8 +7,6 @@ import { AnimatedFAB, Button } from "react-native-paper";
 import GenericCard from "@/components/GenericCard";
 import { useState } from "react";
 
-
-
 export default function TabCategory(){
     const [enabled, setEnabled] = useState(true);
     const useCategoryContext = useCategory();

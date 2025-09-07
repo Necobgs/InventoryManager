@@ -85,7 +85,7 @@ function RootLayoutNav() {
             />
             <Stack.Screen 
               name="user/create/index"
-              options={{title:'Criar uma usuário'}}
+              options={{title:'Criar um usuário'}}
             />
             <Stack.Screen 
               name="user/edit/[id]"

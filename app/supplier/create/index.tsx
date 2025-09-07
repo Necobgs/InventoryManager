@@ -14,7 +14,8 @@ const schema = yup.object().shape({
     id: yup.number().required(),
     name: yup.string().required('Nome é obrigatório'),
     cnpj: yup.string().required('CNPJ é obrigatório'),
-    phone: yup.string().required('Telefone é obrigatório')
+    phone: yup.string().required('Telefone é obrigatório'),
+    enabled: yup.boolean().required(),
 });
 
 const CreateSupplier: React.FC = () => {
@@ -23,6 +24,15 @@ const CreateSupplier: React.FC = () => {
     const [dialogVisible, setDialogVisible] = useState(false);
     const [dialogTitle, setDialogTitle] = useState('');
     const [dialogText, setDialogText] = useState('');
+
+    const showDialog = () => {
+    
+      setDialogVisible(true);
+
+      setTimeout(() => {
+      setDialogVisible(false);
+      }, 4000);
+    };
 
     const {
         control,
@@ -35,6 +45,7 @@ const CreateSupplier: React.FC = () => {
           name: '',
           cnpj: '',
           phone: '',
+          enabled: true
         },
         resolver: yupResolver(schema),
       });
@@ -44,7 +55,7 @@ const CreateSupplier: React.FC = () => {
         const response = supplierContext.addSupplier(data);
         setDialogTitle(response.success ? 'Sucesso' : 'Erro');
         setDialogText(response.message);
-        setDialogVisible(true);
+        showDialog();
         if(response.success) reset(); // limpa o formulário
     };
 

@@ -1,7 +1,8 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import { useInventory } from "./InventoryContext";
 import { ApiResponse } from "@/interfaces/ApiResponse";
 import { MovementsInterface } from "@/interfaces/MovementsInterface";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 interface MovementsContextType {
     movements: MovementsInterface[],
@@ -11,7 +12,8 @@ interface MovementsContextType {
     getMovementsBy<T extends keyof MovementsInterface>(
         By: T,
         value: MovementsInterface[T]
-    ): MovementsInterface[]
+    ): MovementsInterface[],
+    getMovementsByOperation(operation:number): MovementsInterface[]
 }
 
 const MovementsContext = createContext<MovementsContextType | undefined>(undefined);
@@ -21,6 +23,14 @@ export default function MovementsProvider({children}:{children:React.ReactNode})
     const inventoryContext = useInventory();
 
     const [movements, setMovements] = useState<MovementsInterface[]>([]);
+
+    useEffect(() => {
+        async function loadData() {
+          const newMovements = await getMovementsStorage();
+          setMovements(newMovements);
+        }
+        loadData();
+    },[]);
 
     function addMovement(data: MovementsInterface): ApiResponse {
         if (!data.quantity) {
@@ -46,19 +56,24 @@ export default function MovementsProvider({children}:{children:React.ReactNode})
             return response;
         }
 
-        const newId = !movements[0] ? 1 : movements.reduce((max, current) => current.id > max.id ? current : max).id + 1;
         const newValue = iventory.price_per_unity * Math.abs(data.quantity);
 
         setMovements((oldMovements) => {
-            return [
+
+            const newId = !oldMovements[0] ? 1 : oldMovements.reduce((max, current) => current.id > max.id ? current : max).id + 1;
+
+            const newMovements = [
                 ...oldMovements,
                 {
                     ...data,
                     id: newId,
                     value: newValue,
-                    price_at_time: iventory.price_per_unity
+                    price_at_time: data.quantity < 0 ? iventory.price_per_unity : data.price_at_time
                 }
             ];
+
+            setMovementsStorage(newMovements);
+            return newMovements;
         })
 
         return { message: "Movimentação cadastrada com sucesso!", success: true };
@@ -138,11 +153,14 @@ export default function MovementsProvider({children}:{children:React.ReactNode})
 
         const newValue = iventory.price_per_unity * Math.abs(data.quantity);
 
-        const newMovements: MovementsInterface[] = movements.map((vobj) => {
-            return vobj.id === data.id ? {...vobj, ...data, value: newValue, price_at_time: iventory.price_per_unity} : vobj;
-        })
+        setMovements((oldMovements) => {
+            const newMovements = oldMovements.map((vobj) => {
+                return vobj.id === data.id ? {...vobj, ...data, value: newValue, price_at_time: data.quantity < 0 ? iventory.price_per_unity : data.price_at_time} : vobj;
+            });
 
-        setMovements(newMovements);
+            setMovementsStorage(newMovements);
+            return newMovements;
+        });
 
         return { message: "Movimentação alterada com sucesso!", success: true };
     }
@@ -176,9 +194,12 @@ export default function MovementsProvider({children}:{children:React.ReactNode})
             return response;
         }
 
-        const newMovements: MovementsInterface[] = movements.filter(vobj => vobj.id !== id);
+        setMovements((oldMovements) => {
+            const newMovements = oldMovements.filter(vobj => vobj.id !== id);
 
-        setMovements(newMovements);
+            setMovementsStorage(newMovements);
+            return newMovements;
+        });
 
         return { message: "Movimentação removida com sucesso!", success: true };
     }
@@ -190,8 +211,28 @@ export default function MovementsProvider({children}:{children:React.ReactNode})
         return movements.filter((movement) => movement[By] === value);
     }
 
+    function getMovementsByOperation(operation:number): MovementsInterface[] {
+        if (operation === 1) {
+            return movements.filter((movement) => movement["quantity"] > 0);
+        }
+        else {
+            return movements.filter((movement) => movement["quantity"] < 0);
+        }
+    }
+
+    async function setMovementsStorage(newMovements: MovementsInterface[]) {
+        await AsyncStorage.setItem("movements", JSON.stringify(newMovements));
+    }
+
+    async function getMovementsStorage(): Promise<MovementsInterface[]> {
+        const data_json = await AsyncStorage.getItem("movements");
+        const data: MovementsInterface[] = data_json ? JSON.parse(data_json) : [];
+        const movements = data.map((m: any) => ({ ...m, date: new Date(m.date) }));
+        return movements;
+    }
+
     return (
-        <MovementsContext.Provider value={{movements, addMovement, updateMovement, removeMovementById, getMovementsBy}}>
+        <MovementsContext.Provider value={{movements, addMovement, updateMovement, removeMovementById, getMovementsBy, getMovementsByOperation}}>
             {children}
         </MovementsContext.Provider>
     )

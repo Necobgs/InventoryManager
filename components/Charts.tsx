@@ -2,9 +2,9 @@ import { Text, View } from '@/components/Themed';
 import useCategory from '@/contexts/CategoryContext';
 import { useInventory } from '@/contexts/InventoryContext';
 import { useMovements } from '@/contexts/MovementsContext';
+import { useSupplier } from '@/contexts/SupplierContext';
 import { StyleSheet } from 'react-native';
 import { PieChart } from 'react-native-chart-kit';
-
 
 interface ChartInterfcae{
     name: string,
@@ -21,13 +21,18 @@ export default function Charts() {
     const inventoryContext = useInventory();
     const categoryContext = useCategory();
     const movementsContext = useMovements();
-    const categories = categoryContext.findCategoryBy("enabled", true)
+    const supplierContext = useSupplier();
+    const categories = categoryContext.findCategoryBy("enabled", true);
+    const suppliers = supplierContext.getSuppliersBy("enabled", true);
     const inventorys = inventoryContext.getInventoryBy("enabled", true);
     const dataIventorys: ChartInterfcae[] = [];
-    const dataMovements: ChartInterfcae[] = [];
+    const dataExits: ChartInterfcae[] = [];
+    const dataEntries: ChartInterfcae[] = [];
     const dataCategories: ChartInterfcae[] = [];
+    const dataSuppliers: ChartInterfcae[] = [];
     let indexColor = 0;
     let quantity_without_cat = 0;
+    let quantity_without_sup = 0;
 
     if (inventorys[0]) {
         inventorys.map((iv) => {
@@ -40,16 +45,30 @@ export default function Charts() {
             })
 
             const movements = movementsContext.getMovementsBy("id_inventory", iv.id);
-            let quantity = 0;
+            let quantity_exit = 0;
+            let quantity_entry = 0;
 
             if (movements[0]) {
                 movements.map((mov) => {
-                    quantity += mov.quantity;
+                    if (mov.quantity > 0) {
+                        quantity_entry += mov.quantity;
+                    }
+                    else {
+                        quantity_exit += mov.quantity;
+                    }
                 })
 
-                dataMovements.push({
+                dataEntries.push({
                     name: iv.title,
-                    value: quantity,
+                    value: quantity_entry,
+                    color: colors[indexColor],
+                    legendFontColor: colors[indexColor],
+                    legendFontSize: 15
+                })
+
+                dataExits.push({
+                    name: iv.title,
+                    value: quantity_exit * -1,
                     color: colors[indexColor],
                     legendFontColor: colors[indexColor],
                     legendFontSize: 15
@@ -58,6 +77,10 @@ export default function Charts() {
 
             if (!iv.category) {
                 quantity_without_cat += iv.qty_product;
+            }
+            
+            if (!iv.supplier) {
+                quantity_without_sup += iv.qty_product;
             }
 
             if (colors.length === (indexColor + 1)) {
@@ -77,7 +100,6 @@ export default function Charts() {
             legendFontColor: colors[indexColor],
             legendFontSize: 15
         })
-
 
         if (categories[0]) {
             categories.map((cat) => {
@@ -106,6 +128,44 @@ export default function Charts() {
                 })
             })
         }
+
+        indexColor = colors.length - 1;
+
+        dataSuppliers.push({
+            name: "Sem Fornecedor",
+            value: quantity_without_sup,
+            color: colors[indexColor],
+            legendFontColor: colors[indexColor],
+            legendFontSize: 15
+        })
+
+        if (suppliers[0]) {
+            suppliers.map((sup) => {
+
+                if (indexColor === 0) {
+                    indexColor = colors.length - 1;
+                }
+                else {
+                    indexColor -= 1;
+                }
+
+                let quantity_per_sup = 0;
+                inventorys.map((iv) => {
+
+                    if (iv.supplier?.id === sup.id) {
+                        quantity_per_sup += iv.qty_product;
+                    }
+                })
+
+                dataSuppliers.push({
+                    name: sup.name,
+                    value: quantity_per_sup,
+                    color: colors[indexColor],
+                    legendFontColor: colors[indexColor],
+                    legendFontSize: 15
+                })
+            })
+        }
     }
 
     return (
@@ -127,11 +187,28 @@ export default function Charts() {
             />
         </View> : <Text></Text>}
 
-        {dataMovements[0] ?
+        {dataEntries[0] ?
         <View style={styles.areaChart}>
-            <Text style={styles.title}>Retiradas de estoque por produto</Text>
+            <Text style={styles.title}>Entradas no estoque</Text>
             <PieChart
-            data={dataMovements}
+            data={dataEntries}
+            width={315}
+            height={220}
+            chartConfig={{
+                color: () => `black`
+            }}
+            accessor={"value"}
+            backgroundColor="rgb(242 242 242)"
+            paddingLeft={"15"}
+            absolute
+            />
+        </View> : <Text></Text>}
+
+        {dataExits[0] ?
+        <View style={styles.areaChart}>
+            <Text style={styles.title}>Saídas no estoque</Text>
+            <PieChart
+            data={dataExits}
             width={315}
             height={220}
             chartConfig={{
@@ -149,6 +226,23 @@ export default function Charts() {
             <Text style={styles.title}>Quantidade de produtos por categoria</Text>
             <PieChart
             data={dataCategories}
+            width={315}
+            height={220}
+            chartConfig={{
+                color: () => `black`
+            }}
+            accessor={"value"}
+            backgroundColor="rgb(242 242 242)"
+            paddingLeft={"15"}
+            absolute
+            />
+        </View> : <Text></Text>}
+
+        {dataSuppliers[0] ?
+        <View style={styles.areaChart}>
+            <Text style={styles.title}>Quantidade de produtos por fornecedor</Text>
+            <PieChart
+            data={dataSuppliers}
             width={315}
             height={220}
             chartConfig={{
