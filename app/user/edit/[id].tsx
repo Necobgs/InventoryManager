@@ -7,9 +7,11 @@ import { StyleSheet } from "react-native";
 import { Button } from "react-native-paper";
 import * as yup from 'yup';
 import { useState } from "react";
-import { useUser } from "@/contexts/UserContext";
 import { UserInterface } from "@/interfaces/UserInterface";
 import { useLocalSearchParams, useRouter } from "expo-router";
+import { useAppDispatch } from "@/store/hooks";
+import { useSelector } from "react-redux";
+import { editUser, selectUsers } from "@/store/features/userSlice";
 
 const schema = yup.object().shape({
     id: yup.number().required(),
@@ -21,9 +23,10 @@ const schema = yup.object().shape({
 
 const EditUser: React.FC = () => {
     const { id } = useLocalSearchParams<{ id: string }>();
-    const userContext = useUser();
-    const user = userContext.getUsersBy("id", +id)[0];
-    const router = useRouter();
+  const users = useSelector(selectUsers);
+  const user = users.find(u => u.id === +id);
+  const router = useRouter();
+  const dispatch = useAppDispatch();
 
     const [dialogVisible, setDialogVisible] = useState(false);
     const [dialogTitle, setDialogTitle] = useState('');
@@ -53,26 +56,29 @@ const EditUser: React.FC = () => {
         resolver: yupResolver(schema),
       });
 
-    const updateUser = (data: UserInterface) => {
-
-        const response = userContext.updateUser(data);
-        setDialogTitle(response.success ? 'Sucesso' : 'Erro');
-        setDialogText(response.message);
-        showDialog();
+    const updateUser = async(data: UserInterface) => {
+      try {
+        await dispatch(editUser(data)).unwrap();
+        setDialogTitle('Sucesso');
+        setDialogText('Usuário alterado com sucesso!');
+      } catch (error: any) {
+        setDialogTitle('Erro');
+        setDialogText(error?.message || 'Erro ao alterar usuário');
+      }
+      showDialog();
     };
 
-const disableOrEnable = () => {
-        
-        const response = userContext.disableOrEnable(+id);
-        setDialogTitle(response.success ? 'Sucesso' : 'Erro');
-        setDialogText(response.message);
-        showDialog();
-
-        if(response.success) {
-            router.navigate("/(tabs)/user");
-            return;
-        }
-    }
+    const disableOrEnable = async(data: UserInterface) => {
+      try {
+        data.enabled = !data.enabled;
+        await dispatch(editUser(data)).unwrap();
+        router.back();
+      } catch (error: any) {
+        setDialogTitle('Erro');
+        setDialogText(error?.message || 'Erro ao alterar usuário');
+      }
+      showDialog();
+    };
 
     return (
         <View style={styles.container}>

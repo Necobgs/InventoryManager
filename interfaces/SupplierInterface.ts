@@ -5,3 +5,5 @@ export interface SupplierInterface {
     phone: string,
     enabled:boolean,
 }
+
+export type SupplierForm = Omit<SupplierInterface, "id">;

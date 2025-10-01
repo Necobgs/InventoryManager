@@ -11,6 +11,7 @@ interface InventoryContextType {
     By: T,
     value: InventoryInterface[T]
   ) => InventoryInterface[];
+  filterInventory: (enabled: boolean, description: string) => InventoryInterface[];
   updateInventory: (inventory: InventoryInterface) => ApiResponse;
   disableOrEnable: (id: number) => ApiResponse;
 }
@@ -98,6 +99,10 @@ export default function InventoryProvider({
     return inventorys.filter((inventory) => inventory[By] === value);
   }
 
+  function filterInventory(enabled: boolean, description: string){
+    return inventorys.filter((inventory)=> inventory["enabled"] == enabled && inventory["description"].toLocaleLowerCase().includes(description.trim().toLocaleLowerCase()));
+  }
+
   function disableOrEnable(id: number): ApiResponse {
     const inventory = getInventoryBy("id", id);
     if (inventory.length === 0) {
@@ -134,6 +139,7 @@ export default function InventoryProvider({
         inventorys,
         addInventory,
         getInventoryBy,
+        filterInventory,
         updateInventory,
         disableOrEnable,
       }}

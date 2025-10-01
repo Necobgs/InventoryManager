@@ -5,11 +5,14 @@ import { useForm } from "react-hook-form";
 import { StyleSheet, View } from "react-native";
 import { Button } from "react-native-paper";
 import { Text } from "@/components/Themed";
-import { useUser } from "@/contexts/UserContext";
 import DefaultDialog from "@/components/DefaultDialog";
 import { useEffect, useState } from "react";
 import { FormInput } from "@/components/FormInput";
 import { useRouter } from "expo-router";
+import { useAppDispatch } from "@/store/hooks";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { loginUser } from "@/store/features/userSlice";
+import { UserLoggedInterface } from "@/interfaces/UserLoggedInterface";
 
 const schema = yup.object().shape({
   email: yup.string().required('Nome é obrigatório'),
@@ -18,32 +21,38 @@ const schema = yup.object().shape({
 
 const Login: React.FC = () => {
 
-    const usersContext = useUser();
     const router = useRouter();
+    const dispatch = useAppDispatch();
 
     const [dialogVisible, setDialogVisible] = useState(false);
     const [dialogTitle, setDialogTitle] = useState('');
     const [dialogText, setDialogText] = useState('');
+    const [errorMsg, setErrorMsg] = useState('');
 
     useEffect(() => {
       const checkSection = async () => {
-        if(!usersContext.usersLoaded) return;
 
-        const userLogged = await usersContext.getUserLoggedStorage();
+        const data_json = await AsyncStorage.getItem("userLogged");
+        const data : UserLoggedInterface | undefined = data_json ? JSON.parse(data_json) : undefined;
 
-        if (userLogged) {
+        if (data) {
 
-          const data = {email: userLogged.email, password: userLogged.password};
-          const response = usersContext.validationLogin(data, userLogged.expire);
-
-          if (response) {
-              router.navigate('/');
-              reset();
-          } 
+          if (data.expire > Date.now()) {
+            try {
+              
+              let user = await dispatch(loginUser({ email: data.email, password: data.password })).unwrap();
+              
+              if (user) {
+                router.push('/');
+                reset();
+                console.log("login Storage", user)
+              }
+            } catch {}
+          }
         }
       }
       checkSection();
-    }, [usersContext.usersLoaded]);
+    }, []);
 
     const {
         control,
@@ -58,16 +67,24 @@ const Login: React.FC = () => {
             resolver: yupResolver(schema),
         });
 
-    const onSubmit = (data: LoginInterface) => {
-        const response = usersContext.validationLogin(data, 0);
-        if (response) {
-            router.navigate('/');
-            reset();
-        } else {
+    const onSubmit = async (data: LoginInterface) => {
+        try {
+            let user = await dispatch(loginUser({ email: data.email, password: data.password })).unwrap();
+            if (user) {
+              router.push('/');
+              console.log("login", user)
+              reset();
+            }
+            else {
+              setDialogTitle('Erro');
+              setDialogText('Email ou Senha inválida');
+              setDialogVisible(true);
+            }
+        } catch (error) {
             setDialogTitle('Erro');
-            setDialogText('Email ou Senha inválida');
+            setDialogText(error as string);
+            setDialogVisible(true);
         }
-        setDialogVisible(true);
     }
 
     return (
@@ -90,6 +107,7 @@ const Login: React.FC = () => {
             <Button style={styles.button} mode="contained" onPress={handleSubmit(onSubmit)}>
                 Entrar
             </Button>
+            {errorMsg ? <Text style={styles.dialogError}>{errorMsg}</Text> : null}
 
             <DefaultDialog
                 visible={dialogVisible}

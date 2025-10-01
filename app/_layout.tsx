@@ -2,13 +2,15 @@ import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native
 import { Stack } from 'expo-router';
 import 'react-native-reanimated';
 import { useColorScheme } from '@/components/useColorScheme';
+
 import InventoryProvider from '@/contexts/InventoryContext';
 import { CategoryProvider } from '@/contexts/CategoryContext';
 import UserProvider from '@/contexts/UserContext';
 import MovementsProvider from '@/contexts/MovementsContext';
-import { useUser } from '@/contexts/UserContext'; 
 import SupplierProvider from '@/contexts/SupplierContext';
-
+import { Provider, useSelector } from 'react-redux';
+import { store } from '@/store';
+import { selectUserLogged } from '@/store/features/userSlice';
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -21,34 +23,34 @@ export const unstable_settings = {
 };
 
 export default function RootLayout() {
-
   return (
-    <UserProvider>
-      <InventoryProvider>
-        <CategoryProvider>
-          <SupplierProvider>
-            <InventoryProvider>
-              <MovementsProvider>
-                <RootLayoutNav />
-              </MovementsProvider>
-            </InventoryProvider>
-          </SupplierProvider>
-        </CategoryProvider>
-      </InventoryProvider>
-    </UserProvider>
+    <Provider store={store}>
+      <UserProvider>
+        <InventoryProvider>
+          <CategoryProvider>
+            <SupplierProvider>
+              <InventoryProvider>
+                <MovementsProvider>
+                  <RootLayoutNav />
+                </MovementsProvider>
+              </InventoryProvider>
+            </SupplierProvider>
+          </CategoryProvider>
+        </InventoryProvider>
+      </UserProvider>
+    </Provider>
   );
 }
 
 function RootLayoutNav() {
   const colorScheme = useColorScheme();
-  const { isLoged } = useUser();
-
+  const userLogged = useSelector(selectUserLogged);
 
   return (
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
       <Stack>
           <Stack.Screen name="login/index" options={{ headerShown: false }} />
-          <Stack.Protected guard={isLoged()} >
+          <Stack.Protected guard={!!userLogged} >
             <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
             <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
             <Stack.Screen 

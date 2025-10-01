@@ -3,15 +3,15 @@ import { FormInput } from "@/components/FormInput";
 import { View } from "@/components/Themed";;
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useForm } from "react-hook-form";
-import { StyleSheet } from "react-native";
 import { Button } from "react-native-paper";
 import * as yup from 'yup';
 import { useState } from "react";
-import { useUser } from "@/contexts/UserContext";
-import { UserInterface } from "@/interfaces/UserInterface";
+import { UserForm } from "@/interfaces/UserInterface";
+import { globalStyles } from "@/styles/globalStyles";
+import { useAppDispatch } from "@/store/hooks";
+import { addUser } from "@/store/features/userSlice";
 
 const schema = yup.object().shape({
-    id: yup.number().required(),
     name: yup.string().required('Nome é obrigatório'),
     email: yup.string().required('Email é obrigatório'),
     password: yup.string().required('Senha é obrigatória'),
@@ -19,7 +19,7 @@ const schema = yup.object().shape({
 });
 
 const CreateUser: React.FC = () => {
-    const userContext = useUser();
+  const dispatch = useAppDispatch();
 
     const [dialogVisible, setDialogVisible] = useState(false);
     const [dialogTitle, setDialogTitle] = useState('');
@@ -30,7 +30,7 @@ const CreateUser: React.FC = () => {
       setDialogVisible(true);
 
       setTimeout(() => {
-      setDialogVisible(false);
+        setDialogVisible(false);
       }, 4000);
     };
 
@@ -39,9 +39,8 @@ const CreateUser: React.FC = () => {
         handleSubmit,
         reset,
         formState: { errors },
-      } = useForm<UserInterface>({
+      } = useForm<UserForm>({
         defaultValues: {
-          id: 0,
           name: '',
           email: '',
           password: '',
@@ -50,18 +49,22 @@ const CreateUser: React.FC = () => {
         resolver: yupResolver(schema),
       });
 
-    const onSubmit = (data: UserInterface) => {
-
-        const response = userContext.addUser(data);
-        setDialogTitle(response.success ? 'Sucesso' : 'Erro');
-        setDialogText(response.message);
-        showDialog();
-        if(response.success) reset(); // limpa o formulário
+    const onSubmit = async(data: UserForm) => {
+      try {
+        await dispatch(addUser(data)).unwrap();
+        setDialogTitle('Sucesso');
+        setDialogText('Usuário cadastrado com sucesso!');
+        reset();
+      } catch (error: any) {
+        setDialogTitle('Erro');
+        setDialogText(error?.message || 'Erro ao cadastrar usuário');
+      }
+      showDialog();
     };
 
     return (
-        <View style={styles.container}>
-            <View style={styles.formModal}>
+        <View style={globalStyles.container}>
+            <View style={globalStyles.formModal}>
 
             <FormInput
                 control={control}
@@ -95,32 +98,5 @@ const CreateUser: React.FC = () => {
         </View>
     );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    padding: 20,
-    flex: 1,
-    alignItems:'center',
-    justifyContent:'center',
-    minHeight:'100%',
-    backgroundColor:'rgb(242 242 242)',
-
-  },
-  fullWidth: {
-    width: '100%',
-    marginBottom: 10,
-  },
-  formModal:{
-    maxWidth:800,
-    width:'98%',
-    maxHeight:'100%',
-    backgroundColor:'#ffff',
-    padding:25,
-    borderRadius:10,
-    gap:15,
-    overflowY: 'auto',
-  }
-});
-
 
 export default CreateUser;

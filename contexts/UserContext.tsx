@@ -19,6 +19,8 @@ interface UserContextType {
     ): UserInterface[],
     getUserLoggedStorage(): Promise<UserLoggedInterface | undefined>,
     isLoged: ()=>boolean;
+    filterUser : (enabled: boolean, name: string, email: string) => UserInterface[];
+
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
@@ -147,6 +149,10 @@ export default function UserProvider({children}:{children:React.ReactNode}) {
         return !!userLogged;
     }
 
+    function filterUser(enabled: boolean, name: string, email: string){
+        return users.filter((user)=> user["enabled"] == enabled && user["email"].startsWith(email) && user["name"].toLocaleLowerCase().includes(name.trim().toLocaleLowerCase()));
+    }
+
     async function setUsersStorage(newUsers: UserInterface[]) {
         await AsyncStorage.setItem("users", JSON.stringify(newUsers));
     }
@@ -168,7 +174,7 @@ export default function UserProvider({children}:{children:React.ReactNode}) {
     }
 
     return (
-        <UserContext.Provider value={{users, userLogged, usersLoaded, addUser, updateUser, disableOrEnable, validationLogin, getUsersBy, getUserLoggedStorage, isLoged}}>
+        <UserContext.Provider value={{users, userLogged, usersLoaded, addUser, updateUser, disableOrEnable, validationLogin, getUsersBy, getUserLoggedStorage, isLoged, filterUser}}>
             {children}
         </UserContext.Provider>
     )

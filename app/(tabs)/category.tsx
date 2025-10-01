@@ -1,34 +1,87 @@
 import { Text, View } from "@/components/Themed";
-import { FlatList, StyleSheet } from "react-native";
+import { FlatList } from "react-native";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
-import useCategory from "@/contexts/CategoryContext";
 import { useRouter } from "expo-router";
-import { AnimatedFAB, Button } from "react-native-paper";
+import { ActivityIndicator, AnimatedFAB, Button } from "react-native-paper";
 import GenericCard from "@/components/GenericCard";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useForm } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
+import * as yup from 'yup';
+import { FormInput } from "@/components/FormInput";
+import { initCategories, selectCategories, selectCategoryError, selectCategoryLoading } from "@/store/features/categorySlice";
+import { useSelector } from "react-redux";
+import { CategoryInterface } from "@/interfaces/CategoryInterface";
+import { useAppDispatch } from "@/store/hooks";
+import { globalStyles } from "@/styles/globalStyles";
+
+const schema = yup.object().shape({
+    description: yup
+    .string()
+    .required(),
+});
 
 export default function TabCategory(){
     const [enabled, setEnabled] = useState(true);
-    const useCategoryContext = useCategory();
     const router = useRouter();
-    const categories =useCategoryContext.findCategoryBy('enabled',enabled);
+    const categories = useSelector(selectCategories);
+    const error = useSelector(selectCategoryError);
+    const loading = useSelector(selectCategoryLoading);
+    const [filteredCategories, setFilteredCategories] = useState<CategoryInterface[]>([]);
+    const dispatch = useAppDispatch();
+
+    const {
+        control,
+        watch,
+        formState: { isDirty },
+    } = useForm<{description: string}>({
+        defaultValues: {
+            description: ""
+        },
+        resolver: yupResolver(schema),
+    });
+
+    const description = watch("description");
+
+    useEffect(() => {
+        dispatch(initCategories());
+    }, [dispatch]);
+
+    useEffect(() => {
+        setFilteredCategories(categories.filter((category)=> category["enabled"] == enabled && 
+        category["description"].toLocaleLowerCase().includes(description.trim().toLocaleLowerCase())));
+    },[enabled,description,categories]);
+
     return (
         <SafeAreaProvider>
 
-            <View style={styles.areaButtons}>
-                <Button mode={enabled ? 'contained' : 'outlined'} style={styles.button} onPress={() => {setEnabled(true)}}>Ativos</Button>
-                <Button mode={enabled ? 'outlined' : 'contained'} style={styles.button} onPress={() => {setEnabled(false)}}>Inativos</Button>
+            {loading && 
+            <View>
+                <ActivityIndicator animating={true} style={globalStyles.loadingList}/>
+            </View>}
+
+            <View style={{...globalStyles.areaFilters, borderBottomWidth: 0, paddingBottom: 0}}>
+                <Button mode={enabled ? 'contained' : 'outlined'} style={globalStyles.button} onPress={() => {setEnabled(true)}}>Ativas</Button>
+                <Button mode={enabled ? 'outlined' : 'contained'} style={globalStyles.button} onPress={() => {setEnabled(false)}}>Inativas</Button>
+            </View>
+
+            <View style={globalStyles.areaFilters}>
+                <FormInput
+                    control={control}
+                    name="description"
+                    label="Descrição"
+                />
             </View>
 
             <SafeAreaView style={{flex:1}}>
-                {!categories[0] ? 
-                <Text style={styles.no_inventorys}>Nenhuma categoria { enabled ? "ativa" : "inativa" }</Text> 
+                {!filteredCategories[0] || error? 
+                <Text style={globalStyles.msg_empty_list}>{error ? error : `Nenhuma categoria  ${enabled ? "ativa" : "inativa"}`} encontrada</Text> 
                 : 
                 <FlatList
-                    data={categories}
+                    data={filteredCategories}
                     renderItem={({item})=><GenericCard key={item.id} title={`Id: ${item.id.toString()}`} description={item.description} navigateURL={`/category/edit/${item.id}`}/>}
                     keyExtractor={(item)=>item.id.toString()}
-                    style={styles.list_inventorys}
+                    style={globalStyles.list_items}
                     scrollEnabled={true}
                     contentContainerStyle={{gap:25}}
                     />}
@@ -40,61 +93,9 @@ export default function TabCategory(){
                     visible={true}
                     animateFrom={'right'}
                     iconMode={'static'}
-                    style={[styles.fabStyle]}
+                    style={[globalStyles.fabStyle]}
                 />
             </SafeAreaView>
         </SafeAreaProvider>
     )
 }
-
-const styles = StyleSheet.create({
-    list_inventorys:{
-        padding:50,
-    },
-    no_inventorys:{
-        width:'100%',
-        height:'100%',
-        textAlign:'center',
-        alignContent:'center',
-        fontSize:20
-    },
-    btn_add_inventory:{
-        backgroundColor:'green',
-        color:'white',
-        paddingVertical:15,
-        borderRadius:5
-    },
-    div_add_inventory:{
-        width:'100%',
-        paddingVertical:20,
-        paddingHorizontal:50,
-        backgroundColor:'#F6F6F6'
-    },
-    text_btn_add_inventory:{
-        textAlign:'center',
-        color:'white',
-        fontSize:15
-    },
-    fabStyle: {
-        bottom: 16,
-        right: 16,
-        position: 'absolute',
-   },
-    areaButtons: {
-        display: 'flex',
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'center',
-        gap: 10,
-        backgroundColor: "rgb(242, 242, 242)",
-        padding: 15,
-        boxSizing: 'border-box',
-        borderBottomWidth: 1,
-        borderStyle: 'solid',
-        borderColor: 'rgba(103, 80, 164, 0.3)',
-    },
-    button: {
-        borderRadius: 10,
-        width: '50%'
-    }
-})

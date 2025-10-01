@@ -1,18 +1,20 @@
 // pages/PageTarefasId.tsx
-import React, { useState } from 'react';
-import { View, StyleSheet } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View } from 'react-native';
 import { Button } from 'react-native-paper';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import { useInventory } from '@/contexts/InventoryContext';
-import useCategory from '@/contexts/CategoryContext';
 import DefaultDialog from '@/components/DefaultDialog';
 import { InventoryFormType } from '@/types/InventoryFormType';
 import { FormInput } from '@/components/FormInput';
 import ComboBoxForm from '@/components/ComboBoxForm';
-import { useSupplier } from '@/contexts/SupplierContext';
-
+import { globalStyles } from '@/styles/globalStyles';
+import { useAppDispatch } from '@/store/hooks';
+import { initCategories, selectCategoriesEnabled } from '@/store/features/categorySlice';
+import { useSelector } from 'react-redux';
+import { initSuppliers, selectSuppliersEnabled } from '@/store/features/supplierSlice';
 
 const schema = yup.object().shape({
   title: yup.string().required('Título é obrigatório'),
@@ -49,13 +51,12 @@ const schema = yup.object().shape({
 
 const PageTarefasId: React.FC = () => {
   const inventoryContext = useInventory();
-  const categoryContext = useCategory();
-  const supplierContext = useSupplier();
-  const categories = categoryContext.findCategoryBy('enabled',true);
-  const suppliers = supplierContext.getSuppliersBy('enabled',true);
+  const categories = useSelector(selectCategoriesEnabled);
+  const suppliers = useSelector(selectSuppliersEnabled);
   const [dialogVisible, setDialogVisible] = useState(false);
   const [dialogTitle, setDialogTitle] = useState('');
   const [dialogText, setDialogText] = useState('');
+  const dispatch = useAppDispatch();
 
   const showDialog = () => {
     
@@ -91,9 +92,20 @@ const PageTarefasId: React.FC = () => {
       if(response.success) reset(); // limpa o formulário
   };
 
+    useEffect(() => {
+        if (!categories[0]) {
+          dispatch(initCategories());
+        }
+
+        if (!suppliers[0]) {
+          dispatch(initSuppliers());
+        }
+    }, [dispatch]);
+  
+
   return (
-    <View style={styles.container}>
-      <View style={styles.formModal}>
+    <View style={globalStyles.container}>
+      <View style={globalStyles.formModal}>
       <FormInput
           control={control}
           name="title"
@@ -106,7 +118,6 @@ const PageTarefasId: React.FC = () => {
           label="Descrição do item"
           multiline
       />
-
 
       <FormInput
           control={control}
@@ -153,29 +164,5 @@ const PageTarefasId: React.FC = () => {
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    padding: 20,
-    flex: 1,
-    alignItems:'center',
-    justifyContent:'center',
-    minHeight:'100%',
-  },
-  fullWidth: {
-    width: '100%',
-    marginBottom: 10,
-  },
-  formModal:{
-    maxWidth:800,
-    width:'98%',
-    maxHeight:'100%',
-    backgroundColor:'#ffff',
-    padding:25,
-    borderRadius:10,
-    gap:15,
-    overflowY: 'auto',
-  }
-});
 
 export default PageTarefasId;

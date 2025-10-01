@@ -3,13 +3,15 @@ import { FormInput } from "@/components/FormInput";
 import { View } from "@/components/Themed";;
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useForm } from "react-hook-form";
-import { StyleSheet } from "react-native";
-import { Button } from "react-native-paper";
+import { Button, Text } from "react-native-paper";
 import * as yup from 'yup';
 import { SupplierInterface } from "@/interfaces/SupplierInterface";
-import { useSupplier } from "@/contexts/SupplierContext";
 import { useState } from "react";
 import { useLocalSearchParams, useRouter } from "expo-router";
+import { useAppDispatch } from "@/store/hooks";
+import { editSupplier, selectSuppliers } from "@/store/features/supplierSlice";
+import { useSelector } from "react-redux";
+import { globalStyles } from "@/styles/globalStyles";
 
 const schema = yup.object().shape({
     id: yup.number().required(),
@@ -21,9 +23,10 @@ const schema = yup.object().shape({
 
 const EditSupplier: React.FC = () => {
     const { id } = useLocalSearchParams<{ id: string }>();
-    const supplierContext = useSupplier();
-    const supplier = supplierContext.getSuppliersBy("id", +id)[0];
+    const suppliers = useSelector(selectSuppliers);
+    const supplier = suppliers?.find(s => s.id === +id);
     const router = useRouter();
+    const dispatch = useAppDispatch();
 
     const [dialogVisible, setDialogVisible] = useState(false);
     const [dialogTitle, setDialogTitle] = useState('');
@@ -53,103 +56,80 @@ const EditSupplier: React.FC = () => {
         resolver: yupResolver(schema),
       });
 
-    const updateSupplier = (data: SupplierInterface) => {
-
-        const response = supplierContext.updateSupplier(data);
-        setDialogTitle(response.success ? 'Sucesso' : 'Erro');
-        setDialogText(response.message);
-        showDialog();
+    const updateSupplier = async (data: SupplierInterface) => {
+      try {
+        await dispatch(editSupplier(data)).unwrap();
+        setDialogTitle('Sucesso');
+        setDialogText('Fornecedor alterado com sucesso!');
+      } catch (error: any) {
+        setDialogTitle('Erro');
+        setDialogText(error?.message || 'Erro ao alterar fornecedor');
+      }
+      showDialog();
     };
 
-    const disableOrEnable = () => {
-        
-        const response = supplierContext.disableOrEnable(+id);
-        setDialogTitle(response.success ? 'Sucesso' : 'Erro');
-        setDialogText(response.message);
+    const disableOrEnable = async (data: SupplierInterface) => {
+      try {
+        data.enabled = !data.enabled;
+        await dispatch(editSupplier(data)).unwrap();
+        router.back();
+      } catch (error: any) {
+        setDialogTitle('Erro');
+        setDialogText(error?.message || 'Erro ao alterar fornecedor');
         showDialog();
-
-        if(response.success) {
-            router.navigate("/(tabs)/supplier");
-            return;
-        }
+      }
     }
 
     return (
-        <View style={styles.container}>
-            <View style={styles.formModal}>
+      <>
+      {!supplier 
+      ? <View style={{ alignContent: 'center', alignItems: 'center' }}>
+        <Text>Fonecedor não encontrada</Text>
+      </View>
+      : <View style={globalStyles.container}>
+          <View style={globalStyles.formModal}>
 
-            <FormInput
-                control={control}
-                name="name"
-                label="Nome"
-            />
+          <FormInput
+              control={control}
+              name="name"
+              label="Nome"
+          />
 
-            <FormInput
-                control={control}
-                name="cnpj"
-                label="CNPJ"
-            />
+          <FormInput
+              control={control}
+              name="cnpj"
+              label="CNPJ"
+          />
 
-            <FormInput
-                control={control}
-                name="phone"
-                label="Telefone"
-            />
+          <FormInput
+              control={control}
+              name="phone"
+              label="Telefone"
+          />
 
-            <View style={styles.areaButtons}>
-                <Button mode="outlined" style={{ width: '45%' }} onPress={handleSubmit(disableOrEnable)}>
-                    {supplier?.enabled ? "Desabilitar" : "Habilitar"}
-                </Button>
-                <Button
-                    mode="contained"
-                    style={{ width: '45%' }}
-                    onPress={handleSubmit(updateSupplier)}
-                >
-                    Salvar alterações
-                </Button>
-            </View>
+          <View style={globalStyles.areaButtons}>
+              <Button mode="outlined" style={{ width: '45%' }} onPress={handleSubmit(disableOrEnable)}>
+                  {supplier?.enabled ? "Desabilitar" : "Habilitar"}
+              </Button>
+              <Button
+                  mode="contained"
+                  style={{ width: '45%' }}
+                  onPress={handleSubmit(updateSupplier)}
+              >
+                  Salvar alterações
+              </Button>
+          </View>
 
-            <DefaultDialog
-                visible={dialogVisible}
-                onDismiss={() => setDialogVisible(false)}
-                title={dialogTitle}
-                text={dialogText}
-            />
-            </View>
-        </View>
+          <DefaultDialog
+              visible={dialogVisible}
+              onDismiss={() => setDialogVisible(false)}
+              title={dialogTitle}
+              text={dialogText}
+          />
+          </View>
+      </View>}
+      </>
     );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    padding: 20,
-    flex: 1,
-    alignItems:'center',
-    justifyContent:'center',
-    minHeight:'100%',
-    backgroundColor:'rgb(242 242 242)',
-
-  },
-  fullWidth: {
-    width: '100%',
-    marginBottom: 10,
-  },
-  areaButtons:{ 
-    flexDirection: 'row', 
-    justifyContent: 'space-around', 
-    marginTop: 15 
-  },
-  formModal:{
-    maxWidth:800,
-    width:'98%',
-    maxHeight:'100%',
-    backgroundColor:'#ffff',
-    padding:25,
-    borderRadius:10,
-    gap:15,
-    overflowY: 'auto',
-  }
-});
-
 
 export default EditSupplier;

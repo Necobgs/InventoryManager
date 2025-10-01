@@ -1,4 +1,4 @@
-import CategoryInterface from "./CategoryInterface";
+import { CategoryInterface } from "./CategoryInterface";
 import { SupplierInterface } from "./SupplierInterface";
 
 export default interface InventoryInterface{
@@ -12,3 +12,5 @@ export default interface InventoryInterface{
     category:CategoryInterface | null;
     supplier:SupplierInterface | null;
 }
+
+export type InventoryForm = Omit<InventoryInterface, "id">;

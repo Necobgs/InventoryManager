@@ -11,7 +11,8 @@ interface SupplierContextType {
     getSuppliersBy<T extends keyof SupplierInterface>(
         By: T,
         value: SupplierInterface[T]
-    ): SupplierInterface[]
+    ): SupplierInterface[],
+    filterSupplier: (enabled: boolean, name: string, cnpj: string) => SupplierInterface[];
 }
 
 const SupplierContext = createContext<SupplierContextType | undefined>(undefined);
@@ -89,6 +90,10 @@ export default function SupplierProvider({children}:{children:React.ReactNode}) 
         return suppliers.filter((supplier) => supplier[By] === value);
     }
 
+    function filterSupplier(enabled: boolean, name: string, cnpj: string){
+        return suppliers.filter((supplier)=> supplier["enabled"] == enabled && supplier["cnpj"] == (!cnpj ? supplier["cnpj"] : cnpj) && supplier["name"].toLocaleLowerCase().includes(name.trim().toLocaleLowerCase()));
+    }
+
     async function setSuppliersStorage(newSuppliers: SupplierInterface[]) {
         await AsyncStorage.setItem("suppliers", JSON.stringify(newSuppliers));
     }
@@ -100,7 +105,7 @@ export default function SupplierProvider({children}:{children:React.ReactNode}) 
     }
 
     return (
-        <SupplierContext.Provider value={{suppliers, addSupplier, updateSupplier, disableOrEnable, getSuppliersBy}}>
+        <SupplierContext.Provider value={{suppliers, addSupplier, updateSupplier, disableOrEnable, getSuppliersBy, filterSupplier}}>
             {children}
         </SupplierContext.Provider>
     )

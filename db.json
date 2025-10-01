@@ -1,0 +1,60 @@
+{
+  "supplier": [
+    {
+      "id": 1,
+      "name": "Mercado X",
+      "cnpj": "123",
+      "phone": "teste",
+      "enabled": true
+    },
+    {
+      "id": 2,
+      "name": "teste",
+      "cnpj": "teste",
+      "phone": "teste",
+      "enabled": true
+    }
+  ],
+  "category": [
+    {
+      "id": 1,
+      "description": "teste 1",
+      "enabled": true
+    },
+    {
+      "id": 2,
+      "description": "teste2",
+      "enabled": true
+    },
+    {
+      "id": 3,
+      "description": "teste 3",
+      "enabled": false
+    }
+  ],
+  "user": [
+    {
+      "id": 1,
+      "name": "Emanuel Borges",
+      "email": "emanuel@gmail.com",
+      "password": "123",
+      "enabled": true
+    },
+    {
+      "id": 2,
+      "name": "Lucas Rosa",
+      "email": "lucas@gmail.com",
+      "password": "1234@teste",
+      "enabled": true
+    },
+    {
+      "id": 3,
+      "name": "teste 2",
+      "email": "teste",
+      "password": "teste",
+      "enabled": false
+    }
+  ],
+  "inventory": [],
+  "reminders": []
+}

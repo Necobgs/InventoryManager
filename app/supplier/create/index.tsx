@@ -3,15 +3,15 @@ import { FormInput } from "@/components/FormInput";
 import { View } from "@/components/Themed";;
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useForm } from "react-hook-form";
-import { StyleSheet } from "react-native";
 import { Button } from "react-native-paper";
 import * as yup from 'yup';
-import { SupplierInterface } from "@/interfaces/SupplierInterface";
-import { useSupplier } from "@/contexts/SupplierContext";
+import { SupplierForm, SupplierInterface } from "@/interfaces/SupplierInterface";
 import { useState } from "react";
+import { useAppDispatch } from "@/store/hooks";
+import { addSupplier } from "@/store/features/supplierSlice";
+import { globalStyles } from "@/styles/globalStyles";
 
 const schema = yup.object().shape({
-    id: yup.number().required(),
     name: yup.string().required('Nome é obrigatório'),
     cnpj: yup.string().required('CNPJ é obrigatório'),
     phone: yup.string().required('Telefone é obrigatório'),
@@ -19,14 +19,13 @@ const schema = yup.object().shape({
 });
 
 const CreateSupplier: React.FC = () => {
-    const supplierContext = useSupplier();
 
     const [dialogVisible, setDialogVisible] = useState(false);
     const [dialogTitle, setDialogTitle] = useState('');
     const [dialogText, setDialogText] = useState('');
+    const dispatch = useAppDispatch(); 
 
     const showDialog = () => {
-    
       setDialogVisible(true);
 
       setTimeout(() => {
@@ -39,9 +38,8 @@ const CreateSupplier: React.FC = () => {
         handleSubmit,
         reset,
         formState: { errors },
-      } = useForm<SupplierInterface>({
+      } = useForm<SupplierForm>({
         defaultValues: {
-          id: 0,
           name: '',
           cnpj: '',
           phone: '',
@@ -50,18 +48,22 @@ const CreateSupplier: React.FC = () => {
         resolver: yupResolver(schema),
       });
 
-    const onSubmit = (data: SupplierInterface) => {
-
-        const response = supplierContext.addSupplier(data);
-        setDialogTitle(response.success ? 'Sucesso' : 'Erro');
-        setDialogText(response.message);
-        showDialog();
-        if(response.success) reset(); // limpa o formulário
+    const onSubmit = async (data: SupplierForm) => {
+      try {
+        await dispatch(addSupplier(data)).unwrap();
+        setDialogTitle('Sucesso');
+        setDialogText('Fornecedor cadastrado com sucesso!');
+        reset();
+      } catch (error: any) {
+        setDialogTitle('Erro');
+        setDialogText(error?.message || 'Erro ao cadastrar fornecedor');
+      }
+      showDialog();
     };
 
     return (
-        <View style={styles.container}>
-            <View style={styles.formModal}>
+        <View style={globalStyles.container}>
+            <View style={globalStyles.formModal}>
 
             <FormInput
                 control={control}
@@ -82,7 +84,7 @@ const CreateSupplier: React.FC = () => {
             />
 
             <Button mode="contained" onPress={handleSubmit(onSubmit)}>
-                Cadastar movimentação
+                Cadastar fornecedor
             </Button>
 
             <DefaultDialog
@@ -95,32 +97,5 @@ const CreateSupplier: React.FC = () => {
         </View>
     );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    padding: 20,
-    flex: 1,
-    alignItems:'center',
-    justifyContent:'center',
-    minHeight:'100%',
-    backgroundColor:'rgb(242 242 242)',
-
-  },
-  fullWidth: {
-    width: '100%',
-    marginBottom: 10,
-  },
-  formModal:{
-    maxWidth:800,
-    width:'98%',
-    maxHeight:'100%',
-    backgroundColor:'#ffff',
-    padding:25,
-    borderRadius:10,
-    gap:15,
-    overflowY: 'auto',
-  }
-});
-
 
 export default CreateSupplier;

@@ -1,11 +1,12 @@
 import { ApiResponse } from "@/interfaces/ApiResponse";
-import CategoryInterface from "@/interfaces/CategoryInterface";
+import { CategoryInterface } from "@/interfaces/CategoryInterface";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import React, { createContext, useContext, useEffect, useState } from "react";
 
 interface CategoryContextType{
     categories:CategoryInterface[],
     findCategoryBy:<T extends keyof CategoryInterface>(by:T,value:CategoryInterface[T]) => CategoryInterface[],
+    filterCategory: (enabled: boolean, description: string) => CategoryInterface[],
     addCategory: (category:CategoryInterface) => ApiResponse,
     disableOrEnable: (id:number) => ApiResponse,
     updateCategory: (data:CategoryInterface) => ApiResponse
@@ -32,6 +33,10 @@ export function CategoryProvider(
 
     function findCategoryBy<T extends keyof CategoryInterface>(by:T,value:CategoryInterface[T]){
         return categories.filter((category)=>category[by]==value)
+    }
+
+    function filterCategory(enabled: boolean, description: string){
+        return categories.filter((category)=> category["enabled"] == enabled && category["description"].toLocaleLowerCase().includes(description.trim().toLocaleLowerCase()));
     }
 
     function addCategory(newCategory:CategoryInterface): ApiResponse{
@@ -87,7 +92,7 @@ export function CategoryProvider(
     }
 
     return (
-    <CategoryContext.Provider value={{addCategory,disableOrEnable,findCategoryBy,categories,updateCategory}}>
+    <CategoryContext.Provider value={{addCategory,disableOrEnable,findCategoryBy,filterCategory,categories,updateCategory}}>
         {children}
     </CategoryContext.Provider>
     )

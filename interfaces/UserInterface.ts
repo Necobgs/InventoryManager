@@ -5,3 +5,5 @@ export interface UserInterface {
     password: string,
     enabled: boolean,
 }
+
+export type UserForm = Omit<UserInterface, "id">;

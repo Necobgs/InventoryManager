@@ -4,16 +4,14 @@ import { Button } from 'react-native-paper';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
-import useCategory from '@/contexts/CategoryContext';
 import DefaultDialog from '@/components/DefaultDialog';
 import { FormInput } from '@/components/FormInput';
-import CategoryInterface from '@/interfaces/CategoryInterface';
-
+import { CategoryInterface, CategoryForm } from '@/interfaces/CategoryInterface';
+import { useAppDispatch } from '@/store/hooks';
+import { addCategory } from '@/store/features/categorySlice';
+import { globalStyles } from '@/styles/globalStyles';
 
 const schema = yup.object().shape({
-    id: yup
-    .number()
-    .required(),
   description: yup
     .string()
     .required('A descrição da categoria é obrigatória'),
@@ -24,11 +22,10 @@ const schema = yup.object().shape({
 
 export default function PageCategoryCreate() {
   
-  const categoryContext = useCategory();
-
   const [dialogVisible, setDialogVisible] = useState(false);
   const [dialogTitle, setDialogTitle] = useState('');
   const [dialogText, setDialogText] = useState('');
+  const dispatch = useAppDispatch();
 
   const showDialog = () => {
     
@@ -44,26 +41,30 @@ export default function PageCategoryCreate() {
     handleSubmit,
     reset,
     formState: { isDirty },
-  } = useForm<CategoryInterface>({
+  } = useForm<CategoryForm>({
     defaultValues: {
-      id:0,
       description:"",
       enabled: true,
     },
     resolver: yupResolver(schema),
   });
 
-  function saveChanges(data: CategoryInterface) {
-    const response = categoryContext.addCategory(data);
-    setDialogTitle(response.success ? 'Sucesso' : 'Erro');
-    setDialogText(response.message);
+  const onSubmit = async (data: CategoryForm) => {
+    try {
+      await dispatch(addCategory(data)).unwrap();
+      setDialogTitle('Sucesso');
+      setDialogText('Categoria cadastrada com sucesso!');
+      reset();
+    } catch (error: any) {
+      setDialogTitle('Erro');
+      setDialogText(error?.message || 'Erro ao cadastrar categoria');
+    }
     showDialog();
-    if(response.success) reset();
-  }
+  };
 
   return (
-    <View style={styles.container}>
-      <View style={styles.formModal}>
+    <View style={globalStyles.container}>
+      <View style={globalStyles.formModal}>
         
           <FormInput
             control={control}
@@ -75,7 +76,7 @@ export default function PageCategoryCreate() {
           <Button
             mode="contained"
             style={{ width: '45%' }}
-            onPress={handleSubmit(saveChanges)}
+            onPress={handleSubmit(onSubmit)}
           >
             Salvar
           </Button>
@@ -93,30 +94,9 @@ export default function PageCategoryCreate() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    padding: 20,
-    flex: 1,
-    minHeight:'100%',
-    alignItems:'center',
-    justifyContent:'center',
-  },
-  fullWidth: {
-    width: '100%',
-    marginBottom: 10,
-  },
   excludeItemView:{ 
     flexDirection: 'row', 
     justifyContent: 'space-around', 
     marginTop: 15 
   },
-  formModal:{
-    maxWidth:800,
-    width:'98%',
-    maxHeight:'100%',
-    backgroundColor:'#ffff',
-    padding:25,
-    borderRadius:10,
-    gap:15,
-    overflowY: 'auto',
-  }
 });

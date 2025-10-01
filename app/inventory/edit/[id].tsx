@@ -12,6 +12,7 @@ import InventoryInterface from '@/interfaces/InventoryInterface';
 import { FormInput } from '@/components/FormInput';
 import ComboBoxForm from '@/components/ComboBoxForm';
 import { useSupplier } from '@/contexts/SupplierContext';
+import { globalStyles } from '@/styles/globalStyles';
 
 const schema = yup.object().shape({
   title: yup.string().required('Título é obrigatório'),
@@ -125,8 +126,8 @@ export default function PageTarefasId() {
   }
 
   return (
-    <View style={styles.container}>
-      <View style={styles.formModal}>
+    <View style={globalStyles.container}>
+      <View style={globalStyles.formModal}>
         <FormInput
             control={control}
             name="title"
@@ -207,30 +208,9 @@ export default function PageTarefasId() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    padding: 20,
-    flex: 1,
-    alignItems:'center',
-    justifyContent:'center',
-    minHeight:'100%',
-  },
-  fullWidth: {
-    width: '100%',
-    marginBottom: 10,
-  },
   excludeItemView:{ 
     flexDirection: 'row', 
     justifyContent: 'space-around', 
     marginTop: 15 
   },
-  formModal:{
-    maxWidth:800,
-    width:'98%',
-    maxHeight: '100%',
-    backgroundColor:'#ffff',
-    padding:25,
-    borderRadius:10,
-    gap:15,
-    overflowY: 'auto',
-  }
 });
