@@ -1,14 +1,23 @@
 import Charts from '@/components/Charts';
 import { Text, View } from '@/components/Themed';
-import { useInventory } from '@/contexts/InventoryContext';
-import { useUser } from '@/contexts/UserContext';
+import { initInventorys, selectInventorys } from '@/store/features/inventorySlice';
+import { selectUserLogged } from '@/store/features/userSlice';
+import { useAppDispatch } from '@/store/hooks';
+import { useEffect } from 'react';
 import { StyleSheet } from 'react-native';
+import { useSelector } from 'react-redux';
 
 export default function TabOneScreen() {
 
-  const { userLogged } = useUser();
-  const inventoryContext = useInventory();
-  const inventorys = inventoryContext.getInventoryBy("enabled", true);
+  const userLogged = useSelector(selectUserLogged);
+  const inventorys = useSelector(selectInventorys);
+  const dispatch = useAppDispatch();
+
+  useEffect(() => {
+      if (!inventorys[0]) {
+          dispatch(initInventorys());
+      }
+  }, [dispatch]);
 
   return (
     <View style={styles.container}>

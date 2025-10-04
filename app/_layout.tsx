@@ -6,7 +6,7 @@ import { useColorScheme } from '@/components/useColorScheme';
 import InventoryProvider from '@/contexts/InventoryContext';
 import { CategoryProvider } from '@/contexts/CategoryContext';
 import UserProvider from '@/contexts/UserContext';
-import MovementsProvider from '@/contexts/MovementsContext';
+//import MovementsProvider from '@/contexts/MovementsContext';
 import SupplierProvider from '@/contexts/SupplierContext';
 import { Provider, useSelector } from 'react-redux';
 import { store } from '@/store';
@@ -25,19 +25,19 @@ export const unstable_settings = {
 export default function RootLayout() {
   return (
     <Provider store={store}>
-      <UserProvider>
+{/*       <UserProvider>
         <InventoryProvider>
           <CategoryProvider>
             <SupplierProvider>
               <InventoryProvider>
-                <MovementsProvider>
+                <MovementsProvider> */}
                   <RootLayoutNav />
-                </MovementsProvider>
+{/*                 </MovementsProvider>
               </InventoryProvider>
             </SupplierProvider>
           </CategoryProvider>
         </InventoryProvider>
-      </UserProvider>
+      </UserProvider> */}
     </Provider>
   );
 }

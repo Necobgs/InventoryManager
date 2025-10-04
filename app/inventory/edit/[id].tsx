@@ -4,15 +4,17 @@ import { Button, Text } from 'react-native-paper';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
-import { useInventory } from '@/contexts/InventoryContext';
-import useCategory from '@/contexts/CategoryContext';
 import DefaultDialog from '@/components/DefaultDialog';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import InventoryInterface from '@/interfaces/InventoryInterface';
 import { FormInput } from '@/components/FormInput';
 import ComboBoxForm from '@/components/ComboBoxForm';
-import { useSupplier } from '@/contexts/SupplierContext';
 import { globalStyles } from '@/styles/globalStyles';
+import { useSelector } from 'react-redux';
+import { initCategories, selectCategoriesEnabled } from '@/store/features/categorySlice';
+import { initSuppliers, selectSuppliersEnabled } from '@/store/features/supplierSlice';
+import { editInventory, selectInventorys } from '@/store/features/inventorySlice';
+import { useAppDispatch } from '@/store/hooks';
 
 const schema = yup.object().shape({
   title: yup.string().required('Título é obrigatório'),
@@ -52,16 +54,15 @@ const schema = yup.object().shape({
 
 export default function PageTarefasId() {
   const { id } = useLocalSearchParams<{ id: string }>();
-  const inventoryContext = useInventory();
-  const oldInventory = inventoryContext.getInventoryBy('id', +id)?.[0];
-  const categoryContext = useCategory();
-  const supplierContext = useSupplier();
   const [dialogVisible, setDialogVisible] = useState(false);
   const [dialogTitle, setDialogTitle] = useState('');
   const [dialogText, setDialogText] = useState('');
   const router = useRouter();
-  const categories = categoryContext.findCategoryBy('enabled',true);
-  const suppliers = supplierContext.getSuppliersBy('enabled',true);
+  const categories = useSelector(selectCategoriesEnabled);
+  const suppliers = useSelector(selectSuppliersEnabled);
+  const inventorys = useSelector(selectInventorys);
+  const oldInventory = inventorys.find(i => i.id === +id);
+  const dispatch = useAppDispatch();
 
   const showDialog = () => {
     
@@ -80,7 +81,17 @@ export default function PageTarefasId() {
     setValue,
     formState: { errors, isDirty },
   } = useForm<InventoryInterface>({
-    defaultValues: oldInventory || {},
+    defaultValues: oldInventory || {
+          id: 0,
+          title: "",
+          stock_value: 0,
+          price_per_unity: 0,
+          qty_product: 0,
+          enabled: true,
+          description: "",
+          category: null,
+          supplier: null
+    },
     resolver: yupResolver(schema),
   });
 
@@ -97,7 +108,17 @@ export default function PageTarefasId() {
     if (oldInventory) {
       reset(oldInventory); // Atualiza o formulário com os dados mais recentes
     }
-  }, [inventoryContext.inventorys, reset, oldInventory]);
+  }, [suppliers, reset, oldInventory]);
+
+    useEffect(() => {
+        if (!categories[0]) {
+          dispatch(initCategories());
+        }
+  
+        if (!suppliers[0]) {
+          dispatch(initSuppliers());
+        }
+    }, [dispatch]);
 
   if (!oldInventory) {
     return (
@@ -107,21 +128,27 @@ export default function PageTarefasId() {
     );
   }
 
-  function disableOrEnable() {
-    const response = inventoryContext.disableOrEnable(+id);
-    if (response.success) {
-      router.navigate('/(tabs)/inventory');
-      return
+  const disableOrEnable = async(data: InventoryInterface) => {
+    try {
+      data.enabled = !data.enabled;
+      await dispatch(editInventory(data)).unwrap();
+      router.back();
+    } catch (error: any) {
+      setDialogTitle('Erro');
+      setDialogText(error?.message || 'Erro ao alterar inventório');
     }
-    setDialogTitle(response.success ? 'Sucesso' : 'Erro');
-    setDialogText(response.message);
     showDialog();
   }
 
-  function saveChanges(data: InventoryInterface) {
-    const response = inventoryContext.updateInventory(data);
-    setDialogTitle(response.success ? 'Sucesso' : 'Erro');
-    setDialogText(response.message);
+  const updateInventory = async(data: InventoryInterface) => {
+    try {
+      await dispatch(editInventory(data)).unwrap();
+      setDialogTitle('Sucesso');
+      setDialogText('Inventório alterado com sucesso!');
+    } catch (error: any) {
+      setDialogTitle('Erro');
+      setDialogText(error?.message || 'Erro ao alterar inventório');
+    }
     showDialog();
   }
 
@@ -140,7 +167,6 @@ export default function PageTarefasId() {
             label="Descrição do item"
             multiline
         />
-
 
         <FormInput
             control={control}
@@ -189,7 +215,7 @@ export default function PageTarefasId() {
           <Button
             mode="contained"
             style={{ width: '45%' }}
-            onPress={handleSubmit(saveChanges)}
+            onPress={handleSubmit(updateInventory)}
             disabled={!isDirty}
           >
             Salvar alterações

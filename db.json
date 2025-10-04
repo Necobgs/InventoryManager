@@ -10,7 +10,7 @@
     {
       "id": 2,
       "name": "teste",
-      "cnpj": "teste",
+      "cnpj": "1234",
       "phone": "teste",
       "enabled": true
     }
@@ -55,6 +55,135 @@
       "enabled": false
     }
   ],
-  "inventory": [],
+  "inventory": [
+    {
+      "supplier": null,
+      "category": {
+        "id": 2,
+        "description": "teste2",
+        "enabled": true
+      },
+      "price_per_unity": 6,
+      "qty_product": 2,
+      "description": "teste 5",
+      "title": "Teste",
+      "enabled": true,
+      "stock_value": 12,
+      "id": 1
+    },
+    {
+      "supplier": {
+        "id": 1,
+        "name": "Mercado X",
+        "cnpj": "123",
+        "phone": "teste",
+        "enabled": true
+      },
+      "category": {
+        "id": 2,
+        "description": "teste2",
+        "enabled": true
+      },
+      "price_per_unity": 2,
+      "qty_product": 2,
+      "description": "testando",
+      "title": "teste 3",
+      "enabled": true,
+      "stock_value": 4,
+      "id": 2
+    }
+  ],
+  "movement": [
+    {
+      "id": 1,
+      "inventory": {
+        "supplier": null,
+        "category": {
+          "id": 2,
+          "description": "teste2",
+          "enabled": true
+        },
+        "price_per_unity": 6,
+        "qty_product": 2,
+        "description": "teste 5",
+        "title": "Teste",
+        "enabled": true,
+        "stock_value": 12,
+        "id": 1
+      },
+      "user": {
+        "id": 2,
+        "name": "Lucas Rosa",
+        "email": "lucas@gmail.com",
+        "password": "1234@teste",
+        "enabled": true,
+        "expire": 1759611145908
+      },
+      "quantity": 1,
+      "value": 0,
+      "price_at_time": 0,
+      "date": "2025-10-04T18:35:23.167Z"
+    },
+    {
+      "inventory": {
+        "supplier": null,
+        "category": {
+          "id": 2,
+          "description": "teste2",
+          "enabled": true
+        },
+        "price_per_unity": 6,
+        "qty_product": 2,
+        "description": "teste",
+        "title": "Teste",
+        "enabled": true,
+        "stock_value": 12,
+        "id": 1
+      },
+      "user": {
+        "id": 2,
+        "name": "Lucas Rosa",
+        "email": "lucas@gmail.com",
+        "password": "1234@teste",
+        "enabled": true,
+        "expire": 1759609858606
+      },
+      "quantity": -1,
+      "value": 6,
+      "price_at_time": 6,
+      "date": "2025-10-04T18:08:18.767Z",
+      "id": 2
+    },
+    {
+      "id": 3,
+      "inventory": {
+        "supplier": null,
+        "category": {
+          "id": 2,
+          "description": "teste2",
+          "enabled": true
+        },
+        "price_per_unity": 6,
+        "qty_product": 2,
+        "description": "teste 5",
+        "title": "Teste",
+        "enabled": true,
+        "stock_value": 12,
+        "id": 1
+      },
+      "user": {
+        "id": 2,
+        "name": "Lucas Rosa",
+        "email": "lucas@gmail.com",
+        "password": "1234@teste",
+        "enabled": true,
+        "expire": 1759611145908
+      },
+      "quantity": 3,
+      "value": 0,
+      "price_at_time": 0,
+      "date": "2025-10-04T18:30:23.717Z"
+    }
+  ],
   "reminders": []
 }

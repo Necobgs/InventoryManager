@@ -3,6 +3,7 @@ import { supplierReducer } from "./features/supplierSlice";
 import { categoryReducer } from "./features/categorySlice";
 import { userReducer } from "./features/userSlice";
 import { inventoryReducer } from "./features/inventorySlice";
+import { movementReducer } from "./features/movementSlice";
 
 export const store = configureStore({
     reducer: {
@@ -10,6 +11,7 @@ export const store = configureStore({
         category: categoryReducer,
         user: userReducer,
         inventory: inventoryReducer,
+        movement: movementReducer,
     }
 });
 

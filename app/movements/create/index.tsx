@@ -1,10 +1,7 @@
 import DefaultDialog from "@/components/DefaultDialog";
 import { FormInput } from "@/components/FormInput";
 import { View } from "@/components/Themed";
-import { useInventory } from "@/contexts/InventoryContext";
-import { useMovements } from "@/contexts/MovementsContext";
-import { useUser } from "@/contexts/UserContext";
-import { MovementsInterface } from "@/interfaces/MovementsInterface";
+import { MovementForm } from "@/interfaces/MovementInterface";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -13,6 +10,11 @@ import { Button } from "react-native-paper";
 import * as yup from 'yup';
 import MovementsFormType from "@/types/MovementsFormType";
 import ComboBoxForm from "@/components/ComboBoxForm";
+import { useAppDispatch } from "@/store/hooks";
+import { useSelector } from "react-redux";
+import { selectUserLogged } from "@/store/features/userSlice";
+import { editInventory, initInventorys, selectInventorys, selectInventorysEnabled } from "@/store/features/inventorySlice";
+import { addMovement } from "@/store/features/movementSlice";
 
 const schema = yup.object().shape({
     inventory: yup
@@ -40,10 +42,10 @@ const schema = yup.object().shape({
 });
 
 const CreateMovements: React.FC = () => {
-    const movementsContext = useMovements();
-    const inventoryContext = useInventory();
-    const { userLogged } = useUser();
-    const inventorys = inventoryContext.getInventoryBy("enabled", true);
+    const userLogged = useSelector(selectUserLogged);
+    const inventorys_all = useSelector(selectInventorys);
+    const inventorys = useSelector(selectInventorysEnabled);
+    const dispatch = useAppDispatch();
 
     const [dialogVisible, setDialogVisible] = useState(false);
     const [dialogTitle, setDialogTitle] = useState('');
@@ -94,7 +96,7 @@ const CreateMovements: React.FC = () => {
     }, [inventorySel]);
 
     useEffect(() => {
-        const inventory = inventoryContext.getInventoryBy("id", !inventorySel?.id ? 0 : inventorySel.id)?.[0];
+        const inventory = inventorys_all.find(i => i.id === inventorySel?.id);
 
         if (inventory){
             setValue('qty_product', inventory.qty_product);
@@ -118,25 +120,72 @@ const CreateMovements: React.FC = () => {
 
         setAlterPrice(false);
         setAlterInventory(false);
-    }, [quantity, inventorySel, operationSel, price_per_unity, setValue]);
+    }, [quantity, inventorySel, operationSel, price_per_unity, setValue, inventorys_all]);
 
-    const onSubmit = (data: MovementsFormType) => {
+    useEffect(() => {
+        if (!inventorys[0]) {
+            dispatch(initInventorys());
+        }
+    }, [dispatch]);
+      
+    const onSubmit = async (data: MovementsFormType) => {
 
-        const newData: MovementsInterface = {
-            id: 0,
-            id_inventory: !data.inventory?.id ? 0 : data.inventory.id,
-            id_user: !userLogged?.id ? 0 : userLogged.id,
+        const inventory_data = inventorys_all.find(i => i.id === inventorySel?.id) || null;
+        const user = userLogged ? userLogged : null;
+
+        const newData: MovementForm = {
+            inventory: inventory_data,
+            user: user || null,
             quantity: data.operation?.id === 2 ? data.quantity * -1 : data.quantity,
             value: 0,
             price_at_time: data.price_per_unity,
             date: new Date(),
         }
-        const response = movementsContext.addMovement(newData);
-        setDialogTitle(response.success ? 'Sucesso' : 'Erro');
-        setDialogText(response.message);
+
+        if (!inventory_data) {
+            setDialogTitle('Erro');
+            setDialogText('Produto inexistente!'); 
+            showDialog();
+            return;
+        }
+
+        if ((newData.quantity < 0) && (inventory_data.qty_product < Math.abs(newData.quantity))) {
+            setDialogTitle('Erro');
+            setDialogText('Não há estoque suficiente para efetuar a saída deste produto');
+            showDialog();
+            return;
+        }
+
+        inventory_data.qty_product += newData.quantity;
+        inventory_data.stock_value = inventory_data.qty_product * inventory_data.price_per_unity;
+
+        console.log(inventory_data)
+
+        try {
+            await dispatch(editInventory(inventory_data)).unwrap();
+        } catch (error: any) {
+            setDialogTitle('Erro');
+            setDialogText(error?.message || 'Erro ao alterar inventório');
+            showDialog();
+            return;
+        }
+
+        newData.value = inventory_data.price_per_unity * Math.abs(newData.quantity);
+        newData.price_at_time = newData.quantity < 0 ? inventory_data.price_per_unity : newData.price_at_time;
+        newData.inventory = inventory_data;
+
+        try {
+            await dispatch(addMovement(newData)).unwrap();
+            setDialogTitle('Sucesso');
+            setDialogText('Movimentação cadastrada com sucesso!');
+        reset();
+            } catch (error: any) {
+            setDialogTitle('Erro');
+            setDialogText(error?.message || 'Erro ao cadastrar movimentação');
+        }
         showDialog();
-        if(response.success) reset(); // limpa o formulário
     };
+
 
     return (
         <View style={styles.container}>

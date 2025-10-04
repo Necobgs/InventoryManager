@@ -1,17 +1,22 @@
 import { StyleSheet,Text } from "react-native";
 import { useRouter } from "expo-router";
 import { Card } from "react-native-paper";
-import { MovementsInterface } from "@/interfaces/MovementsInterface";
-import { useInventory } from "@/contexts/InventoryContext";
-import { useUser } from "@/contexts/UserContext";
+import { MovementInterface } from "@/interfaces/MovementInterface";
+import { useSelector } from "react-redux";
+import { initUsers, selectUsers } from "@/store/features/userSlice";
+import { selectInventorys } from "@/store/features/inventorySlice";
+import { useAppDispatch } from "@/store/hooks";
+import { useEffect } from "react";
 
 
-export default function CardInventory(movement:MovementsInterface){
+export default function CardInventory(movement:MovementInterface){
     const router = useRouter();
-    const inventoryContext = useInventory();
-    const userContext = useUser();
-    const iventory = inventoryContext.getInventoryBy('id', movement.id_inventory)?.[0];
-    const user = userContext.getUsersBy('id', movement.id_user)?.[0];
+    const inventorys = useSelector(selectInventorys);
+    const users = useSelector(selectUsers);
+    const iventory = inventorys.find(i => i.id === movement.inventory?.id);
+    const user = users.find(u => u.id === movement.user?.id);
+    const dispatch = useAppDispatch();
+    
     const price_at_time = new Intl.NumberFormat('pt-BR', {
         style: 'currency',
         currency: 'BRL'
@@ -21,6 +26,12 @@ export default function CardInventory(movement:MovementsInterface){
         currency: 'BRL'
     }).format(movement.value);
     
+    useEffect(() => {
+        if (!users[0]) {
+            dispatch(initUsers());
+        }
+    }, [dispatch]);
+
     return (
     <Card mode="elevated" onPress={()=>router.navigate(`/movements/edit/${(movement.id)}`)}>
     <Card.Content>
@@ -46,7 +57,7 @@ export default function CardInventory(movement:MovementsInterface){
         </Text> 
         <Text numberOfLines={3}>
             <Text style={styles.bold}>Última alteração: </Text>
-            {`${user?.name} - ${movement.date.toLocaleString().replace(",","")}`}
+            {`${user?.name} - ${new Date(movement.date).toLocaleDateString("pt-BR", {timeZone: "UTC"})}`}
         </Text> 
     </Card.Content> 
     </Card>  

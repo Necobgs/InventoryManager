@@ -1,7 +1,8 @@
 
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import inventoryService from "../../services/inventoryService";
-import InventoryInterface, { InventoryForm } from "@/interfaces/InventoryInterface";
+import InventoryInterface from "@/interfaces/InventoryInterface";
+import { InventoryFormType } from "@/types/InventoryFormType";
 
 interface InventoryState {
     inventorys: InventoryInterface[];
@@ -13,12 +14,12 @@ export const initInventorys = createAsyncThunk('inventory/fetch', async () => {
     return await inventoryService.getInventorys();
 });
 
-export const addInventory = createAsyncThunk('inventory/add', async (payload: InventoryForm) => {
-    return await inventoryService.addInventory(payload);
+export const addInventory = createAsyncThunk('inventory/add', async (payload: InventoryFormType) => {
+    return await inventoryService.addInventory({ ...payload, enabled: true, stock_value: payload.price_per_unity * payload.qty_product });
 });
 
 export const editInventory = createAsyncThunk('inventory/edit', async (payload: InventoryInterface) => {
-    return await inventoryService.editInventory({ ...payload });
+    return await inventoryService.editInventory({ ...payload,  stock_value: payload.price_per_unity * payload.qty_product });
 });
 
 export const removeInventory = createAsyncThunk('inventory/remove', async (payload: InventoryInterface) => {
@@ -90,6 +91,7 @@ const inventorySlice = createSlice({
 
 
 export const selectInventorys = (state: { inventory: InventoryState }) => state.inventory.inventorys;
+export const selectInventorysEnabled = (state: { inventory: InventoryState }) => state.inventory.inventorys ? state.inventory.inventorys.filter(i => i.enabled) : [];
 export const selectInventoryError = (state: { inventory: InventoryState }) => state.inventory.error;
 export const selectInventoryLoading = (state: { inventory: InventoryState }) => state.inventory.loading;
 

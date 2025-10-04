@@ -5,7 +5,6 @@ import { Button } from 'react-native-paper';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
-import { useInventory } from '@/contexts/InventoryContext';
 import DefaultDialog from '@/components/DefaultDialog';
 import { InventoryFormType } from '@/types/InventoryFormType';
 import { FormInput } from '@/components/FormInput';
@@ -15,6 +14,7 @@ import { useAppDispatch } from '@/store/hooks';
 import { initCategories, selectCategoriesEnabled } from '@/store/features/categorySlice';
 import { useSelector } from 'react-redux';
 import { initSuppliers, selectSuppliersEnabled } from '@/store/features/supplierSlice';
+import { addInventory } from '@/store/features/inventorySlice';
 
 const schema = yup.object().shape({
   title: yup.string().required('Título é obrigatório'),
@@ -50,7 +50,6 @@ const schema = yup.object().shape({
 });
 
 const PageTarefasId: React.FC = () => {
-  const inventoryContext = useInventory();
   const categories = useSelector(selectCategoriesEnabled);
   const suppliers = useSelector(selectSuppliersEnabled);
   const [dialogVisible, setDialogVisible] = useState(false);
@@ -84,12 +83,17 @@ const PageTarefasId: React.FC = () => {
     resolver: yupResolver(schema),
   });
 
-  const onSubmit = (data: InventoryFormType) => {
-    const response = inventoryContext.addInventory(data);
-      setDialogTitle(response.success ? 'Sucesso' : 'Erro');
-      setDialogText(response.message);
-      showDialog();
-      if(response.success) reset(); // limpa o formulário
+  const onSubmit = async (data: InventoryFormType) => {
+    try {
+      await dispatch(addInventory(data)).unwrap();
+      setDialogTitle('Sucesso');
+      setDialogText('Inventório cadastrado com sucesso!');
+      reset();
+    } catch (error: any) {
+      setDialogTitle('Erro');
+      setDialogText(error?.message || 'Erro ao cadastrar inventório');
+    }
+    showDialog();
   };
 
     useEffect(() => {

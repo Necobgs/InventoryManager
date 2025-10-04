@@ -1,10 +1,13 @@
 import { Text, View } from '@/components/Themed';
-import useCategory from '@/contexts/CategoryContext';
-import { useInventory } from '@/contexts/InventoryContext';
-import { useMovements } from '@/contexts/MovementsContext';
-import { useSupplier } from '@/contexts/SupplierContext';
+import { initCategories, selectCategoriesEnabled } from '@/store/features/categorySlice';
+import { initInventorys, selectInventorysEnabled } from '@/store/features/inventorySlice';
+import { initMovements, selectMovements } from '@/store/features/movementSlice';
+import { initSuppliers, selectSuppliersEnabled } from '@/store/features/supplierSlice';
+import { useAppDispatch } from '@/store/hooks';
+import { useEffect } from 'react';
 import { StyleSheet } from 'react-native';
 import { PieChart } from 'react-native-chart-kit';
+import { useSelector } from 'react-redux';
 
 interface ChartInterfcae{
     name: string,
@@ -18,21 +21,38 @@ const colors = ['chartreuse','blue','crimson','mediumturquoise','seagreen','oran
 
 export default function Charts() {
     
-    const inventoryContext = useInventory();
-    const categoryContext = useCategory();
-    const movementsContext = useMovements();
-    const supplierContext = useSupplier();
-    const categories = categoryContext.findCategoryBy("enabled", true);
-    const suppliers = supplierContext.getSuppliersBy("enabled", true);
-    const inventorys = inventoryContext.getInventoryBy("enabled", true);
+    const categories = useSelector(selectCategoriesEnabled);
+    const suppliers = useSelector(selectSuppliersEnabled);
+    const inventorys = useSelector(selectInventorysEnabled);
+    const movements_all = useSelector(selectMovements);
     const dataIventorys: ChartInterfcae[] = [];
     const dataExits: ChartInterfcae[] = [];
     const dataEntries: ChartInterfcae[] = [];
     const dataCategories: ChartInterfcae[] = [];
     const dataSuppliers: ChartInterfcae[] = [];
+    const dispatch = useAppDispatch();
     let indexColor = 0;
     let quantity_without_cat = 0;
     let quantity_without_sup = 0;
+
+    useEffect(() => {
+        if (!categories[0]) {
+            dispatch(initCategories());
+        }
+    
+        if (!suppliers[0]) {
+            dispatch(initSuppliers());
+        }
+
+        if (!inventorys[0]) {
+            dispatch(initInventorys());
+        }
+
+        if (!movements_all[0]) {
+            dispatch(initMovements
+                ());
+        }
+    }, [dispatch]);
 
     if (inventorys[0]) {
         inventorys.map((iv) => {
@@ -44,7 +64,7 @@ export default function Charts() {
                 legendFontSize: 15
             })
 
-            const movements = movementsContext.getMovementsBy("id_inventory", iv.id);
+            const movements = movements_all.filter((mov) => mov.inventory?.id === iv.id);
             let quantity_exit = 0;
             let quantity_entry = 0;
 
