@@ -12,7 +12,7 @@ import MovementsFormType from "@/types/MovementsFormType";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import ComboBoxForm from "@/components/ComboBoxForm";
 import { useSelector } from "react-redux";
-import { editMovement, removeMovement, selectMovements } from "@/store/features/movementSlice";
+import { editMovement, initMovements, removeMovement, selectMovements } from "@/store/features/movementSlice";
 import { editInventory, initInventorys, selectInventorys, selectInventorysEnabled } from "@/store/features/inventorySlice";
 import { useAppDispatch } from "@/store/hooks";
 import { selectUserLogged } from "@/store/features/userSlice";
@@ -56,9 +56,6 @@ const EditMovements: React.FC = () => {
     const [dialogVisible, setDialogVisible] = useState(false);
     const [dialogTitle, setDialogTitle] = useState('');
     const [dialogText, setDialogText] = useState('');
-    const [alterInventory, setAlterInventory] = useState(false);
-    const [alterPrice, setAlterPrice] = useState(false);
-    const [disablePrice, setDisablePrice] = useState(false);
 
     const showDialog = () => {
     
@@ -90,39 +87,21 @@ const EditMovements: React.FC = () => {
         resolver: yupResolver(schema),
     });
 
-    const price_per_unity = watch('price_per_unity');
     const quantity = watch('quantity');
     const inventorySel = watch('inventory');
     const operationSel = watch("operation");
 
     useEffect(() => {
-        setAlterPrice(true);
-    }, [price_per_unity]);
-    
-    useEffect(() => {
-        setAlterInventory(true);
-    }, [inventorySel]);
+        const inventory_sel_obj = inventorys_all.find(i => i.id === inventorySel?.id);
 
-    useEffect(() => {
-        const inventory_obj_sel = inventorys_all.find(i =>  i.id === inventorySel?.id);
-
-        if (inventory_obj_sel){
-
-            if ((operationSel?.id === 2 || (quantity === 0 && !alterPrice) || alterInventory) && inventory) {
-                setValue('price_per_unity', inventory?.price_per_unity);
-                setValue('value', inventory.price_per_unity * quantity);
-                setDisablePrice(true);
-            }
-            else {
-                setValue('price_per_unity', price_per_unity);
-                setValue('value', price_per_unity * quantity);
-                setDisablePrice(false);
-            }
+        if (inventory_sel_obj){
+            setValue('qty_product', inventory_sel_obj.qty_product);
+            setValue('price_per_unity', inventory_sel_obj.price_per_unity);
+            setValue('value', inventory_sel_obj.price_per_unity * quantity);
         }
 
-        setAlterPrice(false);
-        setAlterInventory(false);
-    }, [quantity, inventorySel, operationSel, price_per_unity, setValue, inventorys_all]);
+    }, [quantity, inventorySel, operationSel, setValue, inventorys_all]);
+
 
     const updateMovement = async(data: MovementsFormType) => {
 
@@ -133,18 +112,20 @@ const EditMovements: React.FC = () => {
             return;
         }
 
-        const inventory_data = inventorys_all.find(i => i.id === inventorySel?.id) || null;
+        const inventory_data_original = inventorys_all.find(i => i.id === inventorySel?.id) || null;
         const user = userLogged ? userLogged : null;
 
         const newData: MovementInterface = {
             id: +id,
-            inventory: inventory_data,
+            inventory: inventory_data_original,
             user: user,
             quantity: data.operation?.id === 2 ? data.quantity * -1 : data.quantity,
             value: 0,
             price_at_time: 0,
             date: new Date(),
         }
+
+        const inventory_data = inventory_data_original ? {...inventory_data_original} : null;
 
         if (!inventory_data) {
             setDialogTitle('Erro');
@@ -186,7 +167,8 @@ const EditMovements: React.FC = () => {
                 return;
             }
 
-            const oldIventory = inventorys_all.find(i => i.id === movement.inventory?.id);
+            const oldIventory_original = inventorys_all.find(i => i.id === movement.inventory?.id);
+            const oldIventory = oldIventory_original ? {...oldIventory_original} : null;
 
             if (oldIventory) {
 
@@ -226,7 +208,7 @@ const EditMovements: React.FC = () => {
         }
 
         movement.value = inventory_data.price_per_unity * Math.abs(newData.quantity);
-        movement.price_at_time = data.quantity < 0 ? inventory_data.price_per_unity : newData.price_at_time;
+        movement.price_at_time = inventory_data.price_per_unity;
         movement.inventory = inventory_data;
 
         try {
@@ -249,18 +231,20 @@ const EditMovements: React.FC = () => {
             return;
         }
 
-        const inventory_data = inventorys_all.find(i => i.id === inventorySel?.id) || null;
+        const inventory_data_original = inventorys_all.find(i => i.id === inventorySel?.id) || null;
         const user = userLogged ? userLogged : null;
 
         const newData: MovementInterface = {
             id: +id,
-            inventory: inventory_data,
+            inventory: inventory_data_original,
             user: user,
             quantity: data.operation?.id === 2 ? data.quantity * -1 : data.quantity,
             value: 0,
             price_at_time: 0,
             date: new Date(),
         }
+
+        const inventory_data = inventory_data_original ? {...inventory_data_original} : null;
 
         if (inventory_data) {
             let vqty_product = inventory_data.qty_product - movement.quantity;
@@ -284,6 +268,7 @@ const EditMovements: React.FC = () => {
 
         try {
             await dispatch(removeMovement(newData)).unwrap();
+            dispatch(initMovements());
             router.navigate("/(tabs)/movements");
             } catch (error: any) {
             setDialogTitle('Erro');
@@ -338,7 +323,7 @@ const EditMovements: React.FC = () => {
                 name="price_per_unity"
                 label="Preço por unidade"
                 isCurrency
-                disabled={disablePrice}
+                disabled={true}
             />
 
             <FormInput

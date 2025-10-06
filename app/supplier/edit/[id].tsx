@@ -12,12 +12,13 @@ import { useAppDispatch } from "@/store/hooks";
 import { editSupplier, selectSuppliers } from "@/store/features/supplierSlice";
 import { useSelector } from "react-redux";
 import { globalStyles } from "@/styles/globalStyles";
+import { FormMaskedInput } from "@/components/FormMaskedInput";
 
 const schema = yup.object().shape({
     id: yup.number().required(),
     name: yup.string().required('Nome é obrigatório'),
-    cnpj: yup.string().required('CNPJ é obrigatório'),
-    phone: yup.string().required('Telefone é obrigatório'),
+    cnpj: yup.string().required('CNPJ é obrigatório').min(14, 'CNPJ incompleto').max(14, 'CNPJ inválido'),
+    phone: yup.string().required('Telefone é obrigatório').min(10, 'Telefone incompleto').max(10, 'Telefone inválido'),
     enabled: yup.boolean().required()
 });
 
@@ -95,16 +96,18 @@ const EditSupplier: React.FC = () => {
               label="Nome"
           />
 
-          <FormInput
-              control={control}
-              name="cnpj"
-              label="CNPJ"
+          <FormMaskedInput
+            control={control}
+            name="cnpj"
+            label="CNPJ"
+            mask={[/\d/, /\d/, '.', /\d/, /\d/, /\d/, '.', /\d/, /\d/, /\d/, '/', /\d/, /\d/, /\d/, /\d/, '-', /\d/, /\d/]}
           />
 
-          <FormInput
+          <FormMaskedInput
               control={control}
               name="phone"
               label="Telefone"
+              mask={['(', /\d/, /\d/, ')', ' ', /\d/, /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/]}
           />
 
           <View style={globalStyles.areaButtons}>

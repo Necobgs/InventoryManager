@@ -14,6 +14,7 @@ import { useSelector } from "react-redux";
 import { selectSuppliers, selectSupplierError, selectSupplierLoading, initSuppliers} from '../../store/features/supplierSlice'
 import { SupplierInterface } from "@/interfaces/SupplierInterface";
 import { globalStyles } from '../../styles/globalStyles';
+import { FormMaskedInput } from "@/components/FormMaskedInput";
 
 const schema = yup.object().shape({
     name: yup
@@ -82,10 +83,11 @@ export default function tabSupplier() {
             </View>
 
             <View style={{...globalStyles.areaFilters, paddingTop: 0}}>
-                <FormInput
+                <FormMaskedInput
                     control={control}
                     name="cnpj"
                     label="CNPJ"
+                    mask={[/\d/, /\d/, '.', /\d/, /\d/, /\d/, '.', /\d/, /\d/, /\d/, '/', /\d/, /\d/, /\d/, /\d/, '-', /\d/, /\d/]}
                 />
             </View>
 

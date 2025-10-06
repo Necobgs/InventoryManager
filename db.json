@@ -2,28 +2,35 @@
   "supplier": [
     {
       "id": 1,
-      "name": "Mercado X",
-      "cnpj": "123",
-      "phone": "teste",
+      "name": "Fornecedor 1",
+      "cnpj": "12345678912345",
+      "phone": "8877777777",
       "enabled": true
     },
     {
       "id": 2,
-      "name": "teste",
-      "cnpj": "1234",
-      "phone": "teste",
+      "name": "Fornecedor 2",
+      "cnpj": "12345454878787",
+      "phone": "1234567891",
+      "enabled": true
+    },
+    {
+      "id": 3,
+      "name": "Fornecedor 3",
+      "cnpj": "12222222222222",
+      "phone": "4555555555",
       "enabled": true
     }
   ],
   "category": [
     {
       "id": 1,
-      "description": "teste 1",
+      "description": "Categoria 1",
       "enabled": true
     },
     {
       "id": 2,
-      "description": "teste2",
+      "description": "Categoria 2",
       "enabled": true
     },
     {
@@ -57,21 +64,30 @@
   ],
   "inventory": [
     {
-      "supplier": null,
+      "enabled": true,
+      "stock_value": 54,
+      "id": 1,
+      "supplier": {
+        "id": 1,
+        "name": "Fornecedor 1",
+        "cnpj": "123",
+        "phone": "teste",
+        "enabled": true
+      },
       "category": {
         "id": 2,
         "description": "teste2",
         "enabled": true
       },
       "price_per_unity": 6,
-      "qty_product": 2,
-      "description": "teste 5",
-      "title": "Teste",
-      "enabled": true,
-      "stock_value": 12,
-      "id": 1
+      "qty_product": 9,
+      "description": "Descrição Produto 1",
+      "title": "Produto 1"
     },
     {
+      "enabled": true,
+      "stock_value": 8,
+      "id": 2,
       "supplier": {
         "id": 1,
         "name": "Mercado X",
@@ -85,31 +101,54 @@
         "enabled": true
       },
       "price_per_unity": 2,
+      "qty_product": 4,
+      "description": "Descrição Produto 2",
+      "title": "Produto 2"
+    },
+    {
+      "supplier": {
+        "id": 3,
+        "name": "Forncedor 3",
+        "cnpj": "12222222222222",
+        "phone": "4555555555",
+        "enabled": true
+      },
+      "category": {
+        "id": 1,
+        "description": "Categoria 1",
+        "enabled": true
+      },
+      "price_per_unity": 50,
       "qty_product": 2,
-      "description": "testando",
-      "title": "teste 3",
+      "description": "Descrição Produto 3",
+      "title": "Produto 3",
       "enabled": true,
-      "stock_value": 4,
-      "id": 2
+      "stock_value": 100,
+      "id": 3
     }
   ],
   "movement": [
     {
-      "id": 1,
       "inventory": {
-        "supplier": null,
+        "enabled": true,
+        "stock_value": 54,
+        "id": 1,
+        "supplier": {
+          "id": 1,
+          "name": "Fornecedor 1",
+          "cnpj": "123",
+          "phone": "teste",
+          "enabled": true
+        },
         "category": {
           "id": 2,
           "description": "teste2",
           "enabled": true
         },
         "price_per_unity": 6,
-        "qty_product": 2,
-        "description": "teste 5",
-        "title": "Teste",
-        "enabled": true,
-        "stock_value": 12,
-        "id": 1
+        "qty_product": 9,
+        "description": "Descrição Produto 1",
+        "title": "Produto 1"
       },
       "user": {
         "id": 2,
@@ -117,59 +156,36 @@
         "email": "lucas@gmail.com",
         "password": "1234@teste",
         "enabled": true,
-        "expire": 1759611145908
+        "expire": 1759705280083
       },
-      "quantity": 1,
-      "value": 0,
-      "price_at_time": 0,
-      "date": "2025-10-04T18:35:23.167Z"
-    },
-    {
-      "inventory": {
-        "supplier": null,
-        "category": {
-          "id": 2,
-          "description": "teste2",
-          "enabled": true
-        },
-        "price_per_unity": 6,
-        "qty_product": 2,
-        "description": "teste",
-        "title": "Teste",
-        "enabled": true,
-        "stock_value": 12,
-        "id": 1
-      },
-      "user": {
-        "id": 2,
-        "name": "Lucas Rosa",
-        "email": "lucas@gmail.com",
-        "password": "1234@teste",
-        "enabled": true,
-        "expire": 1759609858606
-      },
-      "quantity": -1,
-      "value": 6,
+      "quantity": 2,
+      "value": 12,
       "price_at_time": 6,
-      "date": "2025-10-04T18:08:18.767Z",
-      "id": 2
+      "date": "2025-10-05T20:40:45.486Z",
+      "id": 1
     },
     {
-      "id": 3,
+      "id": 2,
       "inventory": {
-        "supplier": null,
+        "enabled": true,
+        "stock_value": 16,
+        "id": 2,
+        "supplier": {
+          "id": 1,
+          "name": "Mercado X",
+          "cnpj": "123",
+          "phone": "teste",
+          "enabled": true
+        },
         "category": {
           "id": 2,
           "description": "teste2",
           "enabled": true
         },
-        "price_per_unity": 6,
-        "qty_product": 2,
-        "description": "teste 5",
-        "title": "Teste",
-        "enabled": true,
-        "stock_value": 12,
-        "id": 1
+        "price_per_unity": 2,
+        "qty_product": 8,
+        "description": "Descrição Produto 2",
+        "title": "Produto 2"
       },
       "user": {
         "id": 2,
@@ -177,12 +193,12 @@
         "email": "lucas@gmail.com",
         "password": "1234@teste",
         "enabled": true,
-        "expire": 1759611145908
+        "expire": 1759705280083
       },
-      "quantity": 3,
+      "quantity": -2,
       "value": 0,
       "price_at_time": 0,
-      "date": "2025-10-04T18:30:23.717Z"
+      "date": "2025-10-05T20:41:12.022Z"
     }
   ],
   "reminders": []

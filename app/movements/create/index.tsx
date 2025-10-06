@@ -50,9 +50,6 @@ const CreateMovements: React.FC = () => {
     const [dialogVisible, setDialogVisible] = useState(false);
     const [dialogTitle, setDialogTitle] = useState('');
     const [dialogText, setDialogText] = useState('');
-    const [alterInventory, setAlterInventory] = useState(false);
-    const [alterPrice, setAlterPrice] = useState(false);
-    const [disablePrice, setDisablePrice] = useState(false);
 
     const showDialog = () => {
     
@@ -82,45 +79,19 @@ const CreateMovements: React.FC = () => {
         resolver: yupResolver(schema),
     });
 
-    const price_per_unity = watch('price_per_unity');
     const quantity = watch('quantity');
     const inventorySel = watch('inventory');
     const operationSel = watch("operation");
-
-    useEffect(() => {
-        setAlterPrice(true);
-    }, [price_per_unity]);
-    
-    useEffect(() => {
-        setAlterInventory(true);
-    }, [inventorySel]);
 
     useEffect(() => {
         const inventory = inventorys_all.find(i => i.id === inventorySel?.id);
 
         if (inventory){
             setValue('qty_product', inventory.qty_product);
-
-            if (operationSel?.id === 2 || quantity === 0 || alterInventory) {
-                setValue('price_per_unity', inventory.price_per_unity);
-                setValue('value', inventory.price_per_unity * quantity);
-            }
-            else {
-                setValue('price_per_unity', price_per_unity);
-                setValue('value', price_per_unity * quantity);
-            }
-
-            if (operationSel?.id === 1) {
-                setDisablePrice(false);
-            }
-            else {
-                setDisablePrice(true);
-            }
+            setValue('price_per_unity', inventory.price_per_unity);
+            setValue('value', inventory.price_per_unity * quantity);
         }
-
-        setAlterPrice(false);
-        setAlterInventory(false);
-    }, [quantity, inventorySel, operationSel, price_per_unity, setValue, inventorys_all]);
+    }, [quantity, inventorySel, operationSel, setValue, inventorys_all]);
 
     useEffect(() => {
         if (!inventorys[0]) {
@@ -130,17 +101,19 @@ const CreateMovements: React.FC = () => {
       
     const onSubmit = async (data: MovementsFormType) => {
 
-        const inventory_data = inventorys_all.find(i => i.id === inventorySel?.id) || null;
+        const inventory_data_original = inventorys_all.find(i => i.id === inventorySel?.id) || null;
         const user = userLogged ? userLogged : null;
 
         const newData: MovementForm = {
-            inventory: inventory_data,
+            inventory: inventory_data_original,
             user: user || null,
             quantity: data.operation?.id === 2 ? data.quantity * -1 : data.quantity,
             value: 0,
-            price_at_time: data.price_per_unity,
+            price_at_time: 0,
             date: new Date(),
         }
+
+        const inventory_data = inventory_data_original ? {...inventory_data_original} : null;
 
         if (!inventory_data) {
             setDialogTitle('Erro');
@@ -158,9 +131,7 @@ const CreateMovements: React.FC = () => {
 
         inventory_data.qty_product += newData.quantity;
         inventory_data.stock_value = inventory_data.qty_product * inventory_data.price_per_unity;
-
-        console.log(inventory_data)
-
+        
         try {
             await dispatch(editInventory(inventory_data)).unwrap();
         } catch (error: any) {
@@ -171,7 +142,7 @@ const CreateMovements: React.FC = () => {
         }
 
         newData.value = inventory_data.price_per_unity * Math.abs(newData.quantity);
-        newData.price_at_time = newData.quantity < 0 ? inventory_data.price_per_unity : newData.price_at_time;
+        newData.price_at_time = inventory_data.price_per_unity;
         newData.inventory = inventory_data;
 
         try {
@@ -227,7 +198,7 @@ const CreateMovements: React.FC = () => {
                 name="price_per_unity"
                 label="Preço Unidade"
                 isCurrency
-                disabled={disablePrice}
+                disabled
             />
 
             <FormInput

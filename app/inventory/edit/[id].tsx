@@ -11,8 +11,8 @@ import { FormInput } from '@/components/FormInput';
 import ComboBoxForm from '@/components/ComboBoxForm';
 import { globalStyles } from '@/styles/globalStyles';
 import { useSelector } from 'react-redux';
-import { initCategories, selectCategoriesEnabled } from '@/store/features/categorySlice';
-import { initSuppliers, selectSuppliersEnabled } from '@/store/features/supplierSlice';
+import { initCategories, selectCategories, selectCategoriesEnabled } from '@/store/features/categorySlice';
+import { initSuppliers, selectSuppliers, selectSuppliersEnabled } from '@/store/features/supplierSlice';
 import { editInventory, selectInventorys } from '@/store/features/inventorySlice';
 import { useAppDispatch } from '@/store/hooks';
 
@@ -58,6 +58,8 @@ export default function PageTarefasId() {
   const [dialogTitle, setDialogTitle] = useState('');
   const [dialogText, setDialogText] = useState('');
   const router = useRouter();
+  const categories_all = useSelector(selectCategories);
+  const suppliers_all = useSelector(selectSuppliers);
   const categories = useSelector(selectCategoriesEnabled);
   const suppliers = useSelector(selectSuppliersEnabled);
   const inventorys = useSelector(selectInventorys);
@@ -81,7 +83,10 @@ export default function PageTarefasId() {
     setValue,
     formState: { errors, isDirty },
   } = useForm<InventoryInterface>({
-    defaultValues: oldInventory || {
+    defaultValues: oldInventory 
+    ? {...oldInventory, 
+      category: categories.find(c => c.id === oldInventory.category?.id) || oldInventory.category, 
+      supplier: suppliers.find(s => s.id === oldInventory.supplier?.id) || oldInventory?.supplier} : {
           id: 0,
           title: "",
           stock_value: 0,

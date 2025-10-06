@@ -1,13 +1,6 @@
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { Stack } from 'expo-router';
 import 'react-native-reanimated';
-import { useColorScheme } from '@/components/useColorScheme';
-
-import InventoryProvider from '@/contexts/InventoryContext';
-import { CategoryProvider } from '@/contexts/CategoryContext';
-import UserProvider from '@/contexts/UserContext';
-//import MovementsProvider from '@/contexts/MovementsContext';
-import SupplierProvider from '@/contexts/SupplierContext';
 import { Provider, useSelector } from 'react-redux';
 import { store } from '@/store';
 import { selectUserLogged } from '@/store/features/userSlice';
@@ -25,29 +18,16 @@ export const unstable_settings = {
 export default function RootLayout() {
   return (
     <Provider store={store}>
-{/*       <UserProvider>
-        <InventoryProvider>
-          <CategoryProvider>
-            <SupplierProvider>
-              <InventoryProvider>
-                <MovementsProvider> */}
-                  <RootLayoutNav />
-{/*                 </MovementsProvider>
-              </InventoryProvider>
-            </SupplierProvider>
-          </CategoryProvider>
-        </InventoryProvider>
-      </UserProvider> */}
+        <RootLayoutNav />
     </Provider>
   );
 }
 
 function RootLayoutNav() {
-  const colorScheme = useColorScheme();
   const userLogged = useSelector(selectUserLogged);
 
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+    <ThemeProvider value={/* DarkTheme */ DefaultTheme}>
       <Stack>
           <Stack.Screen name="login/index" options={{ headerShown: false }} />
           <Stack.Protected guard={!!userLogged} >
