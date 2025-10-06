@@ -41,15 +41,10 @@ const login = async (email: string, password: string): Promise<UserLoggedInterfa
   return null;
 };
 
-const logout = async () => {
-  await AsyncStorage.removeItem("userLogged");
-};
-
 export default {
     getUsers,
     addUser,
     editUser,
     removeUser,
     login,
-    logout,
 };

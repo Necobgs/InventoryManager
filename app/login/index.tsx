@@ -45,7 +45,6 @@ const Login: React.FC = () => {
               if (user) {
                 router.push('/');
                 reset();
-                console.log("login Storage", user)
               }
             } catch {}
           }
@@ -72,7 +71,6 @@ const Login: React.FC = () => {
             let user = await dispatch(loginUser({ email: data.email, password: data.password })).unwrap();
             if (user) {
               router.push('/');
-              console.log("login", user)
               reset();
             }
             else {

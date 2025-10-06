@@ -96,15 +96,15 @@ const PageTarefasId: React.FC = () => {
     showDialog();
   };
 
-    useEffect(() => {
-        if (!categories[0]) {
-          dispatch(initCategories());
-        }
+  useEffect(() => {
+      if (!categories[0]) {
+        dispatch(initCategories());
+      }
 
-        if (!suppliers[0]) {
-          dispatch(initSuppliers());
-        }
-    }, [dispatch]);
+      if (!suppliers[0]) {
+        dispatch(initSuppliers());
+      }
+  }, [dispatch]);
   
 
   return (

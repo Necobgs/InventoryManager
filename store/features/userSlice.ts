@@ -3,6 +3,7 @@ import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import userService from "../../services/userService";
 import { UserForm, UserInterface } from "@/interfaces/UserInterface";
 import { UserLoggedInterface } from "@/interfaces/UserLoggedInterface";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 interface UserState {
     users: UserInterface[];
@@ -32,6 +33,11 @@ export const removeUser = createAsyncThunk('user/remove', async (payload: UserIn
     return response;
 });
 
+export const logoutUser = createAsyncThunk('user/logout', async () => {
+    await AsyncStorage.removeItem("userLogged");
+    return null;
+});
+
 const initialState: UserState = {
     users: [],
     userLogged: null,
@@ -48,9 +54,6 @@ const userSlice = createSlice({
         state.userLogged = null;
         state.error = null;
         state.loading = false;
-      },
-      logout(state) {
-        state.userLogged = null;
       },
     },
     extraReducers: (builder) => {
@@ -96,8 +99,6 @@ const userSlice = createSlice({
                 state.error = "Erro ao editar usuário";
             })
             .addCase(loginUser.fulfilled, (state, action: PayloadAction<UserLoggedInterface | null>) => {
-        
-              console.log("testando",action.payload);
               state.userLogged = action.payload;
               state.error = null;
             })
@@ -105,6 +106,9 @@ const userSlice = createSlice({
               console.log("rejected")
               state.userLogged = null;
               state.error = "Usuário ou senha inválidos";
+            })
+            .addCase(logoutUser.fulfilled, (state, action: PayloadAction<null>) => {
+                state.userLogged = action.payload;
             });
             
     },
@@ -116,6 +120,6 @@ export const selectUserLogged = (state: { user: UserState }) => state.user.userL
 export const selectUserError = (state: { user: UserState }) => state.user.error;
 export const selectUserLoading = (state: { user: UserState }) => state.user.loading;
 
-export const { removeAllUsers, logout } = userSlice.actions;
+export const { removeAllUsers } = userSlice.actions;
 export const userReducer = userSlice.reducer;
 

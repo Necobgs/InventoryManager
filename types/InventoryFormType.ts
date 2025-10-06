@@ -1,4 +1,4 @@
-import CategoryInterface from "@/interfaces/CategoryInterface";
+import { CategoryInterface } from "@/interfaces/CategoryInterface";
 import { SupplierInterface } from "@/interfaces/SupplierInterface";
 
 export type InventoryFormType = {

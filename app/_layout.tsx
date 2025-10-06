@@ -4,6 +4,7 @@ import 'react-native-reanimated';
 import { Provider, useSelector } from 'react-redux';
 import { store } from '@/store';
 import { selectUserLogged } from '@/store/features/userSlice';
+import useTheme, { ThemeProviderContext } from '@/contexts/ThemeContext';
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -18,16 +19,19 @@ export const unstable_settings = {
 export default function RootLayout() {
   return (
     <Provider store={store}>
-        <RootLayoutNav />
+        <ThemeProviderContext>
+          <RootLayoutNav />
+        </ThemeProviderContext>
     </Provider>
   );
 }
 
 function RootLayoutNav() {
   const userLogged = useSelector(selectUserLogged);
+  const { theme } = useTheme();
 
   return (
-    <ThemeProvider value={/* DarkTheme */ DefaultTheme}>
+    <ThemeProvider value={theme === "dark" ? DarkTheme : DefaultTheme}>
       <Stack>
           <Stack.Screen name="login/index" options={{ headerShown: false }} />
           <Stack.Protected guard={!!userLogged} >
