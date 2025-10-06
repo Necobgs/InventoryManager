@@ -13,6 +13,7 @@ import { useAppDispatch } from "@/store/hooks";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { loginUser } from "@/store/features/userSlice";
 import { UserLoggedInterface } from "@/interfaces/UserLoggedInterface";
+import useTheme from "@/contexts/ThemeContext";
 
 const schema = yup.object().shape({
   email: yup.string().required('Nome é obrigatório'),
@@ -23,6 +24,7 @@ const Login: React.FC = () => {
 
     const router = useRouter();
     const dispatch = useAppDispatch();
+    const { theme } = useTheme();
 
     const [dialogVisible, setDialogVisible] = useState(false);
     const [dialogTitle, setDialogTitle] = useState('');
@@ -87,7 +89,7 @@ const Login: React.FC = () => {
 
     return (
         <View style={styles.container}>
-            <Text style={styles.title}>Login</Text>
+            <Text style={{...styles.title, color: theme === "dark" ? "white" : "black"}}>Login</Text>
 
             <FormInput
                 control={control}

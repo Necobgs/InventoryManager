@@ -7,7 +7,7 @@ export const globalStyles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         gap: 10,
-        backgroundColor: "rgb(242, 242, 242)",
+        backgroundColor: "transparent",
         padding: 15,
         boxSizing: 'border-box',
         borderBottomWidth: 1,
@@ -16,7 +16,7 @@ export const globalStyles = StyleSheet.create({
     },
     loadingList: {
         padding: 5,
-        backgroundColor: "rgb(242, 242, 242)",
+        backgroundColor: "transparent",
     },
     button: {
         borderRadius: 10,
@@ -51,7 +51,7 @@ export const globalStyles = StyleSheet.create({
         alignItems:'center',
         justifyContent:'center',
         minHeight:'100%',
-        backgroundColor:'rgb(242 242 242)',
+        backgroundColor:'transparent',
 
     },
     fullWidth: {

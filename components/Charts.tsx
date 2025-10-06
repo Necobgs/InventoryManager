@@ -283,7 +283,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         width: '100%',
-        backgroundColor: 'rgb(242, 242, 242)',
+        backgroundColor: 'transparent',
         gap: 20,
     },
     areaChart: {

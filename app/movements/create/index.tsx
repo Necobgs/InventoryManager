@@ -5,7 +5,6 @@ import { MovementForm } from "@/interfaces/MovementInterface";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { StyleSheet } from "react-native";
 import { Button } from "react-native-paper";
 import * as yup from 'yup';
 import MovementsFormType from "@/types/MovementsFormType";
@@ -15,6 +14,7 @@ import { useSelector } from "react-redux";
 import { selectUserLogged } from "@/store/features/userSlice";
 import { editInventory, initInventorys, selectInventorys, selectInventorysEnabled } from "@/store/features/inventorySlice";
 import { addMovement } from "@/store/features/movementSlice";
+import { globalStyles } from "@/styles/globalStyles";
 
 const schema = yup.object().shape({
     inventory: yup
@@ -159,8 +159,8 @@ const CreateMovements: React.FC = () => {
 
 
     return (
-        <View style={styles.container}>
-            <View style={styles.formModal}>
+        <View style={globalStyles.container}>
+            <View style={globalStyles.formModal}>
 
             <ComboBoxForm
                 data={[{id: 1, title: "Entrada"},{id: 2, title: "Saída"}]}
@@ -223,32 +223,5 @@ const CreateMovements: React.FC = () => {
         </View>
     );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    padding: 20,
-    flex: 1,
-    alignItems:'center',
-    justifyContent:'center',
-    minHeight:'100%',
-    backgroundColor:'rgb(242 242 242)',
-
-  },
-  fullWidth: {
-    width: '100%',
-    marginBottom: 10,
-  },
-  formModal:{
-    maxWidth:800,
-    width:'98%',
-    maxHeight:'100%',
-    backgroundColor:'#ffff',
-    padding:25,
-    borderRadius:10,
-    gap:15,
-    overflowY: 'auto',
-  }
-});
-
 
 export default CreateMovements;

@@ -46,9 +46,10 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: 'center',
-    backgroundColor: 'rgb(242, 242, 242)',
+    backgroundColor: 'transparent',
     overflowY: 'auto',
     padding: 50,
+    paddingTop: 20,
     boxSizing: 'border-box',
   },
   title: {
@@ -65,14 +66,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'flex-end',
     width: '100%',
-    marginBottom: 10,
+    marginBottom: 20,
     gap: 10,
     backgroundColor: 'transparent',
   },
   buttonAction: {
     boxShadow: 'rgba(0, 0, 0, 0.3) 0px 1px 3px', 
     backgroundColor: 'rgb(242 242 242)',
-    padding: 10,
+    padding: 15,
     borderRadius: 5,
   }
 });

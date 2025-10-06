@@ -4,6 +4,7 @@ import { HelperText, TextInput } from 'react-native-paper';
 import { StyleSheet, View, StyleProp, TextStyle, ViewStyle } from 'react-native';
 import { formatCurrency } from '@/common/FormatCurrency';
 import { parseCurrency } from '@/common/PasseCurrency';
+import useTheme from '@/contexts/ThemeContext';
 
 interface FormInputProps<T extends FieldValues> {
   control: Control<T>;
@@ -33,12 +34,12 @@ export const FormInput = <T extends FieldValues>({
 }: FormInputProps<T>) => {
 
   const [showPassword,setShowPassword] = useState(false);
+  const { theme } = useTheme();
   
   function handlerPassword(){
 
     setShowPassword((oldValue)=>!oldValue)
   }
-
 
   return (
   <View style={styles.container ?? defaultStyles.container}>

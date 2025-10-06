@@ -5,7 +5,6 @@ import { MovementInterface } from "@/interfaces/MovementInterface";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { StyleSheet } from "react-native";
 import { Button } from "react-native-paper";
 import * as yup from 'yup';
 import MovementsFormType from "@/types/MovementsFormType";
@@ -16,6 +15,7 @@ import { editMovement, initMovements, removeMovement, selectMovements } from "@/
 import { editInventory, initInventorys, selectInventorys, selectInventorysEnabled } from "@/store/features/inventorySlice";
 import { useAppDispatch } from "@/store/hooks";
 import { selectUserLogged } from "@/store/features/userSlice";
+import { globalStyles } from "@/styles/globalStyles";
 
 const schema = yup.object().shape({
     quantity: yup
@@ -284,8 +284,8 @@ const EditMovements: React.FC = () => {
     }, [dispatch]);
 
     return (
-        <View style={styles.container}>
-            <View style={styles.formModal}>
+        <View style={globalStyles.container}>
+            <View style={globalStyles.formModal}>
 
             <ComboBoxForm
                 data={[{id: 1, title: "Entrada"},{id: 2, title: "Saída"}]}
@@ -334,7 +334,7 @@ const EditMovements: React.FC = () => {
                 disabled
             />
 
-            <View style={styles.areaButtons}>
+            <View style={globalStyles.areaButtons}>
                 <Button mode="outlined" style={{ width: '45%' }} onPress={handleSubmit(removeMovementFunc)}>
                     Excluir movimentação
                 </Button>
@@ -357,37 +357,5 @@ const EditMovements: React.FC = () => {
         </View>
     );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    padding: 20,
-    flex: 1,
-    alignItems:'center',
-    justifyContent:'center',
-    minHeight:'100%',
-    backgroundColor:'rgb(242 242 242)',
-  },
-  fullWidth: {
-    width: '100%',
-    marginBottom: 10,
-  },
-  areaButtons:{ 
-    flexDirection: 'row', 
-    justifyContent: 'space-around', 
-    marginTop: 15 
-  },
-  formModal:{
-    maxWidth:800,
-    width:'98%',
-    maxHeight:'100%',
-    minHeight: 'auto',
-    backgroundColor:'#ffff',
-    padding:25,
-    borderRadius:10,
-    gap:15,
-    overflowY: 'auto',
-  }
-});
-
 
 export default EditMovements;
