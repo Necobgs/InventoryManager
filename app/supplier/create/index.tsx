@@ -11,6 +11,7 @@ import { useState } from "react";
 import { useAppDispatch } from "@/store/hooks";
 import { addSupplier } from "@/store/features/supplierSlice";
 import { globalStyles } from "@/styles/globalStyles";
+import useTheme from "@/contexts/ThemeContext";
 
 const schema = yup.object().shape({
     name: yup.string().required('Nome é obrigatório'),
@@ -25,6 +26,7 @@ const CreateSupplier: React.FC = () => {
     const [dialogTitle, setDialogTitle] = useState('');
     const [dialogText, setDialogText] = useState('');
     const dispatch = useAppDispatch(); 
+    const { theme } = useTheme();
 
     const showDialog = () => {
       setDialogVisible(true);
@@ -65,7 +67,7 @@ const CreateSupplier: React.FC = () => {
 
     return (
         <View style={globalStyles.container}>
-            <View style={globalStyles.formModal}>
+            <View style={{...globalStyles.formModal, backgroundColor: theme === "dark" ? "rgb(210, 210, 210)" : "white"}}>
 
             <FormInput
                 control={control}

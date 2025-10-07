@@ -15,6 +15,7 @@ import { initCategories, selectCategoriesEnabled } from '@/store/features/catego
 import { useSelector } from 'react-redux';
 import { initSuppliers, selectSuppliersEnabled } from '@/store/features/supplierSlice';
 import { addInventory } from '@/store/features/inventorySlice';
+import useTheme from '@/contexts/ThemeContext';
 
 const schema = yup.object().shape({
   title: yup.string().required('Título é obrigatório'),
@@ -56,6 +57,7 @@ const PageTarefasId: React.FC = () => {
   const [dialogTitle, setDialogTitle] = useState('');
   const [dialogText, setDialogText] = useState('');
   const dispatch = useAppDispatch();
+  const { theme } = useTheme();
 
   const showDialog = () => {
     
@@ -109,7 +111,7 @@ const PageTarefasId: React.FC = () => {
 
   return (
     <View style={globalStyles.container}>
-      <View style={globalStyles.formModal}>
+      <View style={{...globalStyles.formModal, backgroundColor: theme === "dark" ? "rgb(210, 210, 210)" : "white"}}>
       <FormInput
           control={control}
           name="title"

@@ -51,7 +51,7 @@ export const FormInput = <T extends FieldValues>({
           {error && <HelperText type="error">{error.message}</HelperText>}
           <TextInput
             label={label}
-            mode="outlined"
+            mode={theme === "dark" ? "flat" : "outlined"}
             keyboardType={keyboardType}
             multiline={multiline}
             numberOfLines={multiline ? 5 : 1}

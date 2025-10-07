@@ -61,13 +61,13 @@ export const globalStyles = StyleSheet.create({
     areaButtons:{ 
         flexDirection: 'row', 
         justifyContent: 'space-around', 
-        marginTop: 15 
+        marginTop: 15,
+        backgroundColor: "transparent"
     },
-    formModal:{
+    formModal: {
         maxWidth:800,
         width:'98%',
         maxHeight:'100%',
-        backgroundColor:'#ffff',
         padding:25,
         borderRadius:10,
         gap:15,

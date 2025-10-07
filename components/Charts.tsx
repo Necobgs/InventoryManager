@@ -1,4 +1,5 @@
 import { Text, View } from '@/components/Themed';
+import useTheme from '@/contexts/ThemeContext';
 import { initCategories, selectCategoriesEnabled } from '@/store/features/categorySlice';
 import { initInventorys, selectInventorysEnabled } from '@/store/features/inventorySlice';
 import { initMovements, selectMovements } from '@/store/features/movementSlice';
@@ -31,9 +32,34 @@ export default function Charts() {
     const dataCategories: ChartInterfcae[] = [];
     const dataSuppliers: ChartInterfcae[] = [];
     const dispatch = useAppDispatch();
+    const { theme } = useTheme();
     let indexColor = 0;
     let quantity_without_cat = 0;
     let quantity_without_sup = 0;
+    const styles = StyleSheet.create({
+        containerCharts: {
+            alignItems: 'center',
+            justifyContent: 'center',
+            width: '100%',
+            backgroundColor: 'transparent',
+            gap: 20,
+        },
+        areaChart: {
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 5,
+            padding: 15,
+            borderRadius: 10,
+            backgroundColor: 'transparent',
+            boxShadow: theme === "dark" ? "rgba(255, 255, 255, 0.8) 0px 1px 3px" : "rgba(0, 0, 0, 0.3) 0px 1px 3px"
+        },
+        title: {
+            fontSize: 16,
+            fontWeight: 'bold',
+            color: theme === "dark" ? "rgb(230, 225, 229)" : "black"
+        }
+    })
 
     useEffect(() => {
         if (!categories[0]) {
@@ -201,7 +227,7 @@ export default function Charts() {
                 color: () => `black`
             }}
             accessor={"value"}
-            backgroundColor="rgb(242 242 242)"
+            backgroundColor="transparent"
             paddingLeft={"15"}
             absolute
             />
@@ -218,7 +244,7 @@ export default function Charts() {
                 color: () => `black`
             }}
             accessor={"value"}
-            backgroundColor="rgb(242 242 242)"
+            backgroundColor="transparent"
             paddingLeft={"15"}
             absolute
             />
@@ -235,7 +261,7 @@ export default function Charts() {
                 color: () => `black`
             }}
             accessor={"value"}
-            backgroundColor="rgb(242 242 242)"
+            backgroundColor="transparent"
             paddingLeft={"15"}
             absolute
             />
@@ -252,7 +278,7 @@ export default function Charts() {
                 color: () => `black`
             }}
             accessor={"value"}
-            backgroundColor="rgb(242 242 242)"
+            backgroundColor="transparent"
             paddingLeft={"15"}
             absolute
             />
@@ -269,7 +295,7 @@ export default function Charts() {
                 color: () => `black`
             }}
             accessor={"value"}
-            backgroundColor="rgb(242 242 242)"
+            backgroundColor="transparent"
             paddingLeft={"15"}
             absolute
             />
@@ -277,27 +303,3 @@ export default function Charts() {
       </View>
     )
 }
-
-const styles = StyleSheet.create({
-    containerCharts: {
-        alignItems: 'center',
-        justifyContent: 'center',
-        width: '100%',
-        backgroundColor: 'transparent',
-        gap: 20,
-    },
-    areaChart: {
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        gap: 5,
-        boxShadow: 'rgba(0, 0, 0, 0.3) 0px 1px 3px', 
-        padding: 15,
-        borderRadius: 10,
-        backgroundColor: 'rgb(242 242 242)',
-    },
-    title: {
-        fontSize: 16,
-        fontWeight: 'bold',
-    }
-})

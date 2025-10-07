@@ -10,6 +10,7 @@ import { UserForm } from "@/interfaces/UserInterface";
 import { globalStyles } from "@/styles/globalStyles";
 import { useAppDispatch } from "@/store/hooks";
 import { addUser } from "@/store/features/userSlice";
+import useTheme from "@/contexts/ThemeContext";
 
 const schema = yup.object().shape({
     name: yup.string().required('Nome é obrigatório'),
@@ -19,11 +20,12 @@ const schema = yup.object().shape({
 });
 
 const CreateUser: React.FC = () => {
-  const dispatch = useAppDispatch();
+    const dispatch = useAppDispatch();
 
     const [dialogVisible, setDialogVisible] = useState(false);
     const [dialogTitle, setDialogTitle] = useState('');
     const [dialogText, setDialogText] = useState('');
+    const { theme } = useTheme();
 
     const showDialog = () => {
     
@@ -64,7 +66,7 @@ const CreateUser: React.FC = () => {
 
     return (
         <View style={globalStyles.container}>
-            <View style={globalStyles.formModal}>
+            <View style={{...globalStyles.formModal, backgroundColor: theme === "dark" ? "rgb(210, 210, 210)" : "white"}}>
 
             <FormInput
                 control={control}

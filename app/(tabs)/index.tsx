@@ -14,7 +14,42 @@ export default function TabOneScreen() {
   const userLogged = useSelector(selectUserLogged);
   const inventorys = useSelector(selectInventorys);
   const dispatch = useAppDispatch();
-  const { alterTheme } = useTheme();
+  const { theme, alterTheme } = useTheme();
+  const styles = StyleSheet.create({
+    container: {
+      flex: 1,
+      alignItems: 'center',
+      backgroundColor: 'transparent',
+      overflowY: 'auto',
+      padding: 50,
+      paddingTop: 20,
+      boxSizing: 'border-box',
+    },
+    title: {
+      display: 'flex',
+      flex: 1,
+      alignItems: 'center',
+      justifyContent: 'center',
+      fontSize: 20,
+      fontWeight: 'bold',
+    },
+    areaActions: {
+      display: 'flex',
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'flex-end',
+      width: '100%',
+      marginBottom: 20,
+      gap: 10,
+      backgroundColor: 'transparent',
+    },
+    buttonAction: {
+      boxShadow: theme === "dark" ? 'rgba(255, 255, 255, 0.8) 0px 1px 3px' : 'rgba(0, 0, 0, 0.3) 0px 1px 3px', 
+      backgroundColor: 'transparent',
+      padding: 15,
+      borderRadius: 5,
+    }
+  });
 
   function Icon(props: {
     name: React.ComponentProps<typeof FontAwesome>['name'];
@@ -32,8 +67,8 @@ export default function TabOneScreen() {
   return (
     <View style={styles.container}>
       <View style={styles.areaActions}>
-        <Pressable onPress={() => (dispatch(logoutUser()))}><View style={styles.buttonAction}><Icon name="sign-out" color='black'/></View></Pressable>
-        <Pressable onPress={alterTheme}><View style={styles.buttonAction}><Icon name="adjust" color='black'/></View></Pressable>
+        <Pressable onPress={() => (dispatch(logoutUser()))}><View style={styles.buttonAction}><Icon name="sign-out" color={theme === "dark" ? "rgb(230, 225, 229)" : 'black'}/></View></Pressable>
+        <Pressable onPress={alterTheme}><View style={styles.buttonAction}><Icon name="adjust" color={theme === "dark" ? "rgb(230, 225, 229)" : 'black'}/></View></Pressable>
       </View>
       {inventorys[0] 
       ? <Charts/>
@@ -41,39 +76,3 @@ export default function TabOneScreen() {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: 'center',
-    backgroundColor: 'transparent',
-    overflowY: 'auto',
-    padding: 50,
-    paddingTop: 20,
-    boxSizing: 'border-box',
-  },
-  title: {
-    display: 'flex',
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    fontSize: 20,
-    fontWeight: 'bold',
-  },
-  areaActions: {
-    display: 'flex',
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'flex-end',
-    width: '100%',
-    marginBottom: 20,
-    gap: 10,
-    backgroundColor: 'transparent',
-  },
-  buttonAction: {
-    boxShadow: 'rgba(0, 0, 0, 0.3) 0px 1px 3px', 
-    backgroundColor: 'rgb(242 242 242)',
-    padding: 15,
-    borderRadius: 5,
-  }
-});

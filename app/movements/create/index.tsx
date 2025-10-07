@@ -15,6 +15,7 @@ import { selectUserLogged } from "@/store/features/userSlice";
 import { editInventory, initInventorys, selectInventorys, selectInventorysEnabled } from "@/store/features/inventorySlice";
 import { addMovement } from "@/store/features/movementSlice";
 import { globalStyles } from "@/styles/globalStyles";
+import useTheme from "@/contexts/ThemeContext";
 
 const schema = yup.object().shape({
     inventory: yup
@@ -46,6 +47,7 @@ const CreateMovements: React.FC = () => {
     const inventorys_all = useSelector(selectInventorys);
     const inventorys = useSelector(selectInventorysEnabled);
     const dispatch = useAppDispatch();
+    const { theme } = useTheme();
 
     const [dialogVisible, setDialogVisible] = useState(false);
     const [dialogTitle, setDialogTitle] = useState('');
@@ -160,7 +162,7 @@ const CreateMovements: React.FC = () => {
 
     return (
         <View style={globalStyles.container}>
-            <View style={globalStyles.formModal}>
+            <View style={{...globalStyles.formModal, backgroundColor: theme === "dark" ? "rgb(210, 210, 210)" : "white"}}>
 
             <ComboBoxForm
                 data={[{id: 1, title: "Entrada"},{id: 2, title: "Saída"}]}

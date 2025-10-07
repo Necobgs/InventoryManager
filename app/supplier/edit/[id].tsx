@@ -13,6 +13,7 @@ import { editSupplier, selectSuppliers } from "@/store/features/supplierSlice";
 import { useSelector } from "react-redux";
 import { globalStyles } from "@/styles/globalStyles";
 import { FormMaskedInput } from "@/components/FormMaskedInput";
+import useTheme from "@/contexts/ThemeContext";
 
 const schema = yup.object().shape({
     id: yup.number().required(),
@@ -28,6 +29,7 @@ const EditSupplier: React.FC = () => {
     const supplier = suppliers?.find(s => s.id === +id);
     const router = useRouter();
     const dispatch = useAppDispatch();
+    const { theme } = useTheme();
 
     const [dialogVisible, setDialogVisible] = useState(false);
     const [dialogTitle, setDialogTitle] = useState('');
@@ -88,7 +90,7 @@ const EditSupplier: React.FC = () => {
         <Text>Fonecedor não encontrada</Text>
       </View>
       : <View style={globalStyles.container}>
-          <View style={globalStyles.formModal}>
+          <View style={{...globalStyles.formModal, backgroundColor: theme === "dark" ? "rgb(210, 210, 210)" : "white"}}>
 
           <FormInput
               control={control}

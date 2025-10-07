@@ -3,7 +3,6 @@ import { FormInput } from "@/components/FormInput";
 import { View } from "@/components/Themed";;
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useForm } from "react-hook-form";
-import { StyleSheet } from "react-native";
 import { Button } from "react-native-paper";
 import * as yup from 'yup';
 import { useState } from "react";
@@ -12,6 +11,8 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 import { useAppDispatch } from "@/store/hooks";
 import { useSelector } from "react-redux";
 import { editUser, selectUsers } from "@/store/features/userSlice";
+import { globalStyles } from "@/styles/globalStyles";
+import useTheme from "@/contexts/ThemeContext";
 
 const schema = yup.object().shape({
     id: yup.number().required(),
@@ -22,11 +23,12 @@ const schema = yup.object().shape({
 });
 
 const EditUser: React.FC = () => {
-    const { id } = useLocalSearchParams<{ id: string }>();
+  const { id } = useLocalSearchParams<{ id: string }>();
   const users = useSelector(selectUsers);
   const user = users.find(u => u.id === +id);
   const router = useRouter();
   const dispatch = useAppDispatch();
+  const { theme } = useTheme();
 
     const [dialogVisible, setDialogVisible] = useState(false);
     const [dialogTitle, setDialogTitle] = useState('');
@@ -81,8 +83,8 @@ const EditUser: React.FC = () => {
     };
 
     return (
-        <View style={styles.container}>
-            <View style={styles.formModal}>
+        <View style={globalStyles.container}>
+            <View style={{...globalStyles.formModal, backgroundColor: theme === "dark" ? "rgb(210, 210, 210)" : "white"}}>
 
             <FormInput
                 control={control}
@@ -102,7 +104,7 @@ const EditUser: React.FC = () => {
                 label="Senha"
             />
 
-            <View style={styles.areaButtons}>
+            <View style={globalStyles.areaButtons}>
                 <Button mode="outlined" style={{ width: '45%' }} onPress={handleSubmit(disableOrEnable)}>
                     {user?.enabled ? "Desabilitar" : "Habilitar"}
                 </Button>
@@ -125,37 +127,5 @@ const EditUser: React.FC = () => {
         </View>
     );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    padding: 20,
-    flex: 1,
-    alignItems:'center',
-    justifyContent:'center',
-    minHeight:'100%',
-    backgroundColor:'rgb(242 242 242)',
-
-  },
-  fullWidth: {
-    width: '100%',
-    marginBottom: 10,
-  },
-  areaButtons:{ 
-    flexDirection: 'row', 
-    justifyContent: 'space-around', 
-    marginTop: 15 
-  },
-  formModal:{
-    maxWidth:800,
-    width:'98%',
-    maxHeight:'100%',
-    backgroundColor:'#ffff',
-    padding:25,
-    borderRadius:10,
-    gap:15,
-    overflowY: 'auto',
-  }
-});
-
 
 export default EditUser;

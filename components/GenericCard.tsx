@@ -1,28 +1,33 @@
 import { StyleSheet,Text } from "react-native";
 import { RelativePathString, useRouter } from "expo-router";
-import { Card } from "react-native-paper";
+import { Card, MD3DarkTheme, MD3LightTheme, PaperProvider } from "react-native-paper";
 import GenericCardProps from "@/interfaces/GenericCardProps";
+import useTheme from "@/contexts/ThemeContext";
 
 
 
 export default function GenericCard(props:GenericCardProps){
-    const router = useRouter()
+    const router = useRouter();
+    const { theme } = useTheme();
     
     return (
-    <Card style={styles.container} mode="elevated" onPress={()=>router.navigate(props.navigateURL as RelativePathString) }>
-    <Card.Title title={props.title}/>   
-    <Card.Content>
-        <Text numberOfLines={3}>
-            {props.description}
-        </Text>    
-    </Card.Content> 
-    </Card>  
+    <PaperProvider theme={theme === "dark" ? MD3DarkTheme : MD3LightTheme}>
+        <Card mode={theme === "dark" ? "outlined" : "elevated"} style={styles.container} onPress={()=>router.navigate(props.navigateURL as RelativePathString) }>
+            <Card.Title title={props.title}/>   
+            <Card.Content>
+                <Text numberOfLines={3} style={{color:theme==='dark'?'rgb(230, 225, 229)':'black'}}>
+                    {props.description}
+                </Text>    
+            </Card.Content> 
+        </Card>  
+    </PaperProvider>
     )
 }
 
 const styles= StyleSheet.create({
     container:{
         height:125,
-        width:'100%'
+        width:'100%',
+        backgroundColor: 'transparent'
     },
 })

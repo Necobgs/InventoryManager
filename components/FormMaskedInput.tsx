@@ -3,6 +3,7 @@ import { Controller, Control, FieldValues, Path } from 'react-hook-form';
 import { HelperText } from 'react-native-paper';
 import { StyleSheet, View } from 'react-native';
 import MaskInput from 'react-native-mask-input';
+import useTheme from '@/contexts/ThemeContext';
 
 interface FormMaskedInputProps<T extends FieldValues> {
   control: Control<T>;
@@ -19,6 +20,27 @@ export const FormMaskedInput = <T extends FieldValues>({
   mask,
   withFormatting
 }: FormMaskedInputProps<T>) => {
+  const { theme } = useTheme();
+  const defaultStyles = StyleSheet.create({
+    container: {
+      width: '100%',
+      marginBottom: 10,
+    },
+    input: {
+      borderWidth: theme === "dark" ? 0 : 1,
+      borderBottomWidth: 1,
+      borderRadius: 4,
+      padding: 16,
+      height: theme === "dark" ? 56 : 50,
+      outlineColor: 'rgb(103, 80, 164)',
+      color: 'rgb(28, 27, 31)',
+      backgroundColor: theme === "dark" ? "rgb(231, 224, 236)" : "white",
+      fontSize: 16,
+      marginTop: theme === "dark" ? 0 : 6,
+      fontFamily: 'Roboto, "Helvetica Neue", Helvetica, Arial, sans-serif',
+    },
+  });
+
   return (
     <View style={defaultStyles.container}>
       <Controller
@@ -42,22 +64,3 @@ export const FormMaskedInput = <T extends FieldValues>({
     </View>
   );
 };
-
-const defaultStyles = StyleSheet.create({
-  container: {
-    width: '100%',
-    marginBottom: 10,
-  },
-  input: {
-    borderWidth: 1,
-    borderRadius: 4,
-    padding: 16,
-    height: 50,
-    outlineColor: 'rgb(103, 80, 164)',
-    color: 'rgb(28, 27, 31)',
-    backgroundColor: 'white',
-    fontSize: 16,
-    marginTop: 6,
-    fontFamily: 'Roboto, "Helvetica Neue", Helvetica, Arial, sans-serif',
-  },
-});

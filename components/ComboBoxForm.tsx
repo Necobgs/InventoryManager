@@ -3,6 +3,7 @@ import { View } from "./Themed";
 import { Controller, Control, FieldErrors, Path } from "react-hook-form";
 import ModalDropdown from "./ModalDropdownCategory";
 import { StyleProp, ViewStyle } from "react-native";
+import useTheme from "@/contexts/ThemeContext";
 
 // Interface base para itens do dropdown
 interface DropdownItem {
@@ -34,8 +35,10 @@ export default function ComboBoxForm<T extends Record<string, any>, U extends Dr
   onSelect,
   displayKey,
 }: ComboBoxFormProps<T, U>) {
+  const { theme } = useTheme();
+
   return (
-    <View style={[{}, containerStyle]}>
+    <View style={{backgroundColor: "transparent"}}>
       <Text style={{ marginBottom: 5, marginLeft: 5 }}>{label}</Text>
       <Controller
         control={control}

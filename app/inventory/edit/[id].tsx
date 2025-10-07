@@ -15,6 +15,7 @@ import { initCategories, selectCategories, selectCategoriesEnabled } from '@/sto
 import { initSuppliers, selectSuppliers, selectSuppliersEnabled } from '@/store/features/supplierSlice';
 import { editInventory, selectInventorys } from '@/store/features/inventorySlice';
 import { useAppDispatch } from '@/store/hooks';
+import useTheme from '@/contexts/ThemeContext';
 
 const schema = yup.object().shape({
   title: yup.string().required('Título é obrigatório'),
@@ -65,6 +66,7 @@ export default function PageTarefasId() {
   const inventorys = useSelector(selectInventorys);
   const oldInventory = inventorys.find(i => i.id === +id);
   const dispatch = useAppDispatch();
+  const { theme } = useTheme();
 
   const showDialog = () => {
     
@@ -159,7 +161,7 @@ export default function PageTarefasId() {
 
   return (
     <View style={globalStyles.container}>
-      <View style={globalStyles.formModal}>
+      <View style={{...globalStyles.formModal, backgroundColor: theme === "dark" ? "rgb(210, 210, 210)" : "white"}}>
         <FormInput
             control={control}
             name="title"

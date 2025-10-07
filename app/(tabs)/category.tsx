@@ -14,6 +14,7 @@ import { useSelector } from "react-redux";
 import { CategoryInterface } from "@/interfaces/CategoryInterface";
 import { useAppDispatch } from "@/store/hooks";
 import { globalStyles } from "@/styles/globalStyles";
+import useTheme from "@/contexts/ThemeContext";
 
 const schema = yup.object().shape({
     description: yup
@@ -29,6 +30,7 @@ export default function TabCategory(){
     const loading = useSelector(selectCategoryLoading);
     const [filteredCategories, setFilteredCategories] = useState<CategoryInterface[]>([]);
     const dispatch = useAppDispatch();
+    const { theme } = useTheme();
 
     const {
         control,
@@ -93,7 +95,8 @@ export default function TabCategory(){
                     visible={true}
                     animateFrom={'right'}
                     iconMode={'static'}
-                    style={[globalStyles.fabStyle]}
+                    color={theme === "dark" ? "rgb(230, 225, 229)" : "rgb(103, 80, 164)"}
+                    style={{...globalStyles.fabStyle, backgroundColor: theme === "dark" ? "rgb(39, 39, 41)" : "rgb(234, 221, 255)"}}
                 />
             </SafeAreaView>
         </SafeAreaProvider>

@@ -15,6 +15,7 @@ import * as yup from 'yup';
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { FormMaskedInput } from "@/components/FormMaskedInput";
+import useTheme from "@/contexts/ThemeContext";
 
 const schema = yup.object().shape({
     date: yup.string().required(),
@@ -29,7 +30,8 @@ export default function tabMovements() {
     const [filteredMovements, setFilteredMovements] = useState<MovementInterface[]>([]);
     const inventorys = useSelector(selectInventorysEnabled);
     const dispatch = useAppDispatch();
-
+    const { theme } = useTheme();
+    
     const {
         control,
         watch,
@@ -106,7 +108,8 @@ export default function tabMovements() {
                     visible={true}
                     animateFrom={'right'}
                     iconMode={'static'}
-                    style={[globalStyles.fabStyle]}
+                    color={theme === "dark" ? "rgb(230, 225, 229)" : "rgb(103, 80, 164)"}
+                    style={{...globalStyles.fabStyle, backgroundColor: theme === "dark" ? "rgb(39, 39, 41)" : "rgb(234, 221, 255)"}}
                 />
             </SafeAreaView>
         </SafeAreaProvider>
