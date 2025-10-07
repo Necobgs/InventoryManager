@@ -12,6 +12,7 @@ import { editCategory, selectCategories } from '@/store/features/categorySlice';
 import { useAppDispatch } from '@/store/hooks';
 import { useSelector } from 'react-redux';
 import { globalStyles } from '@/styles/globalStyles';
+import useTheme from '@/contexts/ThemeContext';
 
 const schema = yup.object().shape({
     id: yup
@@ -35,6 +36,7 @@ export default function PageCategoryEdit() {
   const [dialogVisible, setDialogVisible] = useState(false);
   const [dialogTitle, setDialogTitle] = useState('');
   const [dialogText, setDialogText] = useState('');
+  const { theme } = useTheme();
 
   const showDialog = () => {
     
@@ -89,7 +91,7 @@ export default function PageCategoryEdit() {
         <Text>Categoria não encontrada</Text>
       </View>
     : <View style={globalStyles.container}>
-      <View style={globalStyles.formModal}>
+      <View style={{...globalStyles.formModal, backgroundColor: theme === "dark" ? "rgb(210, 210, 210)" : "white"}}>
         
           <FormInput
             control={control}

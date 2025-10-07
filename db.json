@@ -37,6 +37,11 @@
       "id": 3,
       "description": "teste 3",
       "enabled": false
+    },
+    {
+      "id": 4,
+      "description": "Categoria 4",
+      "enabled": true
     }
   ],
   "user": [

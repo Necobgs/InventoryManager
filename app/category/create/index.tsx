@@ -10,6 +10,7 @@ import { CategoryInterface, CategoryForm } from '@/interfaces/CategoryInterface'
 import { useAppDispatch } from '@/store/hooks';
 import { addCategory } from '@/store/features/categorySlice';
 import { globalStyles } from '@/styles/globalStyles';
+import useTheme from '@/contexts/ThemeContext';
 
 const schema = yup.object().shape({
   description: yup
@@ -26,6 +27,7 @@ export default function PageCategoryCreate() {
   const [dialogTitle, setDialogTitle] = useState('');
   const [dialogText, setDialogText] = useState('');
   const dispatch = useAppDispatch();
+  const { theme } = useTheme();
 
   const showDialog = () => {
     
@@ -64,7 +66,7 @@ export default function PageCategoryCreate() {
 
   return (
     <View style={globalStyles.container}>
-      <View style={globalStyles.formModal}>
+      <View style={{...globalStyles.formModal, backgroundColor: theme === "dark" ? "rgb(210, 210, 210)" : "white"}}>
         
           <FormInput
             control={control}
