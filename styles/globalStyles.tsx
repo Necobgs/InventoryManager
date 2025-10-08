@@ -32,7 +32,8 @@ export const globalStyles = StyleSheet.create({
         height:'100%',
         textAlign:'center',
         alignContent:'center',
-        fontSize:20
+        fontSize:20,
+        color: "rgb(103, 80, 164)"
     },
     btn_add:{
         backgroundColor:'green',
