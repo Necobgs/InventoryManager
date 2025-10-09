@@ -68,11 +68,11 @@ export default function PageCategoryCreate() {
     <View style={globalStyles.container}>
       <View style={{...globalStyles.formModal, backgroundColor: theme === "dark" ? "rgb(210, 210, 210)" : "white"}}>
         
-          <FormInput
-            control={control}
-            name="description"
-            label="Descrição"
-          />
+        <FormInput
+          control={control}
+          name="description"
+          label="Descrição"
+        />
 
         <View style={styles.excludeItemView}>
           <Button

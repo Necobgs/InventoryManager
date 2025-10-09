@@ -77,7 +77,6 @@ export default function tabMovements() {
                 <Button mode={operation === 2 ? 'contained' : 'outlined'} style={globalStyles.button} onPress={() => {setOperation(2)}}>Saídas</Button>
             </View>
 
-
             <View style={globalStyles.areaFilters}>
                 <FormMaskedInput
                     control={control}
