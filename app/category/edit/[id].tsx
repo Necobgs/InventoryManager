@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { Button, Text } from 'react-native-paper';
 import { useForm } from 'react-hook-form';
@@ -8,22 +8,29 @@ import DefaultDialog from '@/components/DefaultDialog';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { FormInput } from '@/components/FormInput';
 import { CategoryInterface } from '@/interfaces/CategoryInterface';
-import { editCategory, selectCategories } from '@/store/features/categorySlice';
+import { editCategory, selectCategories, selectCategoryError } from '@/store/features/categorySlice';
 import { useAppDispatch } from '@/store/hooks';
 import { useSelector } from 'react-redux';
 import { globalStyles } from '@/styles/globalStyles';
 import useTheme from '@/contexts/ThemeContext';
 
 const schema = yup.object().shape({
-    id: yup
-        .number()
-        .required(),
-    description: yup
-        .string()
-        .required('A descrição da categoria é obrigatória'),
-    enabled: yup
-        .boolean()
-        .required()
+  id: yup
+    .number()
+    .required(),
+  title: yup
+    .string()
+    .required('o título da categoria é obrigatório'),
+  description: yup
+    .string()
+    .required('A descrição da categoria é obrigatória'),
+  color: yup
+    .string()
+    .required('A cor da categoria é obrigatória')
+    .matches(/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/, 'Cor deve ser um hex válido (ex: #FF0000)'),
+  enabled: yup
+    .boolean()
+    .required(),
 });
 
 export default function PageCategoryEdit() {
@@ -32,6 +39,8 @@ export default function PageCategoryEdit() {
   const category = categories.find(c => c.id === +id);
   const router = useRouter();
   const dispatch = useAppDispatch();
+  const error = useSelector(selectCategoryError);
+  const [isError, setIsError] = useState(false);
 
   const [dialogVisible, setDialogVisible] = useState(false);
   const [dialogTitle, setDialogTitle] = useState('');
@@ -50,11 +59,14 @@ export default function PageCategoryEdit() {
   const {
     control,
     handleSubmit,
+    watch,
     formState: { isDirty },
   } = useForm<CategoryInterface>({
     defaultValues: {
       id: category?.id,
+      title: category?.title,
       description: category?.description,
+      color: category?.color,
       enabled: category?.enabled,
     },
     resolver: yupResolver(schema),
@@ -65,12 +77,13 @@ export default function PageCategoryEdit() {
       await dispatch(editCategory(data)).unwrap();
       setDialogTitle('Sucesso');
       setDialogText('Categoria alterada com sucesso!');
+      showDialog();
     } catch (error: any) {
-      setDialogTitle('Erro');
-      setDialogText(error?.message || 'Erro ao alterar categoria');
+      setIsError(true);
     }
-    showDialog();
   }
+
+  const color = watch("color");
 
   const disableOrEnable = async(data: CategoryInterface) => {
     try {
@@ -78,11 +91,20 @@ export default function PageCategoryEdit() {
       await dispatch(editCategory(data)).unwrap();
       router.back();
     } catch (error: any) {
-      setDialogTitle('Erro');
-      setDialogText(error?.message || 'Erro ao alterar categoria');
-      showDialog();
+      setIsError(true);
     }
   }
+
+  useEffect(() => {
+
+    if (isError) {
+      setDialogTitle('Erro');
+      setDialogText(error  || 'Erro ao alterar categoria');
+      showDialog();
+      setIsError(false); 
+    }
+
+  }, [error, isError]);
 
   return (
     <>
@@ -93,12 +115,28 @@ export default function PageCategoryEdit() {
     : <View style={globalStyles.container}>
       <View style={{...globalStyles.formModal, backgroundColor: theme === "dark" ? "rgb(210, 210, 210)" : "white"}}>
         
-          <FormInput
-            control={control}
-            name="description"
-            label="Descrição"
-          />
+        <FormInput
+          control={control}
+          name="title"
+          label="Título"
+        />
 
+        <FormInput
+          control={control}
+          name="description"
+          label="Descrição"
+          multiline
+        />
+
+        <FormInput
+          control={control}
+          name="color"
+          label="Cor"
+          maxLength={7}
+        />
+
+        <View style={{...globalStyles.areaColor, backgroundColor: color}}/>
+        
         <View style={styles.excludeItemView}>
           <Button mode="outlined" style={{ width: '45%' }} onPress={handleSubmit(disableOrEnable)}>
             { category.enabled? 'Desabilitar' : 'Habilitar'}

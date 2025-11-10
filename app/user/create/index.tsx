@@ -5,17 +5,21 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { useForm } from "react-hook-form";
 import { Button } from "react-native-paper";
 import * as yup from 'yup';
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { UserForm } from "@/interfaces/UserInterface";
 import { globalStyles } from "@/styles/globalStyles";
 import { useAppDispatch } from "@/store/hooks";
-import { addUser } from "@/store/features/userSlice";
+import { addUser, selectUserError } from "@/store/features/userSlice";
 import useTheme from "@/contexts/ThemeContext";
+import { FormMaskedInput } from "@/components/FormMaskedInput";
+import { useSelector } from "react-redux";
 
 const schema = yup.object().shape({
     name: yup.string().required('Nome é obrigatório'),
     email: yup.string().required('Email é obrigatório'),
     password: yup.string().required('Senha é obrigatória'),
+    phone: yup.string().required('Telefone é obrigatório').min(10, 'Telefone incompleto').max(10, 'Telefone inválido'),
+    cep: yup.string().required('CEP é obrigatório').min(8, 'CEP incompleto').max(8, 'CEP inválido'),
     enabled: yup.boolean().required()
 });
 
@@ -25,6 +29,8 @@ const CreateUser: React.FC = () => {
     const [dialogVisible, setDialogVisible] = useState(false);
     const [dialogTitle, setDialogTitle] = useState('');
     const [dialogText, setDialogText] = useState('');
+    const [isError, setIsError] = useState(false);
+    const error = useSelector(selectUserError);
     const { theme } = useTheme();
 
     const showDialog = () => {
@@ -47,6 +53,8 @@ const CreateUser: React.FC = () => {
           email: '',
           password: '',
           enabled: true,
+          phone: '',
+          cep: '',
         },
         resolver: yupResolver(schema),
       });
@@ -58,11 +66,22 @@ const CreateUser: React.FC = () => {
         setDialogText('Usuário cadastrado com sucesso!');
         reset();
       } catch (error: any) {
-        setDialogTitle('Erro');
-        setDialogText(error?.message || 'Erro ao cadastrar usuário');
+        setIsError(true);
       }
       showDialog();
     };
+
+    useEffect(() => {
+  
+      if (isError) {
+        setDialogTitle('Erro');
+        setDialogText(error  || 'Erro ao cadastrar usuário');
+        showDialog();
+        setIsError(false); 
+      }
+  
+    }, [error, isError]);
+    
 
     return (
         <View style={globalStyles.container}>
@@ -84,6 +103,20 @@ const CreateUser: React.FC = () => {
                 control={control}
                 name="password"
                 label="Senha"
+            />
+
+            <FormMaskedInput
+                control={control}
+                name="phone"
+                label="Telefone"
+                mask={['(', /\d/, /\d/, ')', ' ', /\d/, /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/]}
+            />
+
+            <FormMaskedInput
+              control={control}
+              name="cep"
+              label="CEP"
+              mask={[/\d/, /\d/, /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/]}
             />
 
             <Button mode="contained" onPress={handleSubmit(onSubmit)}>

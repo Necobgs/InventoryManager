@@ -1,11 +1,25 @@
 {
   "supplier": [
     {
+      "id": 1,
       "name": "Fornecedor 1",
-      "cnpj": "11225555555555",
+      "cnpj": "11111111111111",
       "phone": "4866666666",
+      "enabled": true
+    },
+    {
+      "name": "Fornecedor 2",
+      "cnpj": "45454555445454",
+      "phone": "8888888888",
       "enabled": true,
-      "id": 1
+      "id": 2
+    },
+    {
+      "id": 3,
+      "name": "Fornecedor 4",
+      "cnpj": "22222222222222",
+      "phone": "4899999999",
+      "enabled": false
     }
   ],
   "category": [
@@ -15,9 +29,14 @@
       "id": 1
     },
     {
-      "description": "Categoria 2",
+      "id": 2,
+      "description": "Categoria 5",
+      "enabled": false
+    },
+    {
+      "description": "Categoria 3",
       "enabled": true,
-      "id": 2
+      "id": 3
     }
   ],
   "user": [
@@ -48,11 +67,24 @@
       "password": "12345@teste",
       "enabled": true,
       "id": 4
+    },
+    {
+      "name": "Mario",
+      "email": "mario@gmail.com",
+      "password": "1234",
+      "enabled": true,
+      "id": 5
     }
   ],
   "inventory": [
     {
-      "supplier": null,
+      "supplier": {
+        "name": "Fornecedor 2",
+        "cnpj": "45454555445454",
+        "phone": "8888888888",
+        "enabled": true,
+        "id": 2
+      },
       "category": null,
       "price_per_unity": 20,
       "qty_product": 7,
@@ -63,6 +95,9 @@
       "id": 1
     },
     {
+      "enabled": true,
+      "stock_value": 4,
+      "id": 2,
       "supplier": {
         "name": "Fornecedor 1",
         "cnpj": "11225555555555",
@@ -76,19 +111,43 @@
         "id": 1
       },
       "price_per_unity": 1,
-      "qty_product": 5,
+      "qty_product": 4,
       "description": "Produto 2",
-      "title": "Produto 2",
-      "enabled": true,
-      "stock_value": 5,
-      "id": 2
+      "title": "Produto 2"
+    },
+    {
+      "supplier": {
+        "id": 1,
+        "name": "Fornecedor 1",
+        "cnpj": "11111111111111",
+        "phone": "4866666666",
+        "enabled": true
+      },
+      "category": {
+        "description": "Categoria 3",
+        "enabled": true,
+        "id": 3
+      },
+      "price_per_unity": 2,
+      "qty_product": 2,
+      "description": "produto 4",
+      "title": "Produto 4",
+      "enabled": false,
+      "stock_value": 4,
+      "id": 3
     }
   ],
   "movement": [
     {
       "id": 1,
       "inventory": {
-        "supplier": null,
+        "supplier": {
+          "name": "Fornecedor 2",
+          "cnpj": "45454555445454",
+          "phone": "8888888888",
+          "enabled": true,
+          "id": 2
+        },
         "category": null,
         "price_per_unity": 20,
         "qty_product": 7,
@@ -99,17 +158,17 @@
         "id": 1
       },
       "user": {
-        "id": "2",
+        "id": 2,
         "name": "Lucas Rosa",
         "email": "lucas@gmail.com",
         "password": "1234@teste",
         "enabled": true,
-        "expire": 1760662855639
+        "expire": 1760668353882
       },
       "quantity": 5,
       "value": 0,
       "price_at_time": 0,
-      "date": "2025-10-16T22:41:23.496Z"
+      "date": "2025-10-17T00:15:23.202Z"
     },
     {
       "inventory": {
@@ -146,6 +205,42 @@
       "price_at_time": 1,
       "date": "2025-10-16T22:41:40.693Z",
       "id": 2
+    },
+    {
+      "id": 3,
+      "inventory": {
+        "enabled": true,
+        "stock_value": 10,
+        "id": 2,
+        "supplier": {
+          "name": "Fornecedor 1",
+          "cnpj": "11225555555555",
+          "phone": "4866666666",
+          "enabled": true,
+          "id": 1
+        },
+        "category": {
+          "description": "Categoria 1",
+          "enabled": true,
+          "id": 1
+        },
+        "price_per_unity": 1,
+        "qty_product": 10,
+        "description": "Produto 2",
+        "title": "Produto 2"
+      },
+      "user": {
+        "id": 2,
+        "name": "Lucas Rosa",
+        "email": "lucas@gmail.com",
+        "password": "1234@teste",
+        "enabled": true,
+        "expire": 1760664265944
+      },
+      "quantity": 4,
+      "value": 0,
+      "price_at_time": 0,
+      "date": "2025-10-16T23:02:53.089Z"
     }
   ],
   "reminders": []

@@ -11,10 +11,10 @@ import { FormInput } from '@/components/FormInput';
 import ComboBoxForm from '@/components/ComboBoxForm';
 import { globalStyles } from '@/styles/globalStyles';
 import { useAppDispatch } from '@/store/hooks';
-import { initCategories, selectCategoriesEnabled } from '@/store/features/categorySlice';
+import { initCategories, selectCategories } from '@/store/features/categorySlice';
 import { useSelector } from 'react-redux';
-import { initSuppliers, selectSuppliersEnabled } from '@/store/features/supplierSlice';
-import { addInventory } from '@/store/features/inventorySlice';
+import { initSuppliers, selectSuppliers } from '@/store/features/supplierSlice';
+import { addInventory, selectInventoryError } from '@/store/features/inventorySlice';
 import useTheme from '@/contexts/ThemeContext';
 
 const schema = yup.object().shape({
@@ -33,7 +33,9 @@ const schema = yup.object().shape({
   category: yup
     .object({
         id:yup.number().required(),
+        title: yup.string().required(),
         description: yup.string().required(),
+        color: yup.string().required(),
         enabled:yup.boolean().required()
     })
     .required("selecione uma categoria")
@@ -44,6 +46,7 @@ const schema = yup.object().shape({
         name:yup.string().required(),
         cnpj:yup.string().required(),
         phone:yup.string().required(),
+        cep:yup.string().required(),
         enabled:yup.boolean().required()
     })
     .required("selecione um fonecedor")
@@ -51,11 +54,13 @@ const schema = yup.object().shape({
 });
 
 const PageTarefasId: React.FC = () => {
-  const categories = useSelector(selectCategoriesEnabled);
-  const suppliers = useSelector(selectSuppliersEnabled);
+  const categories = useSelector(selectCategories);
+  const suppliers = useSelector(selectSuppliers);
   const [dialogVisible, setDialogVisible] = useState(false);
   const [dialogTitle, setDialogTitle] = useState('');
   const [dialogText, setDialogText] = useState('');
+  const [isError, setIsError] = useState(false);
+  const error = useSelector(selectInventoryError);
   const dispatch = useAppDispatch();
   const { theme } = useTheme();
 
@@ -89,25 +94,29 @@ const PageTarefasId: React.FC = () => {
     try {
       await dispatch(addInventory(data)).unwrap();
       setDialogTitle('Sucesso');
-      setDialogText('Inventório cadastrado com sucesso!');
+      setDialogText('Item cadastrado com sucesso!');
       reset();
     } catch (error: any) {
-      setDialogTitle('Erro');
-      setDialogText(error?.message || 'Erro ao cadastrar inventório');
+      setIsError(true);
     }
     showDialog();
   };
 
   useEffect(() => {
-      if (!categories[0]) {
-        dispatch(initCategories());
-      }
-
-      if (!suppliers[0]) {
-        dispatch(initSuppliers());
-      }
+      dispatch(initCategories({title: "", description: "", enabled: true}));
+      dispatch(initSuppliers({name: "", cnpj: "", enabled: true}));
   }, [dispatch]);
-  
+
+  useEffect(() => {
+
+    if (isError) {
+      setDialogTitle('Erro');
+      setDialogText(error  || 'Erro ao cadastrar item');
+      showDialog();
+      setIsError(false); 
+    }
+
+  }, [error, isError]);
 
   return (
     <View style={globalStyles.container}>

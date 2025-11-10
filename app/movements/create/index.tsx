@@ -12,8 +12,8 @@ import ComboBoxForm from "@/components/ComboBoxForm";
 import { useAppDispatch } from "@/store/hooks";
 import { useSelector } from "react-redux";
 import { selectUserLogged } from "@/store/features/userSlice";
-import { editInventory, initInventorys, selectInventorys, selectInventorysEnabled } from "@/store/features/inventorySlice";
-import { addMovement } from "@/store/features/movementSlice";
+import { initInventorys, selectInventorys } from "@/store/features/inventorySlice";
+import { addMovement, selectMovementError } from "@/store/features/movementSlice";
 import { globalStyles } from "@/styles/globalStyles";
 import useTheme from "@/contexts/ThemeContext";
 
@@ -23,7 +23,7 @@ const schema = yup.object().shape({
         id:yup.number().required(),
         title: yup.string().required(),
     })
-    .required("selecione um produto")
+    .required("selecione um item")
     .nullable(),
     operation: yup
     .object({
@@ -44,10 +44,11 @@ const schema = yup.object().shape({
 
 const CreateMovements: React.FC = () => {
     const userLogged = useSelector(selectUserLogged);
-    const inventorys_all = useSelector(selectInventorys);
-    const inventorys = useSelector(selectInventorysEnabled);
+    const inventorys = useSelector(selectInventorys);
     const dispatch = useAppDispatch();
     const { theme } = useTheme();
+    const error = useSelector(selectMovementError);
+    const [isError, setIsError] = useState(false);
 
     const [dialogVisible, setDialogVisible] = useState(false);
     const [dialogTitle, setDialogTitle] = useState('');
@@ -84,80 +85,59 @@ const CreateMovements: React.FC = () => {
     const quantity = watch('quantity');
     const inventorySel = watch('inventory');
     const operationSel = watch("operation");
+      
+    const onSubmit = async (data: MovementsFormType) => {
+
+        if (!data.inventory) {
+            setDialogTitle('Erro');
+            setDialogText('Item deve ser informado!'); 
+            showDialog();
+            return;
+        }
+
+        const newData: MovementForm = {
+            inventory: data.inventory,
+            user: userLogged,
+            quantity: data.operation?.id === 2 ? data.quantity * -1 : data.quantity,
+            movement_value: 0,
+            price_at_time: 0,
+        }
+
+        try {
+            await dispatch(addMovement(newData)).unwrap();
+            setDialogTitle('Sucesso');
+            setDialogText('Movimentação cadastrada com sucesso!');
+            showDialog();
+        reset();
+            } catch (error: any) {
+            setIsError(true);
+        }
+    };
 
     useEffect(() => {
-        const inventory = inventorys_all.find(i => i.id === inventorySel?.id);
+        const inventory = inventorys.find(i => i.id === inventorySel?.id);
 
         if (inventory){
             setValue('qty_product', inventory.qty_product);
             setValue('price_per_unity', inventory.price_per_unity);
             setValue('value', inventory.price_per_unity * quantity);
         }
-    }, [quantity, inventorySel, operationSel, setValue, inventorys_all]);
+    }, [quantity, inventorySel, operationSel, setValue, inventorys]);
 
     useEffect(() => {
-        if (!inventorys[0]) {
-            dispatch(initInventorys());
-        }
+        dispatch(initInventorys({title: '', description: '', enabled: true}));
     }, [dispatch]);
-      
-    const onSubmit = async (data: MovementsFormType) => {
 
-        const inventory_data_original = inventorys_all.find(i => i.id === inventorySel?.id) || null;
-        const user = userLogged ? userLogged : null;
+    useEffect(() => {
 
-        const newData: MovementForm = {
-            inventory: inventory_data_original,
-            user: user || null,
-            quantity: data.operation?.id === 2 ? data.quantity * -1 : data.quantity,
-            value: 0,
-            price_at_time: 0,
-            date: new Date(),
-        }
-
-        const inventory_data = inventory_data_original ? {...inventory_data_original} : null;
-
-        if (!inventory_data) {
-            setDialogTitle('Erro');
-            setDialogText('Produto inexistente!'); 
-            showDialog();
-            return;
-        }
-
-        if ((newData.quantity < 0) && (inventory_data.qty_product < Math.abs(newData.quantity))) {
-            setDialogTitle('Erro');
-            setDialogText('Não há estoque suficiente para efetuar a saída deste produto');
-            showDialog();
-            return;
-        }
-
-        inventory_data.qty_product += newData.quantity;
-        inventory_data.stock_value = inventory_data.qty_product * inventory_data.price_per_unity;
-        
-        try {
-            await dispatch(editInventory(inventory_data)).unwrap();
-        } catch (error: any) {
-            setDialogTitle('Erro');
-            setDialogText(error?.message || 'Erro ao alterar inventório');
-            showDialog();
-            return;
-        }
-
-        newData.value = inventory_data.price_per_unity * Math.abs(newData.quantity);
-        newData.price_at_time = inventory_data.price_per_unity;
-        newData.inventory = inventory_data;
-
-        try {
-            await dispatch(addMovement(newData)).unwrap();
-            setDialogTitle('Sucesso');
-            setDialogText('Movimentação cadastrada com sucesso!');
-        reset();
-            } catch (error: any) {
-            setDialogTitle('Erro');
-            setDialogText(error?.message || 'Erro ao cadastrar movimentação');
-        }
+      if (isError) {
+        setDialogTitle('Erro');
+        setDialogText(error  || 'Erro ao cadastrar movimentação');
         showDialog();
-    };
+        setIsError(false);
+      }
+
+    }, [error, isError]);
 
 
     return (
@@ -177,7 +157,7 @@ const CreateMovements: React.FC = () => {
                 data={inventorys}
                 control={control}
                 name="inventory"
-                label="Produto"
+                label="Item"
                 displayKey={'title'}
                 errors={errors}
             />

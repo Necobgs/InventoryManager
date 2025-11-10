@@ -11,11 +11,12 @@ import * as yup from 'yup';
 import { FormInput } from "@/components/FormInput";
 import { useAppDispatch } from "@/store/hooks";
 import { useSelector } from "react-redux";
-import { selectSuppliers, selectSupplierError, selectSupplierLoading, initSuppliers} from '../../store/features/supplierSlice'
-import { SupplierInterface } from "@/interfaces/SupplierInterface";
+import { selectSuppliers, selectSupplierErrorGet, selectSupplierLoading, initSuppliers} from '../../store/features/supplierSlice'
+import { SupplierFilter } from "@/interfaces/SupplierInterface";
 import { globalStyles } from '../../styles/globalStyles';
 import { FormMaskedInput } from "@/components/FormMaskedInput";
 import useTheme from "@/contexts/ThemeContext";
+import { formatCep, formatCnpj, formatPhone } from "@/utils/format";
 
 const schema = yup.object().shape({
     name: yup
@@ -30,9 +31,8 @@ export default function tabSupplier() {
     const [enabled, setEnabled] = useState(true);
     const router = useRouter();
     const suppliers = useSelector(selectSuppliers);
-    const error = useSelector(selectSupplierError);
+    const errorGet = useSelector(selectSupplierErrorGet);
     const loading = useSelector(selectSupplierLoading);
-    const [filteredSuppliers, setFilteredSuppliers] = useState<SupplierInterface[]>([]);
     const dispatch = useAppDispatch();
     const { theme } = useTheme();
 
@@ -40,7 +40,7 @@ export default function tabSupplier() {
         control,
         watch,
         formState: { isDirty },
-    } = useForm<{name: string, cnpj: string}>({
+    } = useForm<SupplierFilter>({
         defaultValues: {
             name: "",
             cnpj: ""
@@ -52,16 +52,8 @@ export default function tabSupplier() {
     const cnpj = watch("cnpj");
     
     useEffect(() => {
-        dispatch(initSuppliers());
-    }, [dispatch]);
-
-    useEffect(() => {
-        setFilteredSuppliers(
-            suppliers.filter((supplier)=> supplier["enabled"] == enabled && 
-            supplier["cnpj"] == (!cnpj ? supplier["cnpj"] : cnpj) &&
-            supplier["name"].toLocaleLowerCase().includes(name.trim().toLocaleLowerCase()))
-        );
-    },[enabled,name,cnpj,suppliers]);
+        dispatch(initSuppliers({name, cnpj, enabled}));
+    }, [dispatch, name, cnpj, enabled]);
 
     return (
         <SafeAreaProvider>
@@ -94,12 +86,23 @@ export default function tabSupplier() {
             </View>
 
             <SafeAreaView style={{flex:1}}>
-                {!filteredSuppliers[0] || error ? 
-                <Text style={globalStyles.msg_empty_list}>{error ? error : `Nenhum fornecedor ${enabled ? "Ativo" : "Inativo"}`}</Text> 
+                {!suppliers.filter((supplier) => supplier.enabled === enabled)[0] || errorGet ? 
+                <Text style={globalStyles.msg_empty_list}>{errorGet ? errorGet : `Nenhum fornecedor ${enabled ? "ativo" : "inativo"}`}</Text> 
                 : 
                 <FlatList
-                    data={filteredSuppliers}
-                    renderItem={({item})=><GenericCard key={item.id} title={`Id: ${item.id.toString()}`} description={item.name} navigateURL={`/supplier/edit/${item.id}`}/>}
+                    data={suppliers.filter((supplier) => supplier.enabled === enabled)}
+                    renderItem={({item})=>
+                        <GenericCard 
+                            key={item.id} 
+                            title={`${item.id} - ${item.name}`} 
+                            description={[
+                                `CPNJ: ${formatCnpj(item.cnpj)}`, 
+                                `Telefone: ${formatPhone(item.phone)}`, 
+                                `CEP: ${formatCep(item.cep)}`
+                            ]} 
+                            navigateURL={`/supplier/edit/${item.id}`}
+                        />
+                    }
                     keyExtractor={(item)=>item.id.toString()}
                     style={globalStyles.list_items}
                     scrollEnabled={true}

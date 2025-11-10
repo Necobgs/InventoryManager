@@ -1,14 +1,27 @@
-import axios from "axios";
-import { CategoryForm, CategoryInterface } from "@/interfaces/CategoryInterface";
+import axios, { InternalAxiosRequestConfig } from "axios";
+import { CategoryFilter, CategoryForm, CategoryInterface } from "@/interfaces/CategoryInterface";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const api = axios.create({
-    baseURL: 'http://localhost:3000/'
+    baseURL: 'http://localhost:3001/'
 });
+
+api.interceptors.request.use(
+  async (config: InternalAxiosRequestConfig): Promise<InternalAxiosRequestConfig> => {
+    const token = await AsyncStorage.getItem("token");
+    if (token) {
+      config.headers.set("Authorization", `Bearer ${token}`);
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
 
 const endpoint = 'category';
 
-const getCategories = async (): Promise<CategoryInterface[]> => {
-    const response = await api.get(endpoint);
+const getCategories = async (filters: CategoryFilter): Promise<CategoryInterface[]> => {
+    const response = await api.get(`${endpoint}?filter={${filters.title ? `"title": { "$ilike": "%${filters.title}%" },` : ""} ${filters.description ? `"description": { "$ilike": "%${filters.description}%" },` : ""} ${filters.enabled != undefined ? `"enabled": ${filters.enabled}` : ""}}`);
+    console.log(response, filters);
     return response.data as CategoryInterface[];
 }
 
@@ -18,7 +31,7 @@ const addCategory = async (newCategory: CategoryForm): Promise<CategoryInterface
 }
 
 const editCategory = async (dataCategory: CategoryInterface): Promise<CategoryInterface> => {
-    const response = await api.put(`${endpoint}/${dataCategory.id}`, dataCategory);
+    const response = await api.patch(`${endpoint}/${dataCategory.id}`, dataCategory);
     return response.data as CategoryInterface;
 }
 

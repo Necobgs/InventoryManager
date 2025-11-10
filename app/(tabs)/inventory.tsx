@@ -10,13 +10,17 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import { FormInput } from "@/components/FormInput";
 import { useSelector } from "react-redux";
-import { initInventorys, selectInventoryError, selectInventoryLoading, selectInventorys } from "@/store/features/inventorySlice";
-import InventoryInterface from "@/interfaces/InventoryInterface";
+import { initInventorys, selectInventoryErrorGet, selectInventoryLoading, selectInventorys } from "@/store/features/inventorySlice";
+import { InventoryFilter } from "@/interfaces/InventoryInterface";
 import { useAppDispatch } from "@/store/hooks";
 import { globalStyles } from "@/styles/globalStyles";
 import useTheme from "@/contexts/ThemeContext";
+import { formatCurrency } from "@/common/FormatCurrency";
 
 const schema = yup.object().shape({
+    title: yup
+    .string()
+    .required(),
     description: yup
     .string()
     .required(),
@@ -26,9 +30,8 @@ export default function TabInventorys(){
     const [enabled, setEnabled] = useState(true);
     const router = useRouter();
     const inventorys = useSelector(selectInventorys);
-    const error = useSelector(selectInventoryError);
+    const errorGet = useSelector(selectInventoryErrorGet);
     const loading = useSelector(selectInventoryLoading);
-    const [filteredInventorys, setFilteredInventorys] = useState<InventoryInterface[]>([]);
     const dispatch = useAppDispatch();
     const { theme } = useTheme();
 
@@ -36,25 +39,20 @@ export default function TabInventorys(){
         control,
         watch,
         formState: { isDirty },
-    } = useForm<{description: string}>({
+    } = useForm<InventoryFilter>({
         defaultValues: {
+            title: "",
             description: ""
         },
         resolver: yupResolver(schema),
     });
 
+    const title = watch("title");
     const description = watch("description");
 
     useEffect(() => {
-        dispatch(initInventorys());
-    }, [dispatch]);
-
-    useEffect(() => {
-        setFilteredInventorys(
-            inventorys.filter((inventory)=> inventory["enabled"] == enabled && 
-            inventory["description"].toLocaleLowerCase().includes(description.trim().toLocaleLowerCase()))
-        );
-    },[enabled,description,inventorys]);
+        dispatch(initInventorys({title, description, enabled}));
+    }, [dispatch, title, description, enabled]);
     
     return (
         <SafeAreaProvider>
@@ -69,7 +67,15 @@ export default function TabInventorys(){
                 <Button mode={enabled ? 'outlined' : 'contained'} style={globalStyles.button} onPress={() => {setEnabled(false)}}>Inativos</Button>
             </View>
 
-            <View style={globalStyles.areaFilters}>
+            <View style={{...globalStyles.areaFilters, borderBottomWidth: 0, paddingBottom: 0}}>
+                <FormInput
+                    control={control}
+                    name="title"
+                    label="Título"
+                />
+            </View>
+
+            <View style={{...globalStyles.areaFilters, paddingTop: 0}}>
                 <FormInput
                     control={control}
                     name="description"
@@ -78,12 +84,26 @@ export default function TabInventorys(){
             </View>
 
             <SafeAreaView style={{flex:1}}>
-                {!filteredInventorys[0] || error ? 
-                <Text style={globalStyles.msg_empty_list}>{ error ? error : `Nenhum item ${enabled ? "ativo" : "inativo"}` }</Text> 
+                {!inventorys.filter((inventory) => inventory.enabled === enabled)[0] || errorGet ? 
+                <Text style={globalStyles.msg_empty_list}>{ errorGet ? errorGet : `Nenhum item ${enabled ? "ativo" : "inativo"}` }</Text> 
                 : 
                 <FlatList
-                    data={filteredInventorys}
-                    renderItem={({item})=><GenericCard key={item.id} title={`Id: ${item.id.toString()}`} description={item.description} navigateURL={`/inventory/edit/${item.id}`}/>}
+                    data={inventorys.filter((inventory) => inventory.enabled === enabled)}
+                    renderItem={({item})=>
+                        <GenericCard 
+                            key={item.id} 
+                            title={`${item.id} - ${item.title}`} 
+                            description={[
+                                item.description, 
+                                `Categoria: ${item.category?.title}`, 
+                                `Fornecedor: ${item.supplier?.name}`, 
+                                `Quantidade: ${item.qty_product}`, 
+                                `Preço Unitário: ${formatCurrency(item.price_per_unity)}`, 
+                                `Valor em estoque: ${formatCurrency(item.stock_value)}`
+                            ]} 
+                            navigateURL={`/inventory/edit/${item.id}`}
+                        />
+                    }
                     keyExtractor={(item)=>item.id.toString()}
                     style={globalStyles.list_items}
                     scrollEnabled={true}

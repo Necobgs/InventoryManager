@@ -2,7 +2,7 @@ import GenericCard from "@/components/GenericCard";
 import { Text, View } from "@/components/Themed";
 import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
-import { FlatList, StyleSheet } from "react-native";
+import { FlatList } from "react-native";
 import { ActivityIndicator, AnimatedFAB, Button } from "react-native-paper";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { useForm } from 'react-hook-form';
@@ -10,11 +10,12 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import { FormInput } from "@/components/FormInput";
 import { useSelector } from "react-redux";
-import { UserInterface } from "@/interfaces/UserInterface";
-import { initUsers, selectUserError, selectUserLoading, selectUsers } from "@/store/features/userSlice";
+import { UserFilter } from "@/interfaces/UserInterface";
+import { initUsers, selectUserErrorGet, selectUserLoading, selectUsers } from "@/store/features/userSlice";
 import { useAppDispatch } from "@/store/hooks";
 import { globalStyles } from "@/styles/globalStyles";
 import useTheme from "@/contexts/ThemeContext";
+import { formatCep, formatPhone } from "@/utils/format";
 
 const schema = yup.object().shape({
     name: yup
@@ -29,9 +30,8 @@ export default function tabUser() {
     const router = useRouter();
     const [enabled, setEnabled] = useState(true);
     const users = useSelector(selectUsers);
-    const error = useSelector(selectUserError);
+    const errorGet = useSelector(selectUserErrorGet);
     const loading = useSelector(selectUserLoading);
-    const [filteredUsers, setFilteredUsers] = useState<UserInterface[]>([]);
     const dispatch = useAppDispatch();
     const { theme } = useTheme();
 
@@ -39,7 +39,7 @@ export default function tabUser() {
         control,
         watch,
         formState: { isDirty },
-    } = useForm<{name: string, email: string}>({
+    } = useForm<UserFilter>({
         defaultValues: {
             name: "",
             email: ""
@@ -51,15 +51,8 @@ export default function tabUser() {
     const email = watch("email");
 
     useEffect(() => {
-        dispatch(initUsers());
-    }, [dispatch]);
-
-    useEffect(() => {
-        setFilteredUsers(
-            users.filter((user)=> user["enabled"] == enabled &&
-            user["email"].startsWith(email) && user["name"].toLocaleLowerCase().includes(name.trim().toLocaleLowerCase()))
-        );
-    },[enabled,name,email,users]);
+        dispatch(initUsers({name, email, enabled}));
+    }, [dispatch, name, email, enabled]);
 
     return (
         <SafeAreaProvider>
@@ -91,12 +84,23 @@ export default function tabUser() {
             </View>
 
             <SafeAreaView style={{flex:1}}>
-                {!filteredUsers[0] || error ? 
-                <Text style={globalStyles.msg_empty_list}>{error ? error : `Nenhum usuário ${enabled ? "Ativo" : "Inativo"}`}</Text> 
+                {!users.filter((user) => user.enabled === enabled)[0] || errorGet ? 
+                <Text style={globalStyles.msg_empty_list}>{errorGet ? errorGet : `Nenhum usuário ${enabled ? "ativo" : "inativo"}`}</Text> 
                 : 
                 <FlatList
-                    data={filteredUsers}
-                    renderItem={({item})=><GenericCard key={item.id} title={`Id: ${item.id.toString()}`} description={item.name} navigateURL={`/user/edit/${item.id}`}/>}
+                    data={users.filter((user) => user.enabled === enabled)}
+                    renderItem={({item})=>
+                        <GenericCard 
+                            key={item.id} 
+                            title={`${item.id} - ${item.name}`} 
+                            description={[
+                                `Email: ${item.email}`,
+                                `Telefone: ${formatPhone(item.phone)}`, 
+                                `CEP: ${formatCep(item.cep)}`
+                            ]} 
+                            navigateURL={`/user/edit/${item.id}`}
+                        />
+                    }
                     keyExtractor={(item)=>item.id.toString()}
                     style={globalStyles.list_items}
                     scrollEnabled={true}

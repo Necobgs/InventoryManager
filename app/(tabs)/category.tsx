@@ -9,14 +9,17 @@ import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import { FormInput } from "@/components/FormInput";
-import { initCategories, selectCategories, selectCategoryError, selectCategoryLoading } from "@/store/features/categorySlice";
+import { initCategories, selectCategories, selectCategoryErrorGet, selectCategoryLoading } from "@/store/features/categorySlice";
 import { useSelector } from "react-redux";
-import { CategoryInterface } from "@/interfaces/CategoryInterface";
+import { CategoryFilter } from "@/interfaces/CategoryInterface";
 import { useAppDispatch } from "@/store/hooks";
 import { globalStyles } from "@/styles/globalStyles";
 import useTheme from "@/contexts/ThemeContext";
 
 const schema = yup.object().shape({
+    title: yup
+    .string()
+    .required(),
     description: yup
     .string()
     .required(),
@@ -26,9 +29,8 @@ export default function TabCategory(){
     const [enabled, setEnabled] = useState(true);
     const router = useRouter();
     const categories = useSelector(selectCategories);
-    const error = useSelector(selectCategoryError);
+    const errorGet = useSelector(selectCategoryErrorGet);
     const loading = useSelector(selectCategoryLoading);
-    const [filteredCategories, setFilteredCategories] = useState<CategoryInterface[]>([]);
     const dispatch = useAppDispatch();
     const { theme } = useTheme();
 
@@ -36,23 +38,20 @@ export default function TabCategory(){
         control,
         watch,
         formState: { isDirty },
-    } = useForm<{description: string}>({
+    } = useForm<CategoryFilter>({
         defaultValues: {
+            title: "",
             description: ""
         },
         resolver: yupResolver(schema),
     });
 
+    const title = watch("title");
     const description = watch("description");
 
     useEffect(() => {
-        dispatch(initCategories());
-    }, [dispatch]);
-
-    useEffect(() => {
-        setFilteredCategories(categories.filter((category)=> category["enabled"] == enabled && 
-        category["description"].toLocaleLowerCase().includes(description.trim().toLocaleLowerCase())));
-    },[enabled,description,categories]);
+        dispatch(initCategories({title, description, enabled}));
+    }, [dispatch, title, description, enabled]);
 
     return (
         <SafeAreaProvider>
@@ -67,7 +66,15 @@ export default function TabCategory(){
                 <Button mode={enabled ? 'outlined' : 'contained'} style={globalStyles.button} onPress={() => {setEnabled(false)}}>Inativas</Button>
             </View>
 
-            <View style={globalStyles.areaFilters}>
+            <View style={{...globalStyles.areaFilters, borderBottomWidth: 0, paddingBottom: 0}}>
+                <FormInput
+                    control={control}
+                    name="title"
+                    label="Título"
+                />
+            </View>
+
+            <View style={{...globalStyles.areaFilters, paddingTop: 0}}>
                 <FormInput
                     control={control}
                     name="description"
@@ -76,12 +83,20 @@ export default function TabCategory(){
             </View>
 
             <SafeAreaView style={{flex:1}}>
-                {!filteredCategories[0] || error? 
-                <Text style={globalStyles.msg_empty_list}>{error ? error : `Nenhuma categoria  ${enabled ? "ativa" : "inativa"}`} encontrada</Text> 
+                {!categories.filter((categorie) => categorie.enabled === enabled)[0] || errorGet? 
+                <Text style={globalStyles.msg_empty_list}>{errorGet ? errorGet : `Nenhuma categoria ${enabled ? "ativa" : "inativa"} encontrada`}</Text> 
                 : 
                 <FlatList
-                    data={filteredCategories}
-                    renderItem={({item})=><GenericCard key={item.id} title={`Id: ${item.id.toString()}`} description={item.description} navigateURL={`/category/edit/${item.id}`}/>}
+                    data={categories.filter((categorie) => categorie.enabled === enabled)}
+                    renderItem={({item})=>
+                        <GenericCard 
+                            key={item.id} 
+                            title={`${item.id} - ${item.title}`} 
+                            description={[item.description]} 
+                            colorField={item.color} 
+                            navigateURL={`/category/edit/${item.id}`}
+                        />
+                    }
                     keyExtractor={(item)=>item.id.toString()}
                     style={globalStyles.list_items}
                     scrollEnabled={true}

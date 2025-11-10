@@ -59,9 +59,7 @@ export default function TabOneScreen() {
   }
 
   useEffect(() => {
-      if (!inventorys[0]) {
-          dispatch(initInventorys());
-      }
+      dispatch(initInventorys({title: '', description: '', enabled: true}));
   }, [dispatch]);
 
   return (
@@ -72,7 +70,7 @@ export default function TabOneScreen() {
       </View>
       {inventorys[0] 
       ? <Charts/>
-      : <Text style={styles.title}>Olá! Seja bem-vindo(a), {userLogged?.name}</Text>}
+      : <Text style={{...styles.title, color: "rgb(103, 80, 164)"}}>Olá! Seja bem-vindo(a), {userLogged?.name}</Text>}
     </View>
   );
 }

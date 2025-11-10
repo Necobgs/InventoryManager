@@ -1,38 +1,69 @@
 
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import userService from "../../services/userService";
-import { UserForm, UserInterface } from "@/interfaces/UserInterface";
+import { UserFilter, UserForm, UserInterface } from "@/interfaces/UserInterface";
 import { UserLoggedInterface } from "@/interfaces/UserLoggedInterface";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import authService from "@/services/authService";
+import { LoginCredentials, LoginInterface } from "@/interfaces/LoginInterface";
 
 interface UserState {
     users: UserInterface[];
     userLogged: UserLoggedInterface | null;
     error: string | null;
+    errorGet: string | null;
     loading: boolean;
+    token: string,
 }
 
-export const loginUser = createAsyncThunk('user/login', async ({ email, password }: { email: string, password: string }) => {
-  return await userService.login(email, password);
+export const initUsers = createAsyncThunk('user/fetch', async (filters: UserFilter) => {
+    return await userService.getUsers(filters);
 });
 
-export const initUsers = createAsyncThunk('user/fetch', async () => {
-    return await userService.getUsers();
+export const addUser = createAsyncThunk('user/add', async (payload: UserForm, { rejectWithValue }) => {
+    try {
+        return await userService.addUser(payload);
+    } catch (error: any) {
+        return rejectWithValue(error.response?.data?.message || 'Erro ao castastrar usuário');
+    }
 });
 
-export const addUser = createAsyncThunk('user/add', async (payload: UserForm) => {
-    return await userService.addUser(payload);
+export const editUser = createAsyncThunk('user/edit', async (payload: UserInterface, { rejectWithValue }) => {
+    try {
+        return await userService.editUser({ ...payload });
+    } catch (error: any) {
+        console.log(error)
+        return rejectWithValue(error.response?.data?.message || 'Erro ao alterar usuário');
+    }
 });
 
-export const editUser = createAsyncThunk('user/edit', async (payload: UserInterface) => {
-    return await userService.editUser({ ...payload });
+export const removeUser = createAsyncThunk('user/remove', async (payload: UserInterface, { rejectWithValue }) => {
+    try {
+        const response = await userService.removeUser(payload);
+        return response;
+    } catch (error: any) {
+        return rejectWithValue(error.response?.data?.message || 'Erro ao remover usuário');
+    }
 });
 
-export const removeUser = createAsyncThunk('user/remove', async (payload: UserInterface) => {
-    const response = await userService.removeUser(payload);
-    return response;
+export const validateTokenUser = createAsyncThunk('user/validateToken', async (_, { rejectWithValue }) => {
+    try {
+        const response = await userService.validateToken();
+        return response;
+    } catch (error: any) {
+        localStorage.removeItem('token');
+        return rejectWithValue(error.response?.data?.message || 'Erro ao validar token');
+    }
 });
 
+export const loginUser = createAsyncThunk('user/login', async (credentials: LoginCredentials, { rejectWithValue }) => {
+    try {
+        const response = await authService.login(credentials);
+        return response;
+    } catch (error: any) {
+        return rejectWithValue(error.response?.data?.message || 'Erro no login');
+    }
+});
 export const logoutUser = createAsyncThunk('user/logout', async () => {
     await AsyncStorage.removeItem("userLogged");
     return null;
@@ -42,7 +73,9 @@ const initialState: UserState = {
     users: [],
     userLogged: null,
     error: null,
+    errorGet: null,
     loading: false,
+    token: ""
 };
 
 const userSlice = createSlice({
@@ -51,6 +84,7 @@ const userSlice = createSlice({
     reducers: {
       removeAllUsers(state) {
         state.users = [];
+        state.token = "";
         state.userLogged = null;
         state.error = null;
         state.loading = false;
@@ -68,7 +102,7 @@ const userSlice = createSlice({
                 state.error = null;
             })
             .addCase(initUsers.rejected, (state) => {
-                state.error = "Erro ao carregar lista";
+                state.errorGet = "Erro ao carregar lista de usuários";
                 state.loading = false;
                 state.users = [];
             })
@@ -76,8 +110,8 @@ const userSlice = createSlice({
                 state.users.push(action.payload);
                 state.error = null;
             })
-            .addCase(addUser.rejected, (state) => {
-                state.error = "Erro ao adicionar usuário";
+            .addCase(addUser.rejected, (state, action) => {
+                state.error = action.payload as string;
             })
             .addCase(removeUser.pending, (state) => {
                 state.loading = true;
@@ -87,28 +121,50 @@ const userSlice = createSlice({
                 state.error = null;
                 state.loading = false;
             })
-            .addCase(removeUser.rejected, (state) => {
-                state.error = "Erro ao remover registro";
+            .addCase(removeUser.rejected, (state, action) => {
+                state.error = action.payload as string;
                 state.loading = false;
             })
             .addCase(editUser.fulfilled, (state, action: PayloadAction<UserInterface>) => {
                 state.users = state.users.map((t) => (t.id === action.payload.id ? action.payload : t));
                 state.error = null;
             })
-            .addCase(editUser.rejected, (state) => {
-                state.error = "Erro ao editar usuário";
+            .addCase(editUser.rejected, (state, action) => {
+                state.error = action.payload as string;
             })
-            .addCase(loginUser.fulfilled, (state, action: PayloadAction<UserLoggedInterface | null>) => {
-              state.userLogged = action.payload;
-              state.error = null;
+            .addCase(validateTokenUser.pending, (state) => {
+                state.loading = true;
+                state.error = null;
             })
-            .addCase(loginUser.rejected, (state) => {
-              console.log("rejected")
+            .addCase(validateTokenUser.fulfilled, (state, action: PayloadAction<{user: UserInterface, access_token: string}>) => {
+                state.token = action.payload.access_token;
+                state.userLogged = action.payload.user;
+                state.loading = false;
+                state.error = null;
+            })
+            .addCase(validateTokenUser.rejected, (state, action) => {
+                state.error = action.payload as string;
+                state.loading = false;
+            })
+            .addCase(loginUser.fulfilled, (state, action: PayloadAction<LoginInterface>) => {
+                
+                const token = action.payload.access_token;
+                let arrayToken = token?.split('.');
+
+                if (arrayToken?.[1]) {
+                    state.token = token;
+                    state.error = null;
+
+                    const obj = JSON.parse(atob(arrayToken[1]));
+                    state.userLogged = {id: obj.id, name: obj.sub};
+                }
+            })
+            .addCase(loginUser.rejected, (state, action) => {
               state.userLogged = null;
-              state.error = "Usuário ou senha inválidos";
+              state.error = action.payload as string;
             })
             .addCase(logoutUser.fulfilled, (state, action: PayloadAction<null>) => {
-                state.userLogged = action.payload;
+                state.userLogged = null
             });
             
     },
@@ -118,6 +174,7 @@ const userSlice = createSlice({
 export const selectUsers = (state: { user: UserState }) => state.user.users;
 export const selectUserLogged = (state: { user: UserState }) => state.user.userLogged;
 export const selectUserError = (state: { user: UserState }) => state.user.error;
+export const selectUserErrorGet = (state: { user: UserState }) => state.user.errorGet;
 export const selectUserLoading = (state: { user: UserState }) => state.user.loading;
 
 export const { removeAllUsers } = userSlice.actions;

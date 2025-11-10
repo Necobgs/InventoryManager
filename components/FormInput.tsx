@@ -10,6 +10,7 @@ interface FormInputProps<T extends FieldValues> {
   control: Control<T>;
   name: Path<T>;
   label: string;
+  maxLength?: number;
   keyboardType?: 'default' | 'numeric' | 'email-address' | 'phone-pad';
   multiline?: boolean;
   disabled?: boolean;
@@ -25,6 +26,7 @@ export const FormInput = <T extends FieldValues>({
   control,
   name,
   label,
+  maxLength,
   keyboardType = 'default',
   multiline = false,
   disabled = false,
@@ -82,6 +84,7 @@ export const FormInput = <T extends FieldValues>({
             disabled={disabled}
             accessible
             accessibilityLabel={label}
+            maxLength={maxLength}
           />
         </>
       )}

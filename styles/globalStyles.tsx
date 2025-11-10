@@ -73,5 +73,13 @@ export const globalStyles = StyleSheet.create({
         borderRadius:10,
         gap:15,
         overflowY: 'auto',
+    },
+    areaColor: {
+        height: 30,
+        width: '100%',
+        borderRadius: 10,
+        borderColor: 'rgb(103, 80, 164)',
+        borderWidth: 2,
+        borderStyle: 'solid'
     }
 });

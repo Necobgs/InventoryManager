@@ -1,14 +1,20 @@
-import InventoryInterface from "./InventoryInterface";
-import { UserInterface } from "./UserInterface";
+import { InventoryPartial, InventoryPartialMovementFilter } from "./InventoryInterface";
+import { RootInterface } from "./RootInterface";
+import { UserLoggedInterface } from "./UserLoggedInterface";
 
-export interface MovementInterface {
-    id: number,
-    inventory: InventoryInterface | null,
-    user: UserInterface | null,
+export interface MovementInterface extends RootInterface {
+    inventory: InventoryPartial | null,
+    user: UserLoggedInterface | null,
     quantity: number,
-    value: number,
+    movement_value: number,
     price_at_time: number,
-    date: Date,
+}
+
+export interface MovementFilter {
+    inventory: InventoryPartialMovementFilter | null,
+    operation?: number
 }
 
 export type MovementForm =  Omit<MovementInterface, 'id'>;
+
+export type MovementPartial = Partial<MovementInterface>;

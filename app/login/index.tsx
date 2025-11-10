@@ -1,4 +1,4 @@
-import { LoginInterface } from "@/interfaces/LoginInterface";
+import { LoginCredentials } from "@/interfaces/LoginInterface";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from 'yup';
 import { useForm } from "react-hook-form";
@@ -10,13 +10,12 @@ import { useEffect, useState } from "react";
 import { FormInput } from "@/components/FormInput";
 import { useRouter } from "expo-router";
 import { useAppDispatch } from "@/store/hooks";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { loginUser } from "@/store/features/userSlice";
-import { UserLoggedInterface } from "@/interfaces/UserLoggedInterface";
+import { loginUser, selectUserError, selectUserLogged, validateTokenUser } from "@/store/features/userSlice";
 import useTheme from "@/contexts/ThemeContext";
+import { useSelector } from "react-redux";
 
 const schema = yup.object().shape({
-  email: yup.string().required('Nome é obrigatório'),
+  email: yup.string().required('Email é obrigatório'),
   password: yup.string().required('Senha é obrigatória'),
 });
 
@@ -29,38 +28,34 @@ const Login: React.FC = () => {
     const [dialogVisible, setDialogVisible] = useState(false);
     const [dialogTitle, setDialogTitle] = useState('');
     const [dialogText, setDialogText] = useState('');
-    const [errorMsg, setErrorMsg] = useState('');
+    const userLogged = useSelector(selectUserLogged);
+    const error = useSelector(selectUserError);
+    const [isError, setIsError] = useState(false);
 
     useEffect(() => {
       const checkSection = async () => {
-
-        const data_json = await AsyncStorage.getItem("userLogged");
-        const data : UserLoggedInterface | undefined = data_json ? JSON.parse(data_json) : undefined;
-
-        if (data) {
-
-          if (data.expire > Date.now()) {
-            try {
-              
-              let user = await dispatch(loginUser({ email: data.email, password: data.password })).unwrap();
-              
-              if (user) {
-                router.push('/');
-                reset();
-              }
-            } catch {}
-          }
-        }
+        try {
+          await dispatch(validateTokenUser());
+        } catch {}
       }
+
       checkSection();
-    }, []);
+    }, [dispatch]);
+
+
+    useEffect(() => {
+      console.log(userLogged)
+      if (userLogged) {
+        router.push("/");
+      }
+    }, [userLogged, router]);
 
     const {
         control,
         handleSubmit,
         reset,
         formState: { errors }
-    } = useForm<LoginInterface>({
+    } = useForm<LoginCredentials>({
             defaultValues: {
                 email: '',
                 password: ''
@@ -68,24 +63,24 @@ const Login: React.FC = () => {
             resolver: yupResolver(schema),
         });
 
-    const onSubmit = async (data: LoginInterface) => {
+    const onSubmit = async (data: LoginCredentials) => {
         try {
-            let user = await dispatch(loginUser({ email: data.email, password: data.password })).unwrap();
-            if (user) {
-              router.push('/');
-              reset();
-            }
-            else {
-              setDialogTitle('Erro');
-              setDialogText('Email ou Senha inválida');
-              setDialogVisible(true);
-            }
+            await dispatch(loginUser({ email: data.email, password: data.password })).unwrap();
         } catch (error) {
-            setDialogTitle('Erro');
-            setDialogText(error as string);
-            setDialogVisible(true);
+            setIsError(true);
         }
     }
+
+      useEffect(() => {
+    
+        if (isError) {
+          setDialogTitle('Erro');
+          setDialogText(error  || 'Erro ao cadastrar categoria');
+          setDialogVisible(true);
+          setIsError(false); 
+        }
+    
+      }, [error, isError]);
 
     return (
         <View style={styles.container}>
@@ -107,7 +102,6 @@ const Login: React.FC = () => {
             <Button style={styles.button} mode="contained" onPress={handleSubmit(onSubmit)}>
                 Entrar
             </Button>
-            {errorMsg ? <Text style={styles.dialogError}>{errorMsg}</Text> : null}
 
             <DefaultDialog
                 visible={dialogVisible}

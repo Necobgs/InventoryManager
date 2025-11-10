@@ -1,9 +1,9 @@
 import { Text, View } from '@/components/Themed';
 import useTheme from '@/contexts/ThemeContext';
-import { initCategories, selectCategoriesEnabled } from '@/store/features/categorySlice';
-import { initInventorys, selectInventorysEnabled } from '@/store/features/inventorySlice';
+import { initCategories, selectCategories } from '@/store/features/categorySlice';
+import { selectInventorys } from '@/store/features/inventorySlice';
 import { initMovements, selectMovements } from '@/store/features/movementSlice';
-import { initSuppliers, selectSuppliersEnabled } from '@/store/features/supplierSlice';
+import { initSuppliers, selectSuppliers } from '@/store/features/supplierSlice';
 import { useAppDispatch } from '@/store/hooks';
 import { useEffect } from 'react';
 import { StyleSheet } from 'react-native';
@@ -22,9 +22,9 @@ const colors = ['chartreuse','blue','crimson','mediumturquoise','seagreen','oran
 
 export default function Charts() {
     
-    const categories = useSelector(selectCategoriesEnabled);
-    const suppliers = useSelector(selectSuppliersEnabled);
-    const inventorys = useSelector(selectInventorysEnabled);
+    const categories = useSelector(selectCategories);
+    const suppliers = useSelector(selectSuppliers);
+    const inventorys = useSelector(selectInventorys);
     const movements_all = useSelector(selectMovements);
     const dataIventorys: ChartInterfcae[] = [];
     const dataExits: ChartInterfcae[] = [];
@@ -62,22 +62,10 @@ export default function Charts() {
     })
 
     useEffect(() => {
-        if (!categories[0]) {
-            dispatch(initCategories());
-        }
-    
-        if (!suppliers[0]) {
-            dispatch(initSuppliers());
-        }
-
-        if (!inventorys[0]) {
-            dispatch(initInventorys());
-        }
-
-        if (!movements_all[0]) {
-            dispatch(initMovements
-                ());
-        }
+           
+        dispatch(initCategories({title: "", description: "", enabled: true}));
+        dispatch(initSuppliers({name: "", cnpj: "", enabled: true}));
+        dispatch(initMovements({inventory: null}));
     }, [dispatch]);
 
     if (inventorys[0]) {
@@ -216,7 +204,7 @@ export default function Charts() {
 
     return (
       <View style={styles.containerCharts}>
-        {dataIventorys[0] ?
+       {dataIventorys[0] ?
         <View style={styles.areaChart}>
             <Text style={styles.title}>Quantidade de produtos no estoque</Text>
             <PieChart

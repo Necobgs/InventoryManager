@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -35,6 +35,8 @@ const ModalDropdown = <T extends DropdownItem>({
     initialValue && displayKey in initialValue ? initialValue : null
   );
 
+  console.log(initialValue)
+
   const toggleModal = () => setModalVisible(!isModalVisible);
 
   const handleSelect = (item: T) => {
@@ -42,6 +44,13 @@ const ModalDropdown = <T extends DropdownItem>({
     onSelect(item);
     toggleModal();
   };
+
+  useEffect(() => {
+    
+    if (initialValue === null) {
+      setSelectedValue(null);
+    }
+  }, [initialValue])
 
   return (
     <View>

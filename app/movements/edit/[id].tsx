@@ -11,8 +11,8 @@ import MovementsFormType from "@/types/MovementsFormType";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import ComboBoxForm from "@/components/ComboBoxForm";
 import { useSelector } from "react-redux";
-import { editMovement, initMovements, removeMovement, selectMovements } from "@/store/features/movementSlice";
-import { editInventory, initInventorys, selectInventorys, selectInventorysEnabled } from "@/store/features/inventorySlice";
+import { editMovement, initMovements, removeMovement, selectMovementError, selectMovements } from "@/store/features/movementSlice";
+import { initInventorys, selectInventorys } from "@/store/features/inventorySlice";
 import { useAppDispatch } from "@/store/hooks";
 import { selectUserLogged } from "@/store/features/userSlice";
 import { globalStyles } from "@/styles/globalStyles";
@@ -49,11 +49,12 @@ const EditMovements: React.FC = () => {
     const userLogged = useSelector(selectUserLogged);
     const movements = useSelector(selectMovements);
     const movement = movements.find(m => m.id === +id);
-    const inventorys_all = useSelector(selectInventorys);
-    const inventorys = useSelector(selectInventorysEnabled);
-    const inventory = inventorys_all.find(i => i.id === movement?.inventory?.id);
+    const inventorys = useSelector(selectInventorys);
+    const inventory = inventorys.find(i => i.id === movement?.inventory?.id);
     const dispatch = useAppDispatch();
     const { theme } = useTheme();
+    const error = useSelector(selectMovementError);
+    const [isError, setIsError] = useState(false);
 
     const [dialogVisible, setDialogVisible] = useState(false);
     const [dialogTitle, setDialogTitle] = useState('');
@@ -93,18 +94,6 @@ const EditMovements: React.FC = () => {
     const inventorySel = watch('inventory');
     const operationSel = watch("operation");
 
-    useEffect(() => {
-        const inventory_sel_obj = inventorys_all.find(i => i.id === inventorySel?.id);
-
-        if (inventory_sel_obj){
-            setValue('qty_product', inventory_sel_obj.qty_product);
-            setValue('price_per_unity', inventory_sel_obj.price_per_unity);
-            setValue('value', inventory_sel_obj.price_per_unity * quantity);
-        }
-
-    }, [quantity, inventorySel, operationSel, setValue, inventorys_all]);
-
-
     const updateMovement = async(data: MovementsFormType) => {
 
         if (!movement) {
@@ -114,114 +103,23 @@ const EditMovements: React.FC = () => {
             return;
         }
 
-        const inventory_data_original = inventorys_all.find(i => i.id === inventorySel?.id) || null;
-        const user = userLogged ? userLogged : null;
-
         const newData: MovementInterface = {
             id: +id,
-            inventory: inventory_data_original,
-            user: user,
+            inventory: data.inventory,
+            user: userLogged,
             quantity: data.operation?.id === 2 ? data.quantity * -1 : data.quantity,
-            value: 0,
+            movement_value: 0,
             price_at_time: 0,
-            date: new Date(),
         }
-
-        const inventory_data = inventory_data_original ? {...inventory_data_original} : null;
-
-        if (!inventory_data) {
-            setDialogTitle('Erro');
-            setDialogText('Produto inexistente!'); 
-            showDialog();
-            return;
-        }
-
-        if (movement.inventory?.id === inventory_data.id) {
-            if (movement.quantity !== newData.quantity) {
-
-                let vqty_product = inventory_data.qty_product - movement.quantity;
-                vqty_product += newData.quantity;
-
-                if (vqty_product < 0) {
-                    setDialogTitle('Erro');
-                    setDialogText('Não há estoque suficiente para movimentar este produto'); 
-                    showDialog();
-                    return;
-                }
-
-                inventory_data.qty_product = vqty_product;
-                inventory_data.stock_value = inventory_data.qty_product * inventory_data.price_per_unity;
-
-                try {
-                    await dispatch(editInventory(inventory_data)).unwrap();
-                } catch (error: any) {
-                    setDialogTitle('Erro');
-                    setDialogText(error?.message || 'Erro ao alterar inventório');
-                    showDialog();
-                    return;
-                }
-            }
-        } else {
-            if ((newData.quantity < 0) && (inventory_data.qty_product < Math.abs(newData.quantity))) {
-                setDialogTitle('Erro');
-                setDialogText('Não há estoque suficiente para efetuar a saída deste produto');
-                showDialog();
-                return;
-            }
-
-            const oldIventory_original = inventorys_all.find(i => i.id === movement.inventory?.id);
-            const oldIventory = oldIventory_original ? {...oldIventory_original} : null;
-
-            if (oldIventory) {
-
-                let vqty_product = oldIventory.qty_product - movement.quantity;
-
-                if (vqty_product < 0) {
-                    setDialogTitle('Erro');
-                    setDialogText('Não é possível realizar essa movimentação, pois a quantidade do produto antigo ficará negativa');
-                    showDialog();
-                    return;
-                }
-
-                oldIventory.qty_product = vqty_product;
-                oldIventory.stock_value = oldIventory.qty_product * oldIventory.price_per_unity;
-
-                try {
-                    await dispatch(editInventory(oldIventory)).unwrap();
-                } catch (error: any) {
-                    setDialogTitle('Erro');
-                    setDialogText(error?.message || 'Erro ao alterar inventório antigo');
-                    showDialog();
-                    return;
-                }
-            }
-
-            inventory_data.qty_product += newData.quantity;
-            inventory_data.stock_value = inventory_data.qty_product * inventory_data.price_per_unity;
-
-            try {
-                await dispatch(editInventory(inventory_data)).unwrap();
-            } catch (error: any) {
-                setDialogTitle('Erro');
-                setDialogText(error?.message || 'Erro ao alterar inventório');
-                showDialog();
-                return;
-            }
-        }
-
-        movement.value = inventory_data.price_per_unity * Math.abs(newData.quantity);
-        movement.price_at_time = inventory_data.price_per_unity;
-        movement.inventory = inventory_data;
 
         try {
             await dispatch(editMovement(newData)).unwrap();
             setDialogTitle('Sucesso');
             setDialogText('Movimentação alterada com sucesso!');
+            showDialog();
             } catch (error: any) {
-            setDialogTitle('Erro');
-            setDialogText(error?.message || 'Erro ao alterar movimentação');
+            setIsError(true);
         }
-        showDialog();
     };
 
     const removeMovementFunc = async(data: MovementsFormType) => {
@@ -233,57 +131,49 @@ const EditMovements: React.FC = () => {
             return;
         }
 
-        const inventory_data_original = inventorys_all.find(i => i.id === inventorySel?.id) || null;
-        const user = userLogged ? userLogged : null;
-
         const newData: MovementInterface = {
             id: +id,
-            inventory: inventory_data_original,
-            user: user,
+            inventory: data.inventory,
+            user: userLogged,
             quantity: data.operation?.id === 2 ? data.quantity * -1 : data.quantity,
-            value: 0,
+            movement_value: 0,
             price_at_time: 0,
-            date: new Date(),
-        }
-
-        const inventory_data = inventory_data_original ? {...inventory_data_original} : null;
-
-        if (inventory_data) {
-            let vqty_product = inventory_data.qty_product - movement.quantity;
-
-            if (vqty_product < 0) {
-                return { message: "Não há estoque suficiente para excluir essa movimentação", success: false};
-            }
-
-            inventory_data.qty_product = vqty_product;
-            inventory_data.stock_value = inventory_data.qty_product * inventory_data.price_per_unity;
-
-            try {
-                await dispatch(editInventory(inventory_data)).unwrap();
-            } catch (error: any) {
-                setDialogTitle('Erro');
-                setDialogText(error?.message || 'Erro ao alterar inventório');
-                showDialog();
-                return;
-            }
         }
 
         try {
             await dispatch(removeMovement(newData)).unwrap();
-            dispatch(initMovements());
             router.navigate("/(tabs)/movements");
             } catch (error: any) {
-            setDialogTitle('Erro');
-            setDialogText(error?.message || 'Erro ao remover movimentação');
+            setIsError(true);
+
         }
-        showDialog();
     }
 
     useEffect(() => {
-        if (!inventorys[0]) {
-            dispatch(initInventorys());
+        const inventory_sel_obj = inventorys.find(i => i.id === inventorySel?.id);
+
+        if (inventory_sel_obj){
+            setValue('qty_product', inventory_sel_obj.qty_product);
+            setValue('price_per_unity', inventory_sel_obj.price_per_unity);
+            setValue('value', inventory_sel_obj.price_per_unity * quantity);
         }
+
+    }, [quantity, inventorySel, operationSel, setValue, inventorys]);
+
+    useEffect(() => {
+        dispatch(initInventorys({title: '', description: '', enabled: true}));
     }, [dispatch]);
+
+    useEffect(() => {
+
+      if (isError) {
+        setDialogTitle('Erro');
+        setDialogText(error  || 'Erro ao alterar ou remover movimentação');
+        showDialog();
+        setIsError(false);
+      }
+
+    }, [error, isError]);
 
     return (
         <View style={globalStyles.container}>
@@ -302,7 +192,7 @@ const EditMovements: React.FC = () => {
                 data={inventorys}
                 control={control}
                 name="inventory"
-                label="Produto"
+                label="Item"
                 displayKey={'title'}
                 errors={errors}
             />
