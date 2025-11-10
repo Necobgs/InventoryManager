@@ -20,7 +20,7 @@ interface ChartInterfcae{
 
 const colors = ['chartreuse','blue','crimson','mediumturquoise','seagreen','orangered','mediumpurple','lightseagreen','gold','teal','darkorange'];
 
-export default function Charts() {
+export default function Charts({ refresh }: { refresh: boolean }) {
     
     const categories = useSelector(selectCategories);
     const suppliers = useSelector(selectSuppliers);
@@ -62,11 +62,13 @@ export default function Charts() {
     })
 
     useEffect(() => {
-           
-        dispatch(initCategories({title: "", description: "", enabled: true}));
-        dispatch(initSuppliers({name: "", cnpj: "", enabled: true}));
-        dispatch(initMovements({inventory: null}));
-    }, [dispatch]);
+        
+        if (refresh) {
+            dispatch(initCategories({title: "", description: "", enabled: true}));
+            dispatch(initSuppliers({name: "", cnpj: "", enabled: true}));
+            dispatch(initMovements({inventory: null}));
+        }
+    }, [dispatch, refresh]);
 
     if (inventorys[0]) {
         inventorys.map((iv) => {

@@ -1,27 +1,32 @@
 import Charts from '@/components/Charts';
 import { Text, View } from '@/components/Themed';
 import useTheme from '@/contexts/ThemeContext';
-import { initInventorys, selectInventorys } from '@/store/features/inventorySlice';
+import { initInventorys, selectInventoryLoading, selectInventorys } from '@/store/features/inventorySlice';
 import { logoutUser, selectUserLogged } from '@/store/features/userSlice';
 import { useAppDispatch } from '@/store/hooks';
+import { globalStyles } from '@/styles/globalStyles';
 import { FontAwesome } from '@expo/vector-icons';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { StyleSheet, Pressable } from 'react-native';
+import { ActivityIndicator } from 'react-native-paper';
 import { useSelector } from 'react-redux';
 
 export default function TabOneScreen() {
 
   const userLogged = useSelector(selectUserLogged);
   const inventorys = useSelector(selectInventorys);
+  const loading = useSelector(selectInventoryLoading);
   const dispatch = useAppDispatch();
   const { theme, alterTheme } = useTheme();
+  const [refresh, setRefresh] = useState(true);
+
   const styles = StyleSheet.create({
     container: {
       flex: 1,
       alignItems: 'center',
       backgroundColor: 'transparent',
       overflowY: 'auto',
-      padding: 50,
+      padding: 20,
       paddingTop: 20,
       boxSizing: 'border-box',
     },
@@ -59,18 +64,26 @@ export default function TabOneScreen() {
   }
 
   useEffect(() => {
+    if (refresh) {
       dispatch(initInventorys({title: '', description: '', enabled: true}));
-  }, [dispatch]);
+      setRefresh(false);
+    }
+  }, [dispatch, refresh]);
 
   return (
     <View style={styles.container}>
+      {loading && 
+      <View>
+          <ActivityIndicator animating={true} style={globalStyles.loadingList}/>
+      </View>}
       <View style={styles.areaActions}>
         <Pressable onPress={() => (dispatch(logoutUser()))}><View style={styles.buttonAction}><Icon name="sign-out" color={theme === "dark" ? "rgb(230, 225, 229)" : 'black'}/></View></Pressable>
         <Pressable onPress={alterTheme}><View style={styles.buttonAction}><Icon name="adjust" color={theme === "dark" ? "rgb(230, 225, 229)" : 'black'}/></View></Pressable>
+        <Pressable onPress={() => {setRefresh(true)}}><View style={styles.buttonAction}><Icon name="rotate-left" color={theme === "dark" ? "rgb(230, 225, 229)" : 'black'}/></View></Pressable>
       </View>
       {inventorys[0] 
-      ? <Charts/>
-      : <Text style={{...styles.title, color: "rgb(103, 80, 164)"}}>Olá! Seja bem-vindo(a), {userLogged?.name}</Text>}
+      ? <Charts refresh={refresh}/>
+      : <Text style={{...styles.title, color: "rgba(79, 77, 86, 1)"}}>Olá! Seja bem-vindo(a), {userLogged?.name}</Text>}
     </View>
   );
 }

@@ -38,7 +38,7 @@ export default function ComboBoxForm<T extends Record<string, any>, U extends Dr
   const { theme } = useTheme();
 
   return (
-    <View style={{backgroundColor: (theme === "dark" ? "rgb(231, 224, 236)" : "white"), width: "100%", position: "relative"}}>
+    <View style={{backgroundColor: (theme === "dark" ? "rgb(231, 224, 236)" : "white"), width: "100%", position: "relative", borderRadius: 5}}>
       
       <Text style={{ position: "absolute", top: -6, left: 12, fontSize: 12, color: "rgb(50, 50, 50)", zIndex: 2, paddingRight: 5, paddingLeft: 5, borderRadius: 10, backgroundColor: theme === "dark" ? "rgb(231, 224, 236)" : "white"}}>{label}</Text>
 

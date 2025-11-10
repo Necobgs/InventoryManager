@@ -88,7 +88,7 @@ export default function tabMovements() {
 
 
             <SafeAreaView style={{flex:1}}>
-                {!movements[0] || errorGet? 
+                {!movements.filter((movement) => operation === 1 ? (movement.quantity > 0) : (movement.quantity < 0))[0] || errorGet? 
                 <Text style={globalStyles.msg_empty_list}>{errorGet ? errorGet : `Nenhuma movimentação de ${operation === 1 ? "entrada" : "saída"} encontrada`}</Text> 
                 : 
                 <FlatList

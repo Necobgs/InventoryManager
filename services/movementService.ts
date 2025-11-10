@@ -20,7 +20,7 @@ api.interceptors.request.use(
 const endpoint = 'movement';
 
 const getMovements = async (filters: MovementFilter): Promise<MovementInterface[]> => {
-    const response = await api.get(`${endpoint}?filter={${filters.inventory?.id ? `"inventory.id":{"$eq":${filters.inventory.id}}` : ""}}`);
+    const response = await api.get(`${endpoint}?filter={${filters.inventory?.id ? `"inventory.id":{"$eq":${filters.inventory.id}},` : ""} ${filters.operation != undefined ? `${filters.operation === 1 ? `"quantity":{"$gt":${filters.operation}}` : `"quantity":{"$lt":${filters.operation}}`}` : ""}}`);
     console.log(response, filters)
     return response.data as MovementInterface[];
 }
