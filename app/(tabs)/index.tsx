@@ -83,7 +83,7 @@ export default function TabOneScreen() {
       </View>
       {inventorys[0] 
       ? <Charts refresh={refresh}/>
-      : <Text style={{...styles.title, color: "rgba(79, 77, 86, 1)"}}>Olá! Seja bem-vindo(a), {userLogged?.name}</Text>}
+      : <Text style={{...styles.title, color: "rgb(103, 80, 164)"}}>Olá! Seja bem-vindo(a), {userLogged?.name}</Text>}
     </View>
   );
 }
