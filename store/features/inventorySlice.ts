@@ -61,12 +61,12 @@ const inventorySlice = createSlice({
         builder
             .addCase(initInventorys.pending, (state) => {
                 state.loading = true;
-                state.error = null;
+                state.errorGet = null;
             })
             .addCase(initInventorys.fulfilled, (state, action: PayloadAction<InventoryInterface[]>) => {
                 state.inventorys = action.payload;
                 state.loading = false;
-                state.error = null;
+                state.errorGet = null;
             })
             .addCase(initInventorys.rejected, (state) => {
                 state.errorGet = "Erro ao carregar lista de itens";

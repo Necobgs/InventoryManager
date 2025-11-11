@@ -94,12 +94,12 @@ const userSlice = createSlice({
         builder
             .addCase(initUsers.pending, (state) => {
                 state.loading = true;
-                state.error = null;
+                state.errorGet = null;
             })
             .addCase(initUsers.fulfilled, (state, action: PayloadAction<UserInterface[]>) => {
                 state.users = action.payload;
                 state.loading = false;
-                state.error = null;
+                state.errorGet = null;
             })
             .addCase(initUsers.rejected, (state) => {
                 state.errorGet = "Erro ao carregar lista de usuários";

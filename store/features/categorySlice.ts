@@ -60,12 +60,12 @@ const categorySlice = createSlice({
         builder
             .addCase(initCategories.pending, (state) => {
                 state.loading = true;
-                state.error = null;
+                state.errorGet = null;
             })
             .addCase(initCategories.fulfilled, (state, action: PayloadAction<CategoryInterface[]>) => {
                 state.categories = action.payload;
                 state.loading = false;
-                state.error = null;
+                state.errorGet = null;
             })
             .addCase(initCategories.rejected, (state) => {
                 state.errorGet = "Erro ao carregar lista de categorias";

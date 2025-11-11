@@ -60,12 +60,12 @@ const supplierSlice = createSlice({
         builder
             .addCase(initSuppliers.pending, (state) => {
                 state.loading = true;
-                state.error = null;
+                state.errorGet = null;
             })
             .addCase(initSuppliers.fulfilled, (state, action: PayloadAction<SupplierInterface[]>) => {
                 state.suppliers = action.payload;
                 state.loading = false;
-                state.error = null;
+                state.errorGet = null;
             })
             .addCase(initSuppliers.rejected, (state) => {
                 state.errorGet = "Erro ao carregar lista de fornecedores";

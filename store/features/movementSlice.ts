@@ -60,12 +60,12 @@ const movementSlice = createSlice({
         builder
             .addCase(initMovements.pending, (state) => {
                 state.loading = true;
-                state.error = null;
+                state.errorGet = null;
             })
             .addCase(initMovements.fulfilled, (state, action: PayloadAction<MovementInterface[]>) => {
                 state.movements = action.payload;
                 state.loading = false;
-                state.error = null;
+                state.errorGet = null;
             })
             .addCase(initMovements.rejected, (state) => {
                 state.errorGet = "Erro ao carregar lista de movimentações";
