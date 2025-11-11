@@ -56,9 +56,9 @@ export default function TabCategory(){
     return (
         <SafeAreaProvider>
 
-            {loading && 
+            {loading &&
             <View>
-                <ActivityIndicator animating={true} style={globalStyles.loadingList}/>
+                <ActivityIndicator animating={true} style={{...globalStyles.loadingList, backgroundColor: theme === "dark" ? "black" : "rgb(242, 242, 242)"}}/>
             </View>}
 
             <View style={{...globalStyles.areaFilters, borderBottomWidth: 0, paddingBottom: 0}}>

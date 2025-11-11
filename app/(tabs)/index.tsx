@@ -72,9 +72,9 @@ export default function TabOneScreen() {
 
   return (
     <View style={styles.container}>
-      {loading && 
+      {loading &&
       <View>
-          <ActivityIndicator animating={true} style={globalStyles.loadingList}/>
+          <ActivityIndicator animating={true} style={{...globalStyles.loadingList, backgroundColor: theme === "dark" ? "black" : "rgb(242, 242, 242)"}}/>
       </View>}
       <View style={styles.areaActions}>
         <Pressable onPress={() => (dispatch(logoutUser()))}><View style={styles.buttonAction}><Icon name="sign-out" color={theme === "dark" ? "rgb(230, 225, 229)" : 'black'}/></View></Pressable>
