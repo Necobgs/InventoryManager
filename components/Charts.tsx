@@ -1,11 +1,8 @@
 import { Text, View } from '@/components/Themed';
 import useTheme from '@/contexts/ThemeContext';
-import { initCategories, selectCategories } from '@/store/features/categorySlice';
-import { selectInventorys } from '@/store/features/inventorySlice';
-import { initMovements, selectMovements } from '@/store/features/movementSlice';
-import { initSuppliers, selectSuppliers } from '@/store/features/supplierSlice';
+import { selectDashboard } from '@/store/features/dashboardSlice';
 import { useAppDispatch } from '@/store/hooks';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { StyleSheet } from 'react-native';
 import { PieChart } from 'react-native-chart-kit';
 import { useSelector } from 'react-redux';
@@ -20,12 +17,13 @@ interface ChartInterfcae{
 
 const colors = ['chartreuse','blue','crimson','mediumturquoise','seagreen','orangered','mediumpurple','lightseagreen','gold','teal','darkorange'];
 
-export default function Charts({ refresh }: { refresh: boolean }) {
+export default function Charts() {
     
-    const categories = useSelector(selectCategories);
-    const suppliers = useSelector(selectSuppliers);
-    const inventorys = useSelector(selectInventorys);
-    const movements_all = useSelector(selectMovements);
+    const dashboard = useSelector(selectDashboard);
+    const [categories, setCategories] = useState(dashboard?.category ? dashboard?.category : []);
+    const [suppliers, setSuppliers] = useState(dashboard?.supplier ? dashboard?.supplier : []);
+    const [inventorys, setInventorys] = useState(dashboard?.inventory ? dashboard?.inventory : []);
+    const [movements_all, setMovements_all] = useState(dashboard?.movement ? dashboard?.movement : []);
     const dataIventorys: ChartInterfcae[] = [];
     const dataExits: ChartInterfcae[] = [];
     const dataEntries: ChartInterfcae[] = [];
@@ -63,12 +61,11 @@ export default function Charts({ refresh }: { refresh: boolean }) {
 
     useEffect(() => {
         
-        if (refresh) {
-            dispatch(initCategories({title: "", description: "", enabled: true}));
-            dispatch(initSuppliers({name: "", cnpj: "", enabled: true}));
-            dispatch(initMovements({inventory: null}));
-        }
-    }, [dispatch, refresh]);
+        setCategories(dashboard?.category ? dashboard?.category : []);
+        setSuppliers(dashboard?.supplier ? dashboard?.supplier : []);
+        setInventorys(dashboard?.inventory ? dashboard?.inventory : []);
+        setMovements_all(dashboard?.movement ? dashboard?.movement : []);
+    }, [dashboard]);
 
     if (inventorys[0]) {
         inventorys.map((iv) => {
@@ -129,14 +126,6 @@ export default function Charts({ refresh }: { refresh: boolean }) {
 
         indexColor = colors.length - 1;
 
-        dataCategories.push({
-            name: "Sem Categoria",
-            value: quantity_without_cat,
-            color: colors[indexColor],
-            legendFontColor: colors[indexColor],
-            legendFontSize: 15
-        })
-
         if (categories[0]) {
             categories.map((cat) => {
 
@@ -166,14 +155,6 @@ export default function Charts({ refresh }: { refresh: boolean }) {
         }
 
         indexColor = colors.length - 1;
-
-        dataSuppliers.push({
-            name: "Sem Fornecedor",
-            value: quantity_without_sup,
-            color: colors[indexColor],
-            legendFontColor: colors[indexColor],
-            legendFontSize: 15
-        })
 
         if (suppliers[0]) {
             suppliers.map((sup) => {

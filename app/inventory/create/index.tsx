@@ -11,9 +11,9 @@ import { FormInput } from '@/components/FormInput';
 import ComboBoxForm from '@/components/ComboBoxForm';
 import { globalStyles } from '@/styles/globalStyles';
 import { useAppDispatch } from '@/store/hooks';
-import { initCategories, selectCategories } from '@/store/features/categorySlice';
+import { initCategoriesComboBox, selectCategoriesComboBox } from '@/store/features/categorySlice';
 import { useSelector } from 'react-redux';
-import { initSuppliers, selectSuppliers } from '@/store/features/supplierSlice';
+import { initSuppliersComboBox, selectSuppliersComboBox } from '@/store/features/supplierSlice';
 import { addInventory, selectInventoryError } from '@/store/features/inventorySlice';
 import useTheme from '@/contexts/ThemeContext';
 
@@ -54,8 +54,8 @@ const schema = yup.object().shape({
 });
 
 const PageTarefasId: React.FC = () => {
-  const categories = useSelector(selectCategories);
-  const suppliers = useSelector(selectSuppliers);
+  const categories = useSelector(selectCategoriesComboBox);
+  const suppliers = useSelector(selectSuppliersComboBox);
   const [dialogVisible, setDialogVisible] = useState(false);
   const [dialogTitle, setDialogTitle] = useState('');
   const [dialogText, setDialogText] = useState('');
@@ -103,8 +103,8 @@ const PageTarefasId: React.FC = () => {
   };
 
   useEffect(() => {
-      dispatch(initCategories({title: "", description: "", enabled: true}));
-      dispatch(initSuppliers({name: "", cnpj: "", enabled: true}));
+      dispatch(initCategoriesComboBox({title: "", description: "", enabled: true}));
+      dispatch(initSuppliersComboBox({name: "", cnpj: "", enabled: true}));
   }, [dispatch]);
 
   useEffect(() => {

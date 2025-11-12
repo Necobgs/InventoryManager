@@ -12,7 +12,7 @@ import ComboBoxForm from "@/components/ComboBoxForm";
 import { useAppDispatch } from "@/store/hooks";
 import { useSelector } from "react-redux";
 import { selectUserLogged } from "@/store/features/userSlice";
-import { initInventorys, selectInventorys } from "@/store/features/inventorySlice";
+import { initInventorysComboBox, selectInventorysComboBox } from "@/store/features/inventorySlice";
 import { addMovement, selectMovementError } from "@/store/features/movementSlice";
 import { globalStyles } from "@/styles/globalStyles";
 import useTheme from "@/contexts/ThemeContext";
@@ -44,7 +44,7 @@ const schema = yup.object().shape({
 
 const CreateMovements: React.FC = () => {
     const userLogged = useSelector(selectUserLogged);
-    const inventorys = useSelector(selectInventorys);
+    const inventorys = useSelector(selectInventorysComboBox);
     const dispatch = useAppDispatch();
     const { theme } = useTheme();
     const error = useSelector(selectMovementError);
@@ -125,7 +125,7 @@ const CreateMovements: React.FC = () => {
     }, [quantity, inventorySel, operationSel, setValue, inventorys]);
 
     useEffect(() => {
-        dispatch(initInventorys({title: '', description: '', enabled: true}));
+        dispatch(initInventorysComboBox({title: '', description: '', enabled: true}));
     }, [dispatch]);
 
     useEffect(() => {

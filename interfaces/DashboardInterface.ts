@@ -1,9 +1,11 @@
 import { CategoryInterface } from "./CategoryInterface";
 import InventoryInterface from "./InventoryInterface";
+import { MovementInterface } from "./MovementInterface";
 import { SupplierInterface } from "./SupplierInterface";
 
 export interface DashboardInterface {
-    inventorys: InventoryInterface[],
-    categorys: CategoryInterface[],
-    suppliers: SupplierInterface[]
+    category: CategoryInterface[],
+    supplier: SupplierInterface[],
+    inventory: InventoryInterface[],
+    movement: MovementInterface[],
 }

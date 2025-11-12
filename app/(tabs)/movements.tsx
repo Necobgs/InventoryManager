@@ -18,7 +18,6 @@ import GenericCard from "@/components/GenericCard";
 import { formatCurrency } from "@/common/FormatCurrency";
 import ComboBoxForm from "@/components/ComboBoxForm";
 import FontAwesome from '@expo/vector-icons/FontAwesome';
-import { transparent } from "react-native-paper/lib/typescript/styles/themes/v2/colors";
 
 const schema = yup.object().shape({
     inventory: yup
@@ -73,7 +72,7 @@ export default function tabMovements() {
                 <Button mode={operation === 2 ? 'contained' : 'outlined'} style={globalStyles.button} onPress={() => {setOperation(2)}}>Saídas</Button>
             </View>
 
-            <View style={{...globalStyles.areaFilters, paddingTop: 20, position: "relative"}}>
+            <View style={{...globalStyles.areaFilters, paddingTop: 20, paddingBottom: 20, position: "relative"}}>
                 <ComboBoxForm
                     data={inventorys}
                     control={control}

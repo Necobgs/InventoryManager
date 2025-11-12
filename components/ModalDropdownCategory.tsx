@@ -9,6 +9,7 @@ import {
 } from "react-native";
 import { FontAwesome } from "@expo/vector-icons";
 import { Button } from "react-native-paper";
+import useTheme from "@/contexts/ThemeContext";
 
 // Interface base para garantir que o item tenha uma propriedade de exibição e uma chave única
 interface DropdownItem {
@@ -35,9 +36,8 @@ const ModalDropdown = <T extends DropdownItem>({
     initialValue && displayKey in initialValue ? initialValue : null
   );
 
-  console.log(initialValue)
-
   const toggleModal = () => setModalVisible(!isModalVisible);
+  const { theme } = useTheme();
 
   const handleSelect = (item: T) => {
     setSelectedValue(item);
@@ -56,7 +56,7 @@ const ModalDropdown = <T extends DropdownItem>({
     <View>
       <Button
         onPress={toggleModal}
-        style={{ borderRadius: 5, minWidth: 150 }}
+        style={{ borderRadius: 5, minWidth: 150, height: theme === "dark" ? 56 : 50, display: 'flex', alignItems: "center", justifyContent: "center" }}
         labelStyle={{ textAlign: "left", margin: 10 }}
         mode="outlined"
         accessibilityRole="button"

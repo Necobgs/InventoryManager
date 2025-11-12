@@ -19,12 +19,12 @@ api.interceptors.request.use(
 
 const endpoint = 'dashboard';
 
-const getDashboards = async (): Promise<DashboardInterface[]> => {
+const getDashboard = async (): Promise<DashboardInterface> => {
     const response = await api.get(endpoint);
     console.log(response);
-    return response.data as DashboardInterface[];
+    return response.data as DashboardInterface;
 }
 
 export default {
-    getDashboards
+    getDashboard
 };

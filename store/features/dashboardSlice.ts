@@ -4,17 +4,17 @@ import dashboardService from "../../services/dashboardService";
 import { DashboardInterface } from "@/interfaces/DashboardInterface";
 
 interface DashboardState {
-    dashboards: DashboardInterface[];
+    dashboard: DashboardInterface | null;
     error: string | null;
     loading: boolean;
 }
 
-export const initDashboards = createAsyncThunk('dashboard/fetch', async () => {
-    return await dashboardService.getDashboards();
+export const initDashboard = createAsyncThunk('dashboard/fetch', async () => {
+    return await dashboardService.getDashboard();
 });
 
 const initialState: DashboardState = {
-    dashboards: [],
+    dashboard: null,
     error: null,
     loading: false,
 };
@@ -26,23 +26,25 @@ const dashboardSlice = createSlice({
     },
     extraReducers: (builder) => {
         builder
-            .addCase(initDashboards.pending, (state) => {
+            .addCase(initDashboard.pending, (state) => {
                 state.loading = true;
                 state.error = null;
             })
-            .addCase(initDashboards.fulfilled, (state, action: PayloadAction<DashboardInterface[]>) => {
-                state.dashboards = action.payload;
+            .addCase(initDashboard.fulfilled, (state, action: PayloadAction<DashboardInterface>) => {
+                state.dashboard = action.payload;
                 state.loading = false;
                 state.error = null;
             })
-            .addCase(initDashboards.rejected, (state) => {
+            .addCase(initDashboard.rejected, (state) => {
                 state.error = "Erro ao carregar gráficos";
                 state.loading = false;
-                state.dashboards = [];
+                state.dashboard = null;
             })
     },
 });
 
 
-export const selectDashboards = (state: { dashboard: DashboardState }) => state.dashboard.dashboards;
+export const selectDashboard = (state: { dashboard: DashboardState }) => state.dashboard.dashboard;
+export const selectDashboardError = (state: { dashboard: DashboardState }) => state.dashboard.error;
+export const selectDashboardLoading = (state: { dashboard: DashboardState }) => state.dashboard.loading;
 export const dashboardReducer = dashboardSlice.reducer;

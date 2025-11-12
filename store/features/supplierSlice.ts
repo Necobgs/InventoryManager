@@ -5,12 +5,17 @@ import { SupplierFilter, SupplierForm, SupplierInterface } from "@/interfaces/Su
 
 interface SupplierState {
     suppliers: SupplierInterface[];
+    suppliersComboBox: SupplierInterface[];
     error: string | null;
     errorGet: string | null;
     loading: boolean;
 }
 
 export const initSuppliers = createAsyncThunk('supplier/fetch', async (filters: SupplierFilter) => {
+    return await supplierService.getSuppliers(filters);
+});
+
+export const initSuppliersComboBox = createAsyncThunk('supplier/fetchCB', async (filters: SupplierFilter) => {
     return await supplierService.getSuppliers(filters);
 });
 
@@ -41,6 +46,7 @@ export const removeSupplier = createAsyncThunk('supplier/remove', async (payload
 
 const initialState: SupplierState = {
     suppliers: [],
+    suppliersComboBox: [],
     error: null,
     errorGet: null,
     loading: false,
@@ -72,8 +78,23 @@ const supplierSlice = createSlice({
                 state.loading = false;
                 state.suppliers = [];
             })
+            .addCase(initSuppliersComboBox.pending, (state) => {
+                state.loading = true;
+                state.errorGet = null;
+            })
+            .addCase(initSuppliersComboBox.fulfilled, (state, action: PayloadAction<SupplierInterface[]>) => {
+                state.suppliersComboBox = action.payload;
+                state.loading = false;
+                state.errorGet = null;
+            })
+            .addCase(initSuppliersComboBox.rejected, (state) => {
+                state.errorGet = "Erro ao carregar lista de fornecedores";
+                state.loading = false;
+                state.suppliersComboBox = [];
+            })
             .addCase(addSupplier.fulfilled, (state, action: PayloadAction<SupplierInterface>) => {
                 state.suppliers.push(action.payload);
+                state.suppliersComboBox.push(action.payload);
                 state.error = null;
             })
             .addCase(addSupplier.rejected, (state, action) => {
@@ -84,6 +105,7 @@ const supplierSlice = createSlice({
             })
             .addCase(removeSupplier.fulfilled, (state, action: PayloadAction<SupplierInterface>) => {
                 state.suppliers = state.suppliers.filter((t) => t.id !== action.payload.id);
+                state.suppliersComboBox = state.suppliersComboBox.filter((t) => t.id !== action.payload.id);
                 state.error = null;
                 state.loading = false;
             })
@@ -93,6 +115,7 @@ const supplierSlice = createSlice({
             })
             .addCase(editSupplier.fulfilled, (state, action: PayloadAction<SupplierInterface>) => {
                 state.suppliers = state.suppliers.map((t) => (t.id === action.payload.id ? action.payload : t));
+                state.suppliersComboBox = state.suppliersComboBox.map((t) => (t.id === action.payload.id ? action.payload : t));
                 state.error = null;
             })
             .addCase(editSupplier.rejected, (state, action) => {
@@ -103,7 +126,7 @@ const supplierSlice = createSlice({
 
 
 export const selectSuppliers = (state: { supplier: SupplierState }) => state.supplier.suppliers;
-export const selectSuppliersEnabled = (state: { supplier: SupplierState }) => state.supplier.suppliers ? state.supplier.suppliers.filter(s => s.enabled) : [];
+export const selectSuppliersComboBox = (state: { supplier: SupplierState }) => state.supplier.suppliersComboBox;
 export const selectSupplierError = (state: { supplier: SupplierState }) => state.supplier.error;
 export const selectSupplierErrorGet = (state: { supplier: SupplierState }) => state.supplier.errorGet;
 export const selectSupplierLoading = (state: { supplier: SupplierState }) => state.supplier.loading;

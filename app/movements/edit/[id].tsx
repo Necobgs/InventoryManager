@@ -11,8 +11,8 @@ import MovementsFormType from "@/types/MovementsFormType";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import ComboBoxForm from "@/components/ComboBoxForm";
 import { useSelector } from "react-redux";
-import { editMovement, initMovements, removeMovement, selectMovementError, selectMovements } from "@/store/features/movementSlice";
-import { initInventorys, selectInventorys } from "@/store/features/inventorySlice";
+import { editMovement, removeMovement, selectMovementError, selectMovements } from "@/store/features/movementSlice";
+import { initInventorysComboBox, selectInventorysComboBox } from "@/store/features/inventorySlice";
 import { useAppDispatch } from "@/store/hooks";
 import { selectUserLogged } from "@/store/features/userSlice";
 import { globalStyles } from "@/styles/globalStyles";
@@ -49,7 +49,7 @@ const EditMovements: React.FC = () => {
     const userLogged = useSelector(selectUserLogged);
     const movements = useSelector(selectMovements);
     const movement = movements.find(m => m.id === +id);
-    const inventorys = useSelector(selectInventorys);
+    const inventorys = useSelector(selectInventorysComboBox);
     const inventory = inventorys.find(i => i.id === movement?.inventory?.id);
     const dispatch = useAppDispatch();
     const { theme } = useTheme();
@@ -161,7 +161,7 @@ const EditMovements: React.FC = () => {
     }, [quantity, inventorySel, operationSel, setValue, inventorys]);
 
     useEffect(() => {
-        dispatch(initInventorys({title: '', description: '', enabled: true}));
+        dispatch(initInventorysComboBox({title: '', description: '', enabled: true}));
     }, [dispatch]);
 
     useEffect(() => {

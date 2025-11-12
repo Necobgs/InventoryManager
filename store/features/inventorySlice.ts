@@ -6,12 +6,17 @@ import { InventoryFormType } from "@/types/InventoryFormType";
 
 interface InventoryState {
     inventorys: InventoryInterface[];
+    inventorysComboBox: InventoryInterface[];
     error: string | null;
     errorGet: string | null;
     loading: boolean;
 }
 
 export const initInventorys = createAsyncThunk('inventory/fetch', async (filters: InventoryFilter) => {
+    return await inventoryService.getInventorys(filters);
+});
+
+export const initInventorysComboBox = createAsyncThunk('inventory/fetchCB', async (filters: InventoryFilter) => {
     return await inventoryService.getInventorys(filters);
 });
 
@@ -42,6 +47,7 @@ export const removeInventory = createAsyncThunk('inventory/remove', async (paylo
 
 const initialState: InventoryState = {
     inventorys: [],
+    inventorysComboBox: [],
     error: null,
     errorGet: null,
     loading: false,
@@ -73,8 +79,23 @@ const inventorySlice = createSlice({
                 state.loading = false;
                 state.inventorys = [];
             })
+            .addCase(initInventorysComboBox.pending, (state) => {
+                state.loading = true;
+                state.errorGet = null;
+            })
+            .addCase(initInventorysComboBox.fulfilled, (state, action: PayloadAction<InventoryInterface[]>) => {
+                state.inventorysComboBox = action.payload;
+                state.loading = false;
+                state.errorGet = null;
+            })
+            .addCase(initInventorysComboBox.rejected, (state) => {
+                state.errorGet = "Erro ao carregar lista de itens";
+                state.loading = false;
+                state.inventorysComboBox = [];
+            })
             .addCase(addInventory.fulfilled, (state, action: PayloadAction<InventoryInterface>) => {
                 state.inventorys.push(action.payload);
+                state.inventorysComboBox.push(action.payload);
                 state.error = null;
             })
             .addCase(addInventory.rejected, (state, action) => {
@@ -85,6 +106,7 @@ const inventorySlice = createSlice({
             })
             .addCase(removeInventory.fulfilled, (state, action: PayloadAction<InventoryInterface>) => {
                 state.inventorys = state.inventorys.filter((t) => t.id !== action.payload.id);
+                state.inventorysComboBox = state.inventorysComboBox.filter((t) => t.id !== action.payload.id);
                 state.error = null;
                 state.loading = false;
             })
@@ -94,6 +116,7 @@ const inventorySlice = createSlice({
             })
             .addCase(editInventory.fulfilled, (state, action: PayloadAction<InventoryInterface>) => {
                 state.inventorys = state.inventorys.map((t) => (t.id === action.payload.id ? action.payload : t));
+                state.inventorysComboBox = state.inventorysComboBox.map((t) => (t.id === action.payload.id ? action.payload : t));
                 state.error = null;
             })
             .addCase(editInventory.rejected, (state, action) => {
@@ -104,7 +127,7 @@ const inventorySlice = createSlice({
 
 
 export const selectInventorys = (state: { inventory: InventoryState }) => state.inventory.inventorys;
-export const selectInventorysEnabled = (state: { inventory: InventoryState }) => state.inventory.inventorys ? state.inventory.inventorys.filter(i => i.enabled) : [];
+export const selectInventorysComboBox = (state: { inventory: InventoryState }) => state.inventory.inventorysComboBox;
 export const selectInventoryError = (state: { inventory: InventoryState }) => state.inventory.error;
 export const selectInventoryErrorGet = (state: { inventory: InventoryState }) => state.inventory.errorGet;
 export const selectInventoryLoading = (state: { inventory: InventoryState }) => state.inventory.loading;

@@ -1,7 +1,7 @@
 import Charts from '@/components/Charts';
 import { Text, View } from '@/components/Themed';
 import useTheme from '@/contexts/ThemeContext';
-import { initInventorys, selectInventoryLoading, selectInventorys } from '@/store/features/inventorySlice';
+import { initDashboard, selectDashboardLoading, selectDashboard } from '@/store/features/dashboardSlice';
 import { logoutUser, selectUserLogged } from '@/store/features/userSlice';
 import { useAppDispatch } from '@/store/hooks';
 import { globalStyles } from '@/styles/globalStyles';
@@ -14,8 +14,8 @@ import { useSelector } from 'react-redux';
 export default function TabOneScreen() {
 
   const userLogged = useSelector(selectUserLogged);
-  const inventorys = useSelector(selectInventorys);
-  const loading = useSelector(selectInventoryLoading);
+  const dashboard = useSelector(selectDashboard);
+  const loading = useSelector(selectDashboardLoading);
   const dispatch = useAppDispatch();
   const { theme, alterTheme } = useTheme();
   const [refresh, setRefresh] = useState(true);
@@ -65,7 +65,7 @@ export default function TabOneScreen() {
 
   useEffect(() => {
     if (refresh) {
-      dispatch(initInventorys({title: '', description: '', enabled: true}));
+      dispatch(initDashboard());
       setRefresh(false);
     }
   }, [dispatch, refresh]);
@@ -81,7 +81,7 @@ export default function TabOneScreen() {
         <Pressable onPress={alterTheme}><View style={styles.buttonAction}><Icon name="adjust" color={theme === "dark" ? "rgb(230, 225, 229)" : 'black'}/></View></Pressable>
         <Pressable onPress={() => {setRefresh(true)}}><View style={styles.buttonAction}><Icon name="rotate-left" color={theme === "dark" ? "rgb(230, 225, 229)" : 'black'}/></View></Pressable>
       </View>
-      {inventorys[0] 
+      {dashboard?.inventory 
       ? <Charts refresh={refresh}/>
       : <Text style={{...styles.title, color: "rgb(103, 80, 164)"}}>Olá! Seja bem-vindo(a), {userLogged?.name}</Text>}
     </View>
