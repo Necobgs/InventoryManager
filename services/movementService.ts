@@ -31,8 +31,8 @@ const addMovement = async (newMovement: MovementForm): Promise<MovementInterface
   
   const payload = {
     ...rest,
-    inventory_id: inventory?.id,
-    user_id: user?.id,
+    inventory_id: inventory?.id ? inventory?.id : 0,
+    user_id: user?.id ? user?.id : 0,
   };
 
   const response = await api.post(endpoint, payload);
@@ -45,8 +45,8 @@ const editMovement = async (dataMovement: MovementInterface): Promise<MovementIn
   
   const payload = {
     ...rest,
-    inventory_id: inventory?.id,
-    user_id: user?.id,
+    inventory_id: inventory?.id ? inventory?.id : 0,
+    user_id: user?.id ? user?.id : 0,
   };
 
   const response = await api.patch(`${endpoint}/${dataMovement.id}`, payload);

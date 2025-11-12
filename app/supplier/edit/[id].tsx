@@ -68,11 +68,10 @@ const EditSupplier: React.FC = () => {
         await dispatch(editSupplier(data)).unwrap();
         setDialogTitle('Sucesso');
         setDialogText('Fornecedor alterado com sucesso!');
+        showDialog();
       } catch (error: any) {
-        setDialogTitle('Erro');
-        setDialogText(error?.message || 'Erro ao alterar fornecedor');
+        setIsError(true);
       }
-      showDialog();
     };
 
     const disableOrEnable = async (data: SupplierInterface) => {

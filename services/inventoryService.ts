@@ -30,8 +30,8 @@ const addInventory = async (newInventory: InventoryForm): Promise<InventoryInter
   
   const payload = {
     ...rest,
-    category_id: category?.id,
-    supplier_id: supplier?.id,
+    category_id: category?.id ? category?.id : 0,
+    supplier_id: supplier?.id ? supplier?.id : 0,
   };
 
   const response = await api.post(endpoint, payload);
@@ -44,8 +44,8 @@ const editInventory = async (dataInventory: InventoryInterface): Promise<Invento
   
   const payload = {
     ...rest,
-    category_id: category?.id,
-    supplier_id: supplier?.id,
+    category_id: category?.id ? category?.id : 0,
+    supplier_id: supplier?.id ? supplier?.id : 0,
   };
 
   const response = await api.patch(`${endpoint}/${dataInventory.id}`, payload);
