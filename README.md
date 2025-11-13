@@ -1,3 +1,13 @@
 # Inventory Manager Frontend
 
-Frontend do sistema Inventory Manager, desenvolvido em *React/TypeScript* (ou outra tecnologia que você estiver usando).
+Sistema desenvolvido em **React Native**.
+Esucri
+Emanuel Borges e Lucas Rosa
+---
+
+## 🚀 Tecnologias
+
+- **React Native**
+- **Typescript**
+
+---
