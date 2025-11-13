@@ -50,7 +50,7 @@ const EditMovements: React.FC = () => {
     const movements = useSelector(selectMovements);
     const movement = movements.find(m => m.id === +id);
     const inventorys = useSelector(selectInventorysComboBox);
-    const inventory = inventorys.find(i => i.id === movement?.inventory?.id);
+    const [inventory, setInventory] = useState(movement?.inventory);
     const dispatch = useAppDispatch();
     const { theme } = useTheme();
     const error = useSelector(selectMovementError);
@@ -78,7 +78,7 @@ const EditMovements: React.FC = () => {
     } = useForm<MovementsFormType>({
         defaultValues: {
         inventory: {
-            id: inventory?.id,
+            id: inventory?.id ,
             title: inventory?.title,
         },
         operation: movement?.quantity ? (movement?.quantity > 0 ? {id: 1, title: "Entrada"} : {id: 2, title: "Saída"}) : {id: 2, title: "Saída"},
@@ -163,6 +163,14 @@ const EditMovements: React.FC = () => {
     useEffect(() => {
         dispatch(initInventorysComboBox({title: '', description: '', enabled: true}));
     }, [dispatch]);
+
+    useEffect(() => {
+        const inventory_obj = inventorys.find(i => i.id === movement?.inventory?.id);
+
+        if (inventory_obj?.enabled) {
+            setInventory(inventory_obj)
+        }
+    }, [inventorys])
 
     useEffect(() => {
 
