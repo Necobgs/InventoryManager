@@ -81,5 +81,16 @@ export const globalStyles = StyleSheet.create({
         borderColor: 'rgb(103, 80, 164)',
         borderWidth: 2,
         borderStyle: 'solid'
+    },
+    label: {
+        position: "absolute", 
+        top: -6, 
+        left: 12, 
+        fontSize: 12, 
+        color: "rgb(50, 50, 50)", 
+        zIndex: 2, 
+        paddingRight: 5, 
+        paddingLeft: 5, 
+        borderRadius: 10,
     }
 });

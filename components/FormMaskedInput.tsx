@@ -1,9 +1,10 @@
 import React from 'react';
 import { Controller, Control, FieldValues, Path } from 'react-hook-form';
 import { HelperText } from 'react-native-paper';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet, View, Text} from 'react-native';
 import MaskInput from 'react-native-mask-input';
 import useTheme from '@/contexts/ThemeContext';
+import { globalStyles } from '@/styles/globalStyles';
 
 interface FormMaskedInputProps<T extends FieldValues> {
   control: Control<T>;
@@ -34,7 +35,7 @@ export const FormMaskedInput = <T extends FieldValues>({
       height: theme === "dark" ? 56 : 50,
       outlineColor: 'rgb(103, 80, 164)',
       color: 'rgb(28, 27, 31)',
-      backgroundColor: theme === "dark" ? "rgb(231, 224, 236)" : "white",
+      backgroundColor: theme === "dark" ? "rgb(231, 224, 236)" : "rgb(255, 251, 254)",
       fontSize: 16,
       marginTop: theme === "dark" ? 0 : 6,
       fontFamily: 'Roboto, "Helvetica Neue", Helvetica, Arial, sans-serif',
@@ -49,15 +50,18 @@ export const FormMaskedInput = <T extends FieldValues>({
         render={({ field: { onChange, value }, fieldState: { error } }) => (
           <>
             {error && <HelperText type="error">{error.message}</HelperText>}
-            <MaskInput
-              value={value ?? ''}
-              onChangeText={(masked, unmasked) => onChange(withFormatting ? masked : unmasked)}
-              mask={mask}
-              keyboardType="numeric"
-              placeholder={label}
-              placeholderTextColor="rgb(73, 69, 79)"
-              style={{...defaultStyles.input,  borderColor: error ? 'rgb(179, 38, 30)' : 'rgb(121, 116, 126)',}}
-            />
+            <View style={{ position: "relative" }}>
+              {value && <Text style={{ ...globalStyles.label, top: theme === "dark" ? -6 : -2, backgroundColor: theme === "dark" ? "rgb(231, 224, 236)" : "rgb(255, 251, 254)"}}>{label}</Text>}
+              <MaskInput
+                value={value ?? ''}
+                onChangeText={(masked, unmasked) => onChange(withFormatting ? masked : unmasked)}
+                mask={mask}
+                keyboardType="numeric"
+                placeholder={label}
+                placeholderTextColor="rgb(73, 69, 79)"
+                style={{...defaultStyles.input,  borderColor: error ? 'rgb(179, 38, 30)' : 'rgb(121, 116, 126)'}}
+              />
+            </View>
           </>
         )}
       />

@@ -4,6 +4,7 @@ import { Controller, Control, FieldErrors, Path } from "react-hook-form";
 import ModalDropdown from "./ModalDropdownCategory";
 import { StyleProp, ViewStyle } from "react-native";
 import useTheme from "@/contexts/ThemeContext";
+import { globalStyles } from "@/styles/globalStyles";
 
 // Interface base para itens do dropdown
 interface DropdownItem {
@@ -38,9 +39,9 @@ export default function ComboBoxForm<T extends Record<string, any>, U extends Dr
   const { theme } = useTheme();
 
   return (
-    <View style={{backgroundColor: (theme === "dark" ? "rgb(231, 224, 236)" : "white"), width: "100%", position: "relative", borderRadius: 5}}>
+    <View style={{backgroundColor: (theme === "dark" ? "rgb(231, 224, 236)" : "rgb(255, 251, 254)"), width: "100%", position: "relative", borderRadius: 5}}>
       
-      <Text style={{ position: "absolute", top: -6, left: 12, fontSize: 12, color: "rgb(50, 50, 50)", zIndex: 2, paddingRight: 5, paddingLeft: 5, borderRadius: 10, backgroundColor: theme === "dark" ? "rgb(231, 224, 236)" : "white"}}>{label}</Text>
+      <Text style={{ ...globalStyles.label, backgroundColor: theme === "dark" ? "rgb(231, 224, 236)" : "rgb(255, 251, 254)"}}>{label}</Text>
 
       <Controller
         control={control}

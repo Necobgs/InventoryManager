@@ -56,7 +56,7 @@ const ModalDropdown = <T extends DropdownItem>({
     <View>
       <Button
         onPress={toggleModal}
-        style={{ borderRadius: 5, minWidth: 150, height: theme === "dark" ? 56 : 50, display: 'flex', alignItems: "center", justifyContent: "center" }}
+        style={{ display: 'flex', alignItems: "center", justifyContent: "center", borderRadius: 5, minWidth: 150, height: theme === "dark" ? 56 : 50, borderColor: theme === "dark" ? "rgb(190, 190, 190)" : "rgb(121, 116, 126)"}}
         labelStyle={{ textAlign: "left", margin: 10 }}
         mode="outlined"
         accessibilityRole="button"
