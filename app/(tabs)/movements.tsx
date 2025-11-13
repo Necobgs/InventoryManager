@@ -6,10 +6,10 @@ import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { initMovements, selectMovementErrorGet, selectMovementLoading, selectMovements } from "@/store/features/movementSlice";
-import { MovementFilter, MovementInterface } from "@/interfaces/MovementInterface";
+import { MovementFilter } from "@/interfaces/MovementInterface";
 import { useAppDispatch } from "@/store/hooks";
 import { globalStyles } from "@/styles/globalStyles";
-import { initInventorys, selectInventorys } from "@/store/features/inventorySlice";
+import { initInventorysComboBox, selectInventorysComboBox } from "@/store/features/inventorySlice";
 import * as yup from 'yup';
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -35,7 +35,7 @@ export default function tabMovements() {
     const movements = useSelector(selectMovements);
     const errorGet = useSelector(selectMovementErrorGet);
     const loading = useSelector(selectMovementLoading);
-    const inventorys = useSelector(selectInventorys);
+    const inventorys = useSelector(selectInventorysComboBox);
     const dispatch = useAppDispatch();
     const { theme } = useTheme();
     
@@ -55,9 +55,11 @@ export default function tabMovements() {
 
     useEffect(() => {
         dispatch(initMovements({inventory, operation}));
-
-        dispatch(initInventorys({title: '', description: '', enabled: true}));
     }, [dispatch, inventory, operation]);
+
+    useEffect(() => {
+        dispatch(initInventorysComboBox({title: '', description: '', enabled: true}));
+    }, [dispatch])
 
     return (
         <SafeAreaProvider>
